@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef } from "react";
+import React, { useRef, forwardRef } from "react";
 import {
   Card,
   CardContent,
@@ -20,8 +20,37 @@ import {
 import { Button } from "@/components/ui/button";
 
 const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const roleRef = useRef<string | null>(null);
+  const orgRef = useRef<string | null>(null);
+
   const handlePropagation = (event: React.MouseEvent) => {
     event.stopPropagation();
+  };
+
+  const handleRoleSelect = (value: string) => {
+    roleRef.current = value;
+  };
+
+  const handleOrgSelect = (value: string) => {
+    orgRef.current = value;
+  };
+
+  const handleAddUser = () => {
+    const email = emailRef.current?.value || "";
+    const firstName = firstNameRef.current?.value || "";
+    const lastName = lastNameRef.current?.value || "";
+    const role = roleRef.current || "";
+    const org = orgRef.current || "";
+
+    // Logic for creating user
+    console.log("Email:", email);
+    console.log("First Name:", firstName);
+    console.log("Last Name:", lastName);
+    console.log("Role:", role);
+    console.log("Organization:", org);
   };
 
   return (
@@ -32,41 +61,63 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
           <CardDescription>Create regular users and editors</CardDescription>
         </CardHeader>
         <CardContent>
-          <Input type="email" placeholder="email" />
+          <Input
+            type="email"
+            placeholder="email"
+            ref={emailRef} // Bind input to ref
+          />
           <div className="flex gap-2">
-            <Input type="text" placeholder="first name" />
-            <Input type="text" placeholder="last name" />
+            <Input
+              type="text"
+              placeholder="first name"
+              ref={firstNameRef} // Bind input to ref
+            />
+            <Input
+              type="text"
+              placeholder="last name"
+              ref={lastNameRef} // Bind input to ref
+            />
           </div>
           <div className="flex gap-2">
             <Select>
               <SelectTrigger
                 className="w-[180px]"
-                onMouseDown={handlePropagation} // Prevent trigger propagation
+                onMouseDown={handlePropagation}
               >
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
-              <SelectContent onMouseDown={handlePropagation}> {/* Prevent dropdown propagation */}
-                <SelectItem value="regular">Regular User</SelectItem>
-                <SelectItem value="editor">Editor</SelectItem>
+              <SelectContent onMouseDown={handlePropagation}>
+                <SelectItem value="regular" onSelect={() => handleRoleSelect("regular")}>
+                  Regular User
+                </SelectItem>
+                <SelectItem value="editor" onSelect={() => handleRoleSelect("editor")}>
+                  Editor
+                </SelectItem>
               </SelectContent>
             </Select>
             <Select>
               <SelectTrigger
                 className="w-[180px]"
-                onMouseDown={handlePropagation} // Prevent trigger propagation
+                onMouseDown={handlePropagation}
               >
                 <SelectValue placeholder="Organization" />
               </SelectTrigger>
-              <SelectContent onMouseDown={handlePropagation}> {/* Prevent dropdown propagation */}
-                <SelectItem value="sales">Sales</SelectItem>
-                <SelectItem value="it">IT Dept</SelectItem>
-                <SelectItem value="marketing">Marketing</SelectItem>
+              <SelectContent onMouseDown={handlePropagation}>
+                <SelectItem value="sales" onSelect={() => handleOrgSelect("sales")}>
+                  Sales
+                </SelectItem>
+                <SelectItem value="it" onSelect={() => handleOrgSelect("it")}>
+                  IT Dept
+                </SelectItem>
+                <SelectItem value="marketing" onSelect={() => handleOrgSelect("marketing")}>
+                  Marketing
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
         </CardContent>
         <CardFooter>
-          <Button>Add User</Button>
+          <Button onClick={handleAddUser}>Add User</Button>
         </CardFooter>
       </Card>
     </div>
