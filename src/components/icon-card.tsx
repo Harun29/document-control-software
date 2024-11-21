@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-export function IconCard({ bgColor, icon: Icon, label }: { bgColor: string; icon: any; label: string }) {
+export function IconCard({ bgColor, icon: Icon, label, href}: { bgColor: string; icon: any; label: string; href: string }) {
   return (
     <div className="m-8 flex flex-col items-center justify-start">
-      <Link href="/users"
+      <Link href={href}
         className="mb-8 h-32 w-32 flex items-center justify-center rounded-3xl"
         style={{
           background: `linear-gradient(to bottom, ${bgColor} 0%, ${darkenColor(bgColor, 0)} 0%, ${lightenColor(bgColor, 5)} 100%)`,
