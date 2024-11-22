@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, forwardRef } from "react";
+import React, { useRef, useState, forwardRef, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -18,39 +18,49 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { auth, db } from "../config/firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const emailRef = useRef<HTMLInputElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
-  const roleRef = useRef<string | null>(null);
-  const orgRef = useRef<string | null>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const [role, setRole] = useState<string | null>(null);
+  const [org, setOrg] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   function handlePropagation(event: React.MouseEvent) {
     event.stopPropagation();
   }
 
-  const handleRoleSelect = (value: string) => {
-    roleRef.current = value;
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevState) => !prevState);
   };
 
-  const handleOrgSelect = (value: string) => {
-    orgRef.current = value;
-  };
-
-  const handleAddUser = () => {
+  const handleAddUser = async () => {
     const email = emailRef.current?.value || "";
+    const password = passwordRef.current?.value || "";
     const firstName = firstNameRef.current?.value || "";
     const lastName = lastNameRef.current?.value || "";
-    const role = roleRef.current || "";
-    const org = orgRef.current || "";
 
-    // Logic for creating user
-    console.log("Email:", email);
-    console.log("First Name:", firstName);
-    console.log("Last Name:", lastName);
-    console.log("Role:", role);
-    console.log("Organization:", org);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await setDoc(doc(db, "users", user.uid), {
+        email,
+        firstName,
+        lastName,
+        role,
+        org,
+      });
+
+      console.log("User registered and added to Firestore");
+    } catch (error) {
+      console.error("Error registering user: ", error);
+    }
   };
 
   return (
@@ -63,23 +73,37 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
         <CardContent>
           <Input
             type="email"
-            placeholder="email"
+            placeholder="Email"
             ref={emailRef} // Bind input to ref
           />
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"} // Toggle visibility
+              placeholder="Password"
+              ref={passwordRef} // Bind input to ref
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-3 flex items-center text-sm text-gray-500"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
           <div className="flex gap-2">
             <Input
               type="text"
-              placeholder="first name"
+              placeholder="First Name"
               ref={firstNameRef} // Bind input to ref
             />
             <Input
               type="text"
-              placeholder="last name"
+              placeholder="Last Name"
               ref={lastNameRef} // Bind input to ref
             />
           </div>
           <div className="flex gap-2">
-            <Select>
+            <Select onValueChange={(value) => setRole(value)}>
               <SelectTrigger
                 className="w-[180px]"
                 onMouseDown={handlePropagation}
@@ -87,15 +111,11 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent onMouseDown={handlePropagation}>
-                <SelectItem value="regular" onSelect={() => handleRoleSelect("regular")}>
-                  Regular User
-                </SelectItem>
-                <SelectItem value="editor" onSelect={() => handleRoleSelect("editor")}>
-                  Editor
-                </SelectItem>
+                <SelectItem value="regular">Regular User</SelectItem>
+                <SelectItem value="editor">Editor</SelectItem>
               </SelectContent>
             </Select>
-            <Select>
+            <Select onValueChange={(value) => setOrg(value)}>
               <SelectTrigger
                 className="w-[180px]"
                 onMouseDown={handlePropagation}
@@ -103,15 +123,9 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
                 <SelectValue placeholder="Organization" />
               </SelectTrigger>
               <SelectContent onMouseDown={handlePropagation}>
-                <SelectItem value="sales" onSelect={() => handleOrgSelect("sales")}>
-                  Sales
-                </SelectItem>
-                <SelectItem value="it" onSelect={() => handleOrgSelect("it")}>
-                  IT Dept
-                </SelectItem>
-                <SelectItem value="marketing" onSelect={() => handleOrgSelect("marketing")}>
-                  Marketing
-                </SelectItem>
+                <SelectItem value="sales">Sales</SelectItem>
+                <SelectItem value="it">IT Dept</SelectItem>
+                <SelectItem value="marketing">Marketing</SelectItem>
               </SelectContent>
             </Select>
           </div>
