@@ -21,6 +21,19 @@ import { Button } from "@/components/ui/button";
 import { auth, db } from "../config/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Terminal } from "lucide-react"
 
 const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -46,7 +59,11 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
     const lastName = lastNameRef.current?.value || "";
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       await setDoc(doc(db, "users", user.uid), {
@@ -71,16 +88,12 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
           <CardDescription>Create regular users and editors</CardDescription>
         </CardHeader>
         <CardContent>
-          <Input
-            type="email"
-            placeholder="Email"
-            ref={emailRef} // Bind input to ref
-          />
+          <Input type="email" placeholder="Email" ref={emailRef} />
           <div className="relative">
             <Input
-              type={showPassword ? "text" : "password"} // Toggle visibility
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
-              ref={passwordRef} // Bind input to ref
+              ref={passwordRef}
             />
             <button
               type="button"
@@ -91,16 +104,8 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
             </button>
           </div>
           <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="First Name"
-              ref={firstNameRef} // Bind input to ref
-            />
-            <Input
-              type="text"
-              placeholder="Last Name"
-              ref={lastNameRef} // Bind input to ref
-            />
+            <Input type="text" placeholder="First Name" ref={firstNameRef} />
+            <Input type="text" placeholder="Last Name" ref={lastNameRef} />
           </div>
           <div className="flex gap-2">
             <Select onValueChange={(value) => setRole(value)}>
@@ -129,9 +134,46 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
               </SelectContent>
             </Select>
           </div>
+          <Alert className="mt-5">
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Heads up!</AlertTitle>
+            <AlertDescription>
+              All fields are required in order to add a new user!
+            </AlertDescription>
+          </Alert>
+
         </CardContent>
         <CardFooter>
-          <Button onClick={handleAddUser}>Add User</Button>
+          <AlertDialog>
+            <AlertDialogTrigger>
+              <Button
+                disabled={
+                  !emailRef ||
+                  !passwordRef ||
+                  !firstNameRef ||
+                  !lastNameRef ||
+                  !role ||
+                  !org
+                }
+              >
+                Add User
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Proceed adding this user?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  New user will be added. Email: {emailRef.current?.value}, Full name: {firstNameRef.current?.value} {lastNameRef.current?.value}, Organization: {org}, Role: {role}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction>
+                  <Button onClick={handleAddUser}>Add User</Button>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardFooter>
       </Card>
     </div>
