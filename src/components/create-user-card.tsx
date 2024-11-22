@@ -26,9 +26,9 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const roleRef = useRef<string | null>(null);
   const orgRef = useRef<string | null>(null);
 
-  const handlePropagation = (event: React.MouseEvent) => {
+  function handlePropagation(event: React.MouseEvent) {
     event.stopPropagation();
-  };
+  }
 
   const handleRoleSelect = (value: string) => {
     roleRef.current = value;

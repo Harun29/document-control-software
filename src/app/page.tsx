@@ -11,12 +11,43 @@ import { IconCard } from "../components/icon-card";
 import { useRef, useState, useEffect } from "react";
 import CreateUserCard from "@/components/create-user-card";
 import CreateOrgCard from "@/components/create-org-card";
+import Loading from "../components/loading";
 
 export default function Home() {
   const [createUser, setCreateUser] = useState(false);
   const [createOrg, setCreateOrg] = useState(false);
   const createOrgRef = useRef<HTMLDivElement | null>(null);
   const createUserRef = useRef<HTMLDivElement | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+  
+    if (isLoading) {
+      interval = setInterval(() => {
+        setProgress((prev) => {
+          const nextProgress = prev + 10;
+          if (nextProgress >= 100) {
+            clearInterval(interval);
+            setIsLoading(false);
+          }
+          return Math.min(nextProgress, 100);
+        });
+      }, 300);
+
+      const timeout = setTimeout(() => {
+        setIsLoading(false);
+        setProgress(100);
+      }, 5000);
+  
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+  }, [isLoading]);
+  
 
   const handleClickOutside = (event: MouseEvent) => {
     const clickedOutsideUser =
@@ -41,6 +72,10 @@ export default function Home() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [createUser, createOrg]);
+
+  if (isLoading) {
+    return <Loading progress={progress} />;
+  }
 
   return (
     <div className="h-full">
