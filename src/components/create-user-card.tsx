@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, forwardRef, useEffect } from "react";
+import React, { useState, forwardRef } from "react";
 import {
   Card,
   CardContent,
@@ -32,38 +32,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Terminal } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const firstNameRef = useRef<HTMLInputElement>(null);
-  const lastNameRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<string | null>(null);
   const [org, setOrg] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  function handlePropagation(event: React.MouseEvent) {
+  const handlePropagation = (event: React.MouseEvent) => {
     event.stopPropagation();
-  }
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
   const handleAddUser = async () => {
-    const email = emailRef.current?.value || "";
-    const password = passwordRef.current?.value || "";
-    const firstName = firstNameRef.current?.value || "";
-    const lastName = lastNameRef.current?.value || "";
+    if (!email || !password || !firstName || !lastName || !role || !org) {
+      alert("Please fill out all fields before proceeding.");
+      return;
+    }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       await setDoc(doc(db, "users", user.uid), {
@@ -88,12 +84,18 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
           <CardDescription>Create regular users and editors</CardDescription>
         </CardHeader>
         <CardContent>
-          <Input type="email" placeholder="Email" ref={emailRef} />
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
           <div className="relative">
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              ref={passwordRef}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <button
               type="button"
@@ -104,8 +106,18 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
             </button>
           </div>
           <div className="flex gap-2">
-            <Input type="text" placeholder="First Name" ref={firstNameRef} />
-            <Input type="text" placeholder="Last Name" ref={lastNameRef} />
+            <Input
+              type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <Input
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
           </div>
           <div className="flex gap-2">
             <Select onValueChange={(value) => setRole(value)}>
@@ -141,21 +153,11 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
               All fields are required in order to add a new user!
             </AlertDescription>
           </Alert>
-
         </CardContent>
         <CardFooter>
           <AlertDialog>
             <AlertDialogTrigger>
-              <Button
-                disabled={
-                  !emailRef ||
-                  !passwordRef ||
-                  !firstNameRef ||
-                  !lastNameRef ||
-                  !role ||
-                  !org
-                }
-              >
+              <Button disabled={!email || !password || !firstName || !lastName || !role || !org}>
                 Add User
               </Button>
             </AlertDialogTrigger>
@@ -163,7 +165,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Proceed adding this user?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  New user will be added. Email: {emailRef.current?.value}, Full name: {firstNameRef.current?.value} {lastNameRef.current?.value}, Organization: {org}, Role: {role}
+                  New user will be added. Email: {email}, Full name: {firstName} {lastName}, Organization: {org}, Role: {role}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

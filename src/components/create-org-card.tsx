@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, forwardRef } from "react";
+import React, { useState, forwardRef } from "react";
 import {
   Card,
   CardContent,
@@ -12,18 +12,45 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "./ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../config/firebaseConfig";
 
 const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
-  const orgNameRef = useRef<HTMLInputElement>(null);
-  const orgDescriptionRef = useRef<HTMLTextAreaElement>(null);
+  const [orgName, setOrgName] = useState("");
+  const [orgDescription, setOrgDescription] = useState("");
 
-  const handleCreateOrganization = () => {
-    const orgName = orgNameRef.current?.value || "";
-    const orgDescription = orgDescriptionRef.current?.value || "";
+  const handlePropagation = (event: React.MouseEvent) => {
+    event.stopPropagation();
+  };
 
-    // Logic to handle organization creation
-    console.log("Organization Name:", orgName);
-    console.log("Organization Description:", orgDescription);
+  const handleCreateOrganization = async () => {
+    if (!orgName || !orgDescription) {
+      alert("Please fill out all fields before proceeding.");
+      return;
+    }
+
+    try {
+      await setDoc(doc(db, "org", orgName), {
+        orgName,
+        orgDescription,
+      });
+      console.log("Organization added to Firestore");
+    } catch (error) {
+      console.error("Error creating organization: ", error);
+    }
   };
 
   return (
@@ -31,22 +58,58 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
       <Card className="w-96" ref={ref}>
         <CardHeader>
           <CardTitle>Create New Organization</CardTitle>
-          <CardDescription>Create new Organization in company</CardDescription>
+          <CardDescription>Create a new organization in the company</CardDescription>
         </CardHeader>
         <CardContent>
           <Input
             type="text"
             placeholder="Organization name"
-            ref={orgNameRef} // Bind input to ref
+            value={orgName}
+            onChange={(e) => setOrgName(e.target.value)}
           />
           <Textarea
             className="mb-3"
             placeholder="Organization description"
-            ref={orgDescriptionRef} // Bind textarea to ref
+            value={orgDescription}
+            onChange={(e) => setOrgDescription(e.target.value)}
           />
+          <Alert className="mt-5">
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Heads up!</AlertTitle>
+            <AlertDescription>
+              All fields are required to create a new organization!
+            </AlertDescription>
+          </Alert>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleCreateOrganization}>Create Organization</Button>
+          <AlertDialog>
+            <AlertDialogTrigger>
+              <Button disabled={!orgName || !orgDescription}>
+                Create Organization
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Proceed creating this organization?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  The organization will be created with the name: {orgName}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onMouseDown={handlePropagation}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction>
+                  <Button
+                    onMouseDown={handlePropagation}
+                    onClick={handleCreateOrganization}
+                  >
+                    Create Organization
+                  </Button>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardFooter>
       </Card>
     </div>
