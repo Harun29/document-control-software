@@ -88,7 +88,7 @@ export const columns: ColumnDef<Users>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Pencil />
-              Update user
+              Modify user
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

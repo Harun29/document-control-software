@@ -69,7 +69,7 @@ export default function Home() {
               bgColor="#E4FF1A"
               icon={Users2}
               label="Manage organizations"
-              href="/organizations"
+              href="/orgs"
             />
             <div onClick={() => setCreateOrg(!createOrg)}>
               <IconCard

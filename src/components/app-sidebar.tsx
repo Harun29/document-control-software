@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, History, Settings2, User2, Users2 } from "lucide-react";
+import { BookOpen, History, Home, Settings2, User2, Users2 } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -29,6 +29,11 @@ const data = {
   ],
   navMain: [
     {
+      title: "Home",
+      url: "/home",
+      icon: Home,
+    },
+    {
       title: "Organizations",
       url: "#",
       icon: Users2,
@@ -41,7 +46,7 @@ const data = {
         },
         {
           title: "Manage organizations",
-          url: "#",
+          url: "/orgs",
         },
       ],
     },

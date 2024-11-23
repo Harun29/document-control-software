@@ -44,8 +44,10 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
 
     try {
       await setDoc(doc(db, "org", orgName), {
-        orgName,
-        orgDescription,
+        name: orgName,
+        description: orgDescription,
+        users: [],
+        docs: []
       });
       console.log("Organization added to Firestore");
     } catch (error) {
