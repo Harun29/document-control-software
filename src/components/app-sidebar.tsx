@@ -16,14 +16,10 @@ import {
 import { useRef, useState, useEffect } from "react";
 import CreateUserCard from "@/components/create-user-card";
 import CreateOrgCard from "@/components/create-org-card";
+import { useAuth } from "@/context/AuthContext";
 
 // Sample Data
 const data = {
-  user: {
-    name: "Harun",
-    email: "harun@dcs.ba",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
       name: "DCS",
@@ -102,6 +98,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [createOrg, setCreateOrg] = useState(false);
   const createOrgRef = useRef<HTMLDivElement | null>(null);
   const createUserRef = useRef<HTMLDivElement | null>(null);
+  const { user } = useAuth();
 
   const handleClickOutside = (event: MouseEvent) => {
     const clickedOutsideUser =
@@ -153,7 +150,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navItems} onAction={handleNavAction} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user?.userInfo} />
       </SidebarFooter>
       <SidebarRail />
       {createUser && <CreateUserCard ref={createUserRef} />}
