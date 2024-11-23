@@ -55,7 +55,7 @@ export default function Home() {
               bgColor="#1BE7FF"
               icon={User2}
               label="Manage users"
-              href="/user"
+              href="/users"
             />
             <div onClick={() => setCreateUser(!createUser)}>
               <IconCard

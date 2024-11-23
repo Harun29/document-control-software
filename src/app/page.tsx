@@ -13,7 +13,7 @@ export default function Page() {
       console.log("User is logged in: ", user);
       router.replace("/home"); 
     } else {
-      router.replace("/"); 
+      router.replace("/login"); 
     }
   }, [user, router]);
 

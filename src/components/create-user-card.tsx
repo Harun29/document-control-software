@@ -168,7 +168,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
                   New user will be added. Email: {email}, Full name: {firstName} {lastName}, Organization: {org}, Role: {role}
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
+              <AlertDialogFooter onMouseDown={handlePropagation}>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction>
                   <Button onClick={handleAddUser}>Add User</Button>

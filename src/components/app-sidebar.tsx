@@ -57,7 +57,7 @@ const data = {
         },
         {
           title: "Manage users",
-          url: "#",
+          url: "/users",
         },
       ],
     },
