@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Copy, MoreHorizontal, Pencil, Trash, User2 } from "lucide-react";
+import { Copy, MoreHorizontal, Pencil, Trash } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,29 +12,21 @@ import {
 
 export type Users = {
   id: string;
+  email: string;
   firstName: string;
   lastName: string;
-  email: string;
   role: string;
   org: string;
 };
 
-export const columns: ColumnDef<Users>[] = [
+export const columns = (handleModifyUser: (user: Users) => void): ColumnDef<Users>[] => [
   {
     accessorKey: "id",
     header: "User ID",
   },
   {
     accessorKey: "email",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Email
-        <ArrowUpDown />
-      </Button>
-    ),
+    header: "Email",
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
@@ -75,16 +67,12 @@ export const columns: ColumnDef<Users>[] = [
               <Copy />
               Copy user ID
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User2 />
-              View user details
-            </DropdownMenuItem>
             <DropdownMenuItem>
               <Trash />
               Delete user
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleModifyUser(user)}>
               <Pencil />
               Modify user
             </DropdownMenuItem>

@@ -3,23 +3,24 @@
 import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Copy, MoreHorizontal, User2, FileText } from "lucide-react";
+import { ArrowUpDown, Copy, MoreHorizontal, User2, FileText, Pencil } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { db } from "@/config/firebaseConfig";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
 export type Orgs = {
   id: string;
   name: string;
   description: string;
-  users: string[]; // Array of user IDs
-  docs: string[]; // Array of document IDs
+  users: string[];
+  docs: string[];
 };
 
 export const orgsColumns: ColumnDef<Orgs>[] = [
@@ -159,12 +160,13 @@ export const orgsColumns: ColumnDef<Orgs>[] = [
               Copy org ID
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <User2 />
-              View org details
-            </DropdownMenuItem>
-            <DropdownMenuItem>
               <FileText />
               View documents
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Pencil />
+              Modify Org
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

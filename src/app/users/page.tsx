@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Users, columns } from "./columns";
+import { DataTable } from "./data-table";
+import UpdateUserCard from "../../components/update-user-card";
 import {
   ColumnFiltersState,
   SortingState,
@@ -32,6 +34,7 @@ const ManageUsers = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [selectedUser, setSelectedUser] = useState<Users | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -52,9 +55,17 @@ const ManageUsers = () => {
     fetchUsers();
   }, []);
 
+  const handleModifyUser = (user: Users) => {
+    setSelectedUser(user);
+  };
+
+  const handleClose = () => {
+    setSelectedUser(null);
+  };
+
   const table = useReactTable({
     data,
-    columns,
+    columns: columns(handleModifyUser),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -181,6 +192,9 @@ const ManageUsers = () => {
           </Button>
         </div>
       </div>
+      {selectedUser && (
+        <UpdateUserCard user={selectedUser} onClose={handleClose} />
+      )}
     </div>
   );
 };

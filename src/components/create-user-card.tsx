@@ -175,7 +175,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
                   <SelectItem value="loading">Loading...</SelectItem>
                 ) : (
                   data.map((org) => (
-                    <SelectItem key={org.id} value={org.name}>
+                    <SelectItem key={org.id} value={org.id}>
                       {org.name}
                     </SelectItem>
                   ))
