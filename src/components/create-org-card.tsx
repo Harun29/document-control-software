@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { db } from "../config/firebaseConfig";
 
 const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
@@ -43,7 +43,7 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
     }
 
     try {
-      await setDoc(doc(db, "org", orgName), {
+      await addDoc(collection(db, "org"), {
         name: orgName,
         description: orgDescription,
         users: [],

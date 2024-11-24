@@ -34,6 +34,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
+import { useEffect } from "react";
+import { getDocs, collection } from "firebase/firestore";
+import { Orgs } from "@/app/orgs/columns";
 
 const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [email, setEmail] = useState("");
@@ -43,6 +46,27 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [role, setRole] = useState<string | null>(null);
   const [org, setOrg] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<Orgs[]>([]);
+
+  useEffect(() => {
+    const fetchOrgs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "org"));
+        const orgsList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Orgs[];
+        setData(orgsList);
+      } catch (error) {
+        console.error("Error fetching orgs: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrgs();
+  }, []);
 
   const handlePropagation = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -140,9 +164,15 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
                 <SelectValue placeholder="Organization" />
               </SelectTrigger>
               <SelectContent onMouseDown={handlePropagation}>
-                <SelectItem value="sales">Sales</SelectItem>
-                <SelectItem value="it">IT Dept</SelectItem>
-                <SelectItem value="marketing">Marketing</SelectItem>
+                {loading && !data ? (
+                  <SelectItem value="loading">Loading...</SelectItem>
+                ) : (
+                  data.map((org) => (
+                    <SelectItem key={org.id} value={org.name}>
+                      {org.name}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
