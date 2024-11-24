@@ -18,22 +18,15 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
-export function NavMain({
-  items,
-  onAction,
-}: {
-  items: {
+export function NavMain({ items, onAction }: { 
+  items: Array<{
     title: string;
-    url: string;
+    url?: string;
     icon?: LucideIcon;
     isActive?: boolean;
-    items?: {
-      title: string;
-      url?: string;
-      action?: string; // Action property for triggering modals or events
-    }[];
-  }[];
-  onAction?: (action: string) => void; // Callback for handling actions
+    items?: Array<{ title: string; url?: string; action?: string }>;
+  }>;
+  onAction?: (action: string) => void; 
 }) {
   return (
     <SidebarGroup>
@@ -47,15 +40,24 @@ export function NavMain({
             className="group/collapsible"
           >
             <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  {item.items && (
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  )}
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
+              {item.items ? (
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip={item.title}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                    {item.items && (
+                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    )}
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+              ) : (
+                <a href={item.url}>
+                  <SidebarMenuButton tooltip={item.title}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </a>
+              )}
               {item.items && (
                 <CollapsibleContent>
                   <SidebarMenuSub>
@@ -85,3 +87,4 @@ export function NavMain({
     </SidebarGroup>
   );
 }
+

@@ -129,9 +129,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     };
   }, [createUser, createOrg]);
 
-  const handleNavAction = (action: string) => {
-    if (action === "createUser") setCreateUser(true);
-    if (action === "createOrg") setCreateOrg(true);
+  const handleNavAction = (action?: string) => {
+    if (action === "createUser") {
+      setCreateUser(true);
+    } else if (action === "createOrg") {
+      setCreateOrg(true);
+    } else {
+      console.log("Action not implemented");
+    }
   };
 
   const navItems = data.navMain.map((item) => ({

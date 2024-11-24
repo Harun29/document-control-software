@@ -1,5 +1,3 @@
-"use client"
-
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Copy, MoreHorizontal, Pencil, Trash, User2 } from "lucide-react";

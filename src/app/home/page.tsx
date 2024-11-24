@@ -11,7 +11,6 @@ import { IconCard } from "../../components/icon-card";
 import { useRef, useState, useEffect } from "react";
 import CreateUserCard from "@/components/create-user-card";
 import CreateOrgCard from "@/components/create-org-card";
-import ProtectedRoute from "../_protected/ProtectedRoute";
 
 
 export default function Home() {
