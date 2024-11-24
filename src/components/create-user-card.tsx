@@ -20,7 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { auth, db } from "../config/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -92,6 +92,13 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
         lastName,
         role,
         org,
+      });
+
+      const orgRef = doc(db, "org", org);
+      const orgDoc = await getDoc(orgRef);
+      const orgData = orgDoc.data();
+      await updateDoc(orgRef, {
+        users: [...(orgData?.users || []), user.uid],
       });
 
       console.log("User registered and added to Firestore");
