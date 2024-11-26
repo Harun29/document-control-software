@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Orgs, orgsColumns } from "./columns";
+import UpdateOrgCard from "../../components/update-org-card";
 import {
   ColumnFiltersState,
   SortingState,
@@ -13,7 +14,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  flexRender,
+  flexRender
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ const ManageOrgs = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [selectedOrg, setSelectedOrg] = useState<Orgs | null>(null);
 
   useEffect(() => {
     const fetchOrgs = async () => {
@@ -43,7 +45,7 @@ const ManageOrgs = () => {
         })) as Orgs[];
         setData(orgsList);
       } catch (error) {
-        console.error("Error fetching orgs: ", error);
+        console.error("Error fetching organizations: ", error);
       } finally {
         setLoading(false);
       }
@@ -52,9 +54,17 @@ const ManageOrgs = () => {
     fetchOrgs();
   }, []);
 
+  const handleModifyOrg = (org: Orgs) => {
+    setSelectedOrg(org);
+  };
+
+  const handleClose = () => {
+    setSelectedOrg(null);
+  };
+
   const table = useReactTable({
     data,
-    columns: orgsColumns,
+    columns: orgsColumns(handleModifyOrg),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -75,6 +85,8 @@ const ManageOrgs = () => {
 
   return (
     <div className="w-full p-10">
+      <h1 className="text-3xl mb-1">Manage Organizations</h1>
+      <p className="text-[#505050]">View, modify and delete organizations.</p>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter names..."
@@ -181,6 +193,9 @@ const ManageOrgs = () => {
           </Button>
         </div>
       </div>
+      {selectedOrg && (
+        <UpdateOrgCard org={selectedOrg} onClose={handleClose} />
+      )}
     </div>
   );
 };

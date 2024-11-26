@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Copy, MoreHorizontal, User2, FileText, Pencil } from "lucide-react";
+import { ArrowUpDown, Copy, MoreHorizontal, User2, FileText, Pencil, Trash } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +23,7 @@ export type Orgs = {
   docs: string[];
 };
 
-export const orgsColumns: ColumnDef<Orgs>[] = [
+export const orgsColumns = (handleModifyOrg: (org: Orgs) => void): ColumnDef<Orgs>[] => [
   {
     accessorKey: "id",
     header: "Org ID",
@@ -163,10 +163,14 @@ export const orgsColumns: ColumnDef<Orgs>[] = [
               <FileText />
               View documents
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem>
+              <Trash />
+              Delete organization
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleModifyOrg(org)}>
               <Pencil />
-              Modify Org
+              Modify organization
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

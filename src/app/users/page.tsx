@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Users, columns } from "./columns";
-import { DataTable } from "./data-table";
 import UpdateUserCard from "../../components/update-user-card";
 import {
   ColumnFiltersState,
@@ -86,6 +85,8 @@ const ManageUsers = () => {
 
   return (
     <div className="w-full p-10">
+      <h1 className="text-3xl mb-1">Manage Users</h1>
+      <p className="text-[#505050]">View, modify and delete users.</p>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
