@@ -3,7 +3,15 @@
 import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Copy, MoreHorizontal, User2, FileText, Pencil, Trash } from "lucide-react";
+import {
+  ArrowUpDown,
+  Copy,
+  MoreHorizontal,
+  User2,
+  FileText,
+  Pencil,
+  Trash,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +22,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { db } from "@/config/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@radix-ui/react-alert-dialog";
+import {
+  AlertDialogFooter,
+  AlertDialogHeader,
+} from "@/components/ui/alert-dialog";
 
 export type Orgs = {
   id: string;
@@ -23,7 +44,10 @@ export type Orgs = {
   docs: string[];
 };
 
-export const orgsColumns = (handleModifyOrg: (org: Orgs) => void): ColumnDef<Orgs>[] => [
+export const orgsColumns = (
+  handleModifyOrg: (org: Orgs) => void,
+  handleDeleteOrg: (org: Orgs) => void
+): ColumnDef<Orgs>[] => [
   {
     accessorKey: "id",
     header: "Org ID",
@@ -49,7 +73,9 @@ export const orgsColumns = (handleModifyOrg: (org: Orgs) => void): ColumnDef<Org
     accessorKey: "users",
     header: "Users",
     cell: ({ row }) => {
-      const [users, setUsers] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+      const [users, setUsers] = useState<
+        { id: string; firstName: string; lastName: string }[]
+      >([]);
       const orgUsers = row.getValue("users") as string[];
 
       useEffect(() => {
@@ -57,7 +83,11 @@ export const orgsColumns = (handleModifyOrg: (org: Orgs) => void): ColumnDef<Org
           const usersList = await Promise.all(
             orgUsers.map(async (userId) => {
               const userDoc = await getDoc(doc(db, "users", userId));
-              return { id: userDoc.id, ...userDoc.data() } as { id: string; firstName: string; lastName: string };
+              return { id: userDoc.id, ...userDoc.data() } as {
+                id: string;
+                firstName: string;
+                lastName: string;
+              };
             })
           );
           setUsers(usersList);
@@ -103,7 +133,10 @@ export const orgsColumns = (handleModifyOrg: (org: Orgs) => void): ColumnDef<Org
           const docsList = await Promise.all(
             orgDocs.map(async (docId) => {
               const docDoc = await getDoc(doc(db, "documents", docId));
-              return { id: docDoc.id, ...docDoc.data() } as { id: string; name: string };
+              return { id: docDoc.id, ...docDoc.data() } as {
+                id: string;
+                name: string;
+              };
             })
           );
           setDocs(docsList);
@@ -165,7 +198,28 @@ export const orgsColumns = (handleModifyOrg: (org: Orgs) => void): ColumnDef<Org
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Trash />
-              Delete organization
+              <AlertDialog>
+                <AlertDialogTrigger>Delete Organization</AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Proceed deleting this organization?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      this organization and remove your data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>
+                      <Button onClick={() => handleDeleteOrg(org)}>
+                        Delete
+                      </Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleModifyOrg(org)}>

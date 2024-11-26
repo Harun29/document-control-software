@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+  arrayRemove,
+} from "firebase/firestore";
 import { Orgs, orgsColumns } from "./columns";
 import UpdateOrgCard from "../../components/update-org-card";
 import {
@@ -14,7 +21,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  flexRender
+  flexRender,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,7 +31,14 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ChevronDown } from "lucide-react";
 
 const ManageOrgs = () => {
@@ -58,13 +72,28 @@ const ManageOrgs = () => {
     setSelectedOrg(org);
   };
 
+  const handleDeleteOrg = async (org: Orgs) => {
+    try {
+      if (org.users[0] === "") {
+        await deleteDoc(doc(db, "org", org.id));
+        setData((prevData) => prevData.filter((data) => data.id !== org.id));
+      } else {
+        alert(
+          "There are users in this organization. Please remove them before deleting the organization."
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting organization: ", error);
+    }
+  };
+
   const handleClose = () => {
     setSelectedOrg(null);
   };
 
   const table = useReactTable({
     data,
-    columns: orgsColumns(handleModifyOrg),
+    columns: orgsColumns(handleModifyOrg, handleDeleteOrg),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -193,9 +222,7 @@ const ManageOrgs = () => {
           </Button>
         </div>
       </div>
-      {selectedOrg && (
-        <UpdateOrgCard org={selectedOrg} onClose={handleClose} />
-      )}
+      {selectedOrg && <UpdateOrgCard org={selectedOrg} onClose={handleClose} />}
     </div>
   );
 };

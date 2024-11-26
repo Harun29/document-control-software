@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, updateDoc, arrayRemove } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Users, columns } from "./columns";
 import UpdateUserCard from "../../components/update-user-card";
@@ -58,13 +58,29 @@ const ManageUsers = () => {
     setSelectedUser(user);
   };
 
+  const handleDeleteUser = async (user: Users) => {
+    try {
+      await deleteDoc(doc(db, "users", user.id));
+
+      const orgRef = doc(db, "org", user.org);
+      await updateDoc(orgRef, {
+        users: arrayRemove(user.id),
+      });
+
+      setData((prevData) => prevData.filter((u) => u.id !== user.id));
+      console.log("User deleted from Firestore and removed from organization");
+    } catch (error) {
+      console.error("Error deleting user: ", error);
+    }
+  };
+
   const handleClose = () => {
     setSelectedUser(null);
   };
 
   const table = useReactTable({
     data,
-    columns: columns(handleModifyUser),
+    columns: columns(handleModifyUser, handleDeleteUser),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

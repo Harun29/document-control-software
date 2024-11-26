@@ -9,6 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
+import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
 
 export type Users = {
   id: string;
@@ -19,7 +21,10 @@ export type Users = {
   org: string;
 };
 
-export const columns = (handleModifyUser: (user: Users) => void): ColumnDef<Users>[] => [
+export const columns = (
+  handleModifyUser: (user: Users) => void,
+  handleDeleteUser: (user: Users) => void
+): ColumnDef<Users>[] => [
   {
     accessorKey: "id",
     header: "User ID",
@@ -69,7 +74,28 @@ export const columns = (handleModifyUser: (user: Users) => void): ColumnDef<User
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Trash />
-              Delete user
+              <AlertDialog>
+                <AlertDialogTrigger>Delete User</AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Proceed deleting this user?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      this user and remove its data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>
+                      <Button onClick={() => handleDeleteUser(user)}>
+                        Delete
+                      </Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleModifyUser(user)}>
