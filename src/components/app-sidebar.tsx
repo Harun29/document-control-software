@@ -30,18 +30,16 @@ const data = {
   navMain: [
     {
       title: "Home",
-      url: "/home",
+      url: "/",
       icon: Home,
     },
     {
       title: "Organizations",
-      url: "#",
       icon: Users2,
       isActive: true,
       items: [
         {
           title: "Create organization",
-          url: "#",
           action: "createOrg",
         },
         {
@@ -52,12 +50,10 @@ const data = {
     },
     {
       title: "Users",
-      url: "#",
       icon: User2,
       items: [
         {
           title: "Create user",
-          url: "#",
           action: "createUser",
         },
         {
@@ -68,7 +64,6 @@ const data = {
     },
     {
       title: "History",
-      url: "#",
       icon: History,
     },
     {

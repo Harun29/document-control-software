@@ -17,6 +17,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export function NavMain({ items, onAction }: { 
   items: Array<{
@@ -50,13 +51,18 @@ export function NavMain({ items, onAction }: {
                     )}
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
-              ) : (
-                <a href={item.url}>
+              ) : item.url ? (
+                <Link href={item.url}>
                   <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </SidebarMenuButton>
-                </a>
+                </Link>
+              ) : (
+                <SidebarMenuButton tooltip={item.title}>
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
               )}
               {item.items && (
                 <CollapsibleContent>
@@ -71,9 +77,9 @@ export function NavMain({ items, onAction }: {
                               : (window.location.href = subItem.url ?? "#")
                           }
                         >
-                          <a href={subItem.url ?? "#"}>
+                          <Link href={subItem.url ?? "#"}>
                             <span>{subItem.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
