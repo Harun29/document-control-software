@@ -65,6 +65,7 @@ export default function Home() {
               />
             </div>
             <IconCard
+              
               bgColor="#E4FF1A"
               icon={Users2}
               label="Manage organizations"

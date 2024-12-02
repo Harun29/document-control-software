@@ -11,7 +11,7 @@ export function IconCard({ bgColor, icon: Icon, label, href}: { bgColor: string;
         }}
       >
         <div className="bg-white h-24 w-24 rounded-full flex items-center justify-center">
-          <Icon size={48} strokeWidth={1} />
+          <Icon color={bgColor} size={48} strokeWidth={2} />
         </div>
       </Link>
       <span className="w-32 text-xl text-center">{label}</span>
