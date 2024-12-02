@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
-
 import {
   Collapsible,
   CollapsibleContent,
@@ -68,19 +67,22 @@ export function NavMain({ items, onAction }: {
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton
-                          asChild
-                          onClick={() =>
-                            subItem.action
-                              ? onAction?.(subItem.action)
-                              : (window.location.href = subItem.url ?? "#")
-                          }
-                        >
-                          <Link href={subItem.url ?? "#"}>
-                            <span>{subItem.title}</span>
+                      <SidebarMenuSubItem className="cursor-pointer" key={subItem.title}>
+                        {subItem.url ? (
+                          <Link href={subItem.url}>
+                            <SidebarMenuSubButton asChild>
+                              <span>{subItem.title}</span>
+                            </SidebarMenuSubButton>
                           </Link>
-                        </SidebarMenuSubButton>
+                        ) : (
+                          <SidebarMenuSubButton
+                            onClick={() =>
+                              subItem.action && onAction?.(subItem.action)
+                            }
+                          >
+                            <span>{subItem.title}</span>
+                          </SidebarMenuSubButton>
+                        )}
                       </SidebarMenuSubItem>
                     ))}
                   </SidebarMenuSub>

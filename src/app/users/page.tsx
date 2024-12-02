@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { collection, getDocs, deleteDoc, doc, updateDoc, arrayRemove } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Users, columns } from "./columns";
@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronDown } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ManageUsers = () => {
   const [data, setData] = useState<Users[]>([]);
@@ -96,7 +97,21 @@ const ManageUsers = () => {
   });
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full p-10">
+        <h1 className="text-3xl mb-1">Manage Users</h1>
+        <p className="text-[#505050]">View, modify and delete users.</p>
+        <div className="flex items-center py-4">
+          <Skeleton className="max-w-sm h-10" />
+          <Skeleton className="w-32 h-10" />
+          <Skeleton className="ml-5 w-32 h-10" />
+        </div>
+        <Skeleton className="mb-5 w-full h-24" />
+        <Skeleton className="mb-5 w-full h-24" />
+        <Skeleton className="mb-5 w-full h-24" />
+        <Skeleton className="w-full h-24" />
+      </div>
+    );
   }
 
   return (

@@ -18,7 +18,6 @@ import CreateUserCard from "@/components/create-user-card";
 import CreateOrgCard from "@/components/create-org-card";
 import { useAuth } from "@/context/AuthContext";
 
-// Sample Data
 const data = {
   teams: [
     {
@@ -124,7 +123,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     };
   }, [createUser, createOrg]);
 
-  const handleNavAction = (action?: string) => {
+  const handleNavAction = (action: string) => {
     if (action === "createUser") {
       setCreateUser(true);
     } else if (action === "createOrg") {

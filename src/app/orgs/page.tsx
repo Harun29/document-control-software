@@ -40,6 +40,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ChevronDown } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ManageOrgs = () => {
   const [data, setData] = useState<Orgs[]>([]);
@@ -109,7 +110,21 @@ const ManageOrgs = () => {
   });
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full p-10">
+        <h1 className="text-3xl mb-1">Manage Users</h1>
+        <p className="text-[#505050]">View, modify and delete users.</p>
+        <div className="flex items-center py-4">
+          <Skeleton className="max-w-sm h-10" />
+          <Skeleton className="w-32 h-10" />
+          <Skeleton className="ml-5 w-32 h-10" />
+        </div>
+        <Skeleton className="mb-5 w-full h-24" />
+        <Skeleton className="mb-5 w-full h-24" />
+        <Skeleton className="mb-5 w-full h-24" />
+        <Skeleton className="w-full h-24" />
+      </div>
+    );;
   }
 
   return (
