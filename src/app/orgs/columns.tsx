@@ -22,19 +22,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { db } from "@/config/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@radix-ui/react-alert-dialog";
-import {
-  AlertDialogFooter,
-  AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
 
 export type Orgs = {
   id: string;
@@ -46,7 +33,7 @@ export type Orgs = {
 
 export const orgsColumns = (
   handleModifyOrg: (org: Orgs) => void,
-  handleDeleteOrg: (org: Orgs) => void
+  handleSelectOrgToDelete: (org: Orgs) => void
 ): ColumnDef<Orgs>[] => [
   {
     accessorKey: "id",
@@ -196,30 +183,9 @@ export const orgsColumns = (
               <FileText />
               View documents
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSelectOrgToDelete(org)}>
               <Trash />
-              <AlertDialog>
-                <AlertDialogTrigger>Delete Organization</AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Proceed deleting this organization?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      this organization and remove your data from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>
-                      <Button onClick={() => handleDeleteOrg(org)}>
-                        Delete
-                      </Button>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              Delete Organization
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleModifyOrg(org)}>

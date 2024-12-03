@@ -6,9 +6,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
-  doc,
-  updateDoc,
-  arrayRemove,
+  doc
 } from "firebase/firestore";
 import { Orgs, orgsColumns } from "./columns";
 import UpdateOrgCard from "../../components/update-org-card";
@@ -41,6 +39,18 @@ import {
 } from "@/components/ui/table";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertDialog, AlertDialogContent } from "@radix-ui/react-alert-dialog";
+import {
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@radix-ui/react-alert-dialog";
+import {
+  AlertDialogFooter,
+  AlertDialogHeader,
+} from "@/components/ui/alert-dialog";
+import DeleteOrgDialog from "@/components/delete-org-alert";
 
 const ManageOrgs = () => {
   const [data, setData] = useState<Orgs[]>([]);
@@ -49,6 +59,11 @@ const ManageOrgs = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [selectedOrg, setSelectedOrg] = useState<Orgs | null>(null);
+  const [orgToDelete, setOrgToDelete] = useState<Orgs | null>(null);
+
+  const handleSelectOrgToDelete = (org: Orgs) => {
+    setOrgToDelete(org);
+  };
 
   useEffect(() => {
     const fetchOrgs = async () => {
@@ -73,28 +88,34 @@ const ManageOrgs = () => {
     setSelectedOrg(org);
   };
 
-  const handleDeleteOrg = async (org: Orgs) => {
-    try {
-      if (org.users[0] === "") {
-        await deleteDoc(doc(db, "org", org.id));
-        setData((prevData) => prevData.filter((data) => data.id !== org.id));
-      } else {
-        alert(
-          "There are users in this organization. Please remove them before deleting the organization."
-        );
-      }
-    } catch (error) {
-      console.error("Error deleting organization: ", error);
-    }
-  };
+  useEffect(() => {
+    console.log("orgToDelete: ", orgToDelete);
+    console.log("selectedOrg: ", selectedOrg);
+  }, [orgToDelete, selectedOrg])
+
+  // const handleDeleteOrg = async (org: Orgs) => {
+  //   try {
+  //     if (!org.users[0]) {
+  //       await deleteDoc(doc(db, "org", org.id));
+  //       setData((prevData) => prevData.filter((data) => data.id !== org.id));
+  //     } else {
+  //       alert(
+  //         "There are users in this organization. Please remove them before deleting the organization."
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Error deleting organization: ", error);
+  //   }
+  // };
 
   const handleClose = () => {
     setSelectedOrg(null);
+    setOrgToDelete(null);
   };
 
   const table = useReactTable({
     data,
-    columns: orgsColumns(handleModifyOrg, handleDeleteOrg),
+    columns: orgsColumns(handleModifyOrg, handleSelectOrgToDelete),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -124,7 +145,7 @@ const ManageOrgs = () => {
         <Skeleton className="mb-5 w-full h-24" />
         <Skeleton className="w-full h-24" />
       </div>
-    );;
+    );
   }
 
   return (
@@ -237,6 +258,10 @@ const ManageOrgs = () => {
           </Button>
         </div>
       </div>
+      {orgToDelete && <DeleteOrgDialog
+        orgToDelete={orgToDelete}
+        onClose={handleClose}
+      />}
       {selectedOrg && <UpdateOrgCard org={selectedOrg} onClose={handleClose} />}
     </div>
   );

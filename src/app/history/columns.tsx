@@ -1,12 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowUpDown,
-  Copy,
   MoreHorizontal,
-  User2,
-  FileText,
-  Pencil,
   Trash,
 } from "lucide-react";
 import {
@@ -81,7 +76,7 @@ export const historyColumns = (
             <DropdownMenuItem>
               <Trash />
               <AlertDialog>
-                <AlertDialogTrigger>Delete Record</AlertDialogTrigger>
+                <span>Delete Record</span>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
