@@ -19,6 +19,7 @@ export type Users = {
   lastName: string;
   role: string;
   org: string;
+  orgName: string;
 };
 
 export const columns = (
@@ -47,7 +48,7 @@ export const columns = (
     header: "Role",
   },
   {
-    accessorKey: "org",
+    accessorKey: "orgName",
     header: "Organization",
   },
   {

@@ -11,6 +11,7 @@ import { IconCard } from "../components/icon-card";
 import { useRef, useState, useEffect } from "react";
 import CreateUserCard from "@/components/create-user-card";
 import CreateOrgCard from "@/components/create-org-card";
+import { useAuth } from "@/context/AuthContext";
 
 
 export default function Home() {
@@ -18,7 +19,7 @@ export default function Home() {
   const [createOrg, setCreateOrg] = useState(false);
   const createOrgRef = useRef<HTMLDivElement | null>(null);
   const createUserRef = useRef<HTMLDivElement | null>(null);
-
+  const {isAdmin} = useAuth();
 
   const handleClickOutside = (event: MouseEvent) => {
     const clickedOutsideUser =
@@ -43,6 +44,10 @@ export default function Home() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [createUser, createOrg]);
+
+  useEffect(() => {
+    console.log("isAdmin", isAdmin)
+  }, [isAdmin])
 
 
   return (

@@ -15,6 +15,7 @@ interface AuthContextProps {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextProps | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<(User & { userInfo?: any }) | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchUserInfo = async (uid: string) => {
     try {
@@ -46,6 +48,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentUser) {
         try {
           const userInfo = await fetchUserInfo(currentUser.uid);
+          const idTokenResult = await currentUser.getIdTokenResult();
+          setIsAdmin(!!idTokenResult.claims.admin);
+          console.log("isAdmin in context: ", !!idTokenResult.claims.admin);
           setUser({ ...currentUser, userInfo });
         } catch (error) {
           console.error("Failed to fetch user info:", error);
@@ -53,6 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } else {
         setUser(null);
+        setIsAdmin(false);
       }
       setLoading(false);
     });
@@ -70,7 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, isAdmin }}>
       {!loading && children}
     </AuthContext.Provider>
   );

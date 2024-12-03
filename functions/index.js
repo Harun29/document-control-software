@@ -1,35 +1,47 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import * as cors from "cors";
+import serviceAccount from "./serviceAccountKey.json";
 
-admin.initializeApp();
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
-export const createUser = functions.https.onCall(async (data) => {
-  const { email, password, firstName, lastName, role, org } = data;
+const corsHandler = cors({ origin: true });
 
-  try {
-    const userRecord = await admin.auth().createUser({
-      email,
-      password,
-    });
+export const createUser = functions.https.onRequest((req, res) => {
+  corsHandler(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send({ error: "Method not allowed" });
+    }
 
-    await admin.firestore().collection("users").doc(userRecord.uid).set({
-      email,
-      firstName,
-      lastName,
-      role,
-      org,
-    });
+    const { email, password, firstName, lastName, role, org } = req.body;
 
-    const orgRef = admin.firestore().collection("orgs").doc(org);
-    const orgDoc = await orgRef.get();
-    const orgData = orgDoc.data();
-    await orgRef.update({
-      users: [...(orgData?.users || []), userRecord.uid],
-    });
+    try {
+      const userRecord = await admin.auth().createUser({
+        email,
+        password,
+      });
 
-    return { success: true };
-  } catch (error) {
-    console.error("Error creating user: ", error);
-    throw new functions.https.HttpsError("internal", "Error creating user");
-  }
+      await admin.firestore().collection("users").doc(userRecord.uid).set({
+        email,
+        firstName,
+        lastName,
+        role,
+        org,
+      });
+
+      const orgRef = admin.firestore().collection("orgs").doc(org);
+      const orgDoc = await orgRef.get();
+      const orgData = orgDoc.data();
+      await orgRef.update({
+        users: [...(orgData?.users || []), userRecord.uid],
+      });
+
+      res.status(200).send({ success: true, uid: userRecord.uid });
+    } catch (error) {
+      console.error("Error creating user: ", error);
+      res.status(500).send({ error: "Error creating user" });
+    }
+  });
 });

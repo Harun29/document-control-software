@@ -92,6 +92,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
         lastName,
         role,
         org,
+        orgName: data.find((o) => o.id === org)?.name,
       });
 
       const orgRef = doc(db, "org", org);
@@ -159,8 +160,8 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent onMouseDown={handlePropagation}>
-                <SelectItem value="regular">Regular User</SelectItem>
-                <SelectItem value="editor">Editor</SelectItem>
+                <SelectItem value="Regular">Regular User</SelectItem>
+                <SelectItem value="Editor">Editor</SelectItem>
               </SelectContent>
             </Select>
             <Select onValueChange={(value) => setOrg(value)}>
