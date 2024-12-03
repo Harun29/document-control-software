@@ -25,12 +25,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../config/firebaseConfig";
+import { useAuth } from "@/context/AuthContext";
 
 const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [orgName, setOrgName] = useState("");
   const [orgDescription, setOrgDescription] = useState("");
+  const { user } = useAuth();
 
   const handlePropagation = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -49,6 +51,18 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
         users: [],
         docs: []
       });
+
+      try {
+        await addDoc(collection(db, "history"), {
+          author: user?.userInfo.email || "Unknown",
+          action: "created organization",
+          result: orgName,
+          timestamp: serverTimestamp(),
+        });
+        console.log("History record added to Firestore");
+      } catch (historyError) {
+        console.error("Error adding history record: ", historyError);
+      }
       console.log("Organization added to Firestore");
     } catch (error) {
       console.error("Error creating organization: ", error);
