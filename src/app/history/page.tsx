@@ -9,6 +9,8 @@ import {
   doc,
   updateDoc,
   arrayRemove,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { History, historyColumns } from "./columns";
 import UpdateOrgCard from "../../components/update-org-card";
@@ -52,7 +54,8 @@ const ViewHistory = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "history"));
+        const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
         const historyList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),

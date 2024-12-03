@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { deleteDoc, getDoc, doc } from "firebase/firestore";
+import { deleteDoc, getDoc, doc, addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Users } from "@/app/users/columns";
+import { useAuth } from "@/context/AuthContext";
 
 interface DeleteUserDialogProps {
   userToDelete: Users | null;
@@ -10,6 +11,8 @@ interface DeleteUserDialogProps {
 }
 
 const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({ userToDelete, onClose }) => {
+  const {user}= useAuth();
+  const currentUserEmail = user?.userInfo.email;
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
 
@@ -18,7 +21,19 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({ userToDelete, onClo
       const userDoc = await getDoc(userRef);
 
       if (userDoc.exists()) {
+        const userName = userDoc.data().firstName + " " + userDoc.data().lastName;
         await deleteDoc(userRef);
+        try {
+          await addDoc(collection(db, "history"), {
+            author: currentUserEmail || "Unknown",
+            action: "deleted user",
+            result: userName,
+            timestamp: serverTimestamp(),
+          });
+          console.log("History record added to Firestore");
+        } catch (historyError) {
+          console.error("Error adding history record: ", historyError);
+        }
         onClose();
       } else {
         alert("There are users in this organization. Please remove them before deleting the organization.");
