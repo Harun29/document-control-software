@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, forwardRef } from "react";
-import { collection, doc, getDocs, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc, arrayRemove, arrayUnion, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface User {
   id: string;
@@ -30,9 +31,10 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(({ user, 
   const [lastName, setLastName] = useState(user.lastName);
   const [role, setRole] = useState<string | null>(user.role);
   const [org, setOrg] = useState<string | null>(user.org);
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{ id: string; name: string }[]>([]);
+  const { user: authUser } = useAuth();
+  const currentUserEmail = authUser?.userInfo.email;
 
   useEffect(() => {
     const fetchOrgs = async () => {
@@ -85,6 +87,18 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(({ user, 
         await updateDoc(newOrgRef, {
           users: arrayUnion(user.id),
         });
+      }
+
+      try {
+        await addDoc(collection(db, "history"), {
+          author: currentUserEmail || "Unknown",
+          action: "updated user",
+          result: email,
+          timestamp: serverTimestamp(),
+        });
+        console.log("History record added to Firestore");
+      } catch (historyError) {
+        console.error("Error adding history record: ", historyError);
       }
 
       console.log("User information updated in Firestore");

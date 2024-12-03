@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, forwardRef } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface Org {
   id: string;
@@ -25,6 +26,8 @@ interface UpdateOrgCardProps {
 const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onClose }, ref) => {
   const [name, setName] = useState(org.name);
   const [description, setDescription] = useState(org.description);
+  const {user}= useAuth();
+  const currentUserEmail = user?.userInfo.email;
 
   const handlePropagation = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -43,6 +46,18 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
         name,
         description,
       });
+
+      try {
+        await addDoc(collection(db, "history"), {
+          author: currentUserEmail || "Unknown",
+          action: "updated organization",
+          result: name,
+          timestamp: serverTimestamp(),
+        });
+        console.log("History record added to Firestore");
+      } catch (historyError) {
+        console.error("Error adding history record: ", historyError);
+      }
 
       console.log("Organization information updated in Firestore");
       onClose();
