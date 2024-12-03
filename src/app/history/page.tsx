@@ -54,7 +54,10 @@ const ViewHistory = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const q = query(collection(db, "history"), orderBy("timestamp", "desc"));
+        const q = query(
+          collection(db, "history"),
+          orderBy("timestamp", "desc")
+        );
         const querySnapshot = await getDocs(q);
         const historyList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -111,7 +114,9 @@ const ViewHistory = () => {
     return (
       <div className="w-full p-10">
         <h1 className="text-3xl mb-1">History</h1>
-        <p className="text-[#505050]">View all the things happening on the DCS</p>
+        <p className="text-[#505050]">
+          View all the things happening on the DCS
+        </p>
         <div className="flex items-center py-4">
           <Skeleton className="max-w-sm h-10" />
           <Skeleton className="w-32 h-10" />
@@ -190,10 +195,12 @@ const ViewHistory = () => {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className={`${getRowBackgroundColor(row.original.action)} text-white hover:text-black`}
+                  className={`${getRowBackgroundColor(
+                    row.original.action
+                  )} text-white text-base hover:text-black`} // Change the height class here
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell className="px-4 py-2" key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
