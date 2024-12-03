@@ -9,8 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
-import { AlertDialogFooter, AlertDialogHeader } from "@/components/ui/alert-dialog";
 
 export type Users = {
   id: string;

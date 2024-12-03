@@ -4,14 +4,14 @@ export function IconCard({ bgColor, icon: Icon, label, href}: { bgColor: string;
   return (
     <div className="m-8 flex flex-col items-center justify-start">
       <Link href={href}
-        className="mb-8 h-32 w-32 flex items-center justify-center rounded-3xl"
+        className="mb-5 h-24 w-24 flex items-center justify-center rounded-3xl hover:scale-105 transform transition duration-300 ease-in-out"
         style={{
           background: `linear-gradient(to bottom, ${bgColor} 0%, ${darkenColor(bgColor, 0)} 0%, ${lightenColor(bgColor, 5)} 100%)`,
           boxShadow: `0px 4px 6px rgba(0, 0, 0, 0.1), inset 0px 2px 10px rgba(0, 0, 0, 0.1)`,
         }}
       >
-        <div className="bg-white h-24 w-24 rounded-full flex items-center justify-center">
-          <Icon color={bgColor} size={48} strokeWidth={2} />
+        <div className="bg-white h-16 w-16 rounded-full flex items-center justify-center">
+          <Icon color={bgColor} size={36} strokeWidth={2} />
         </div>
       </Link>
       <span className="w-32 text-xl text-center">{label}</span>
