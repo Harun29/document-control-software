@@ -77,6 +77,16 @@ const ViewHistory = () => {
     }
   };
 
+  const getRowBackgroundColor = (action: string) => {
+    if (action.toLowerCase().includes("deleted")) {
+      return "bg-[#ff4d4faa]";
+    } else if (action.includes("created")) {
+      return "bg-[#52c41aaa]";
+    } else {
+      return "bg-[#1890ffaa]";
+    }
+  };
+
   const table = useReactTable({
     data,
     columns: historyColumns(handleDeleteHistory),
@@ -109,7 +119,7 @@ const ViewHistory = () => {
         <Skeleton className="mb-5 w-full h-24" />
         <Skeleton className="w-full h-24" />
       </div>
-    );;
+    );
   }
 
   return (
@@ -118,8 +128,8 @@ const ViewHistory = () => {
       <p className="text-[#505050]">View all the things happening on the DCS</p>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter names..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          placeholder="Search history..."
+          value={(table.getColumn("result")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
@@ -175,7 +185,10 @@ const ViewHistory = () => {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  className={`${getRowBackgroundColor(row.original.action)} text-white hover:text-black`}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(

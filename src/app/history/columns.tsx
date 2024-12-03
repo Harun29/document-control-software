@@ -78,28 +78,18 @@ export const historyColumns = (
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(org.id)}
-            >
-              <Copy />
-              Copy org ID
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <FileText />
-              View documents
-            </DropdownMenuItem>
             <DropdownMenuItem>
               <Trash />
               <AlertDialog>
-                <AlertDialogTrigger>Delete Organization</AlertDialogTrigger>
+                <AlertDialogTrigger>Delete Record</AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
-                      Proceed deleting this organization?
+                      Proceed deleting this history record?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete
-                      this organization and remove your data from our servers.
+                      this record and remove its data from our servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
