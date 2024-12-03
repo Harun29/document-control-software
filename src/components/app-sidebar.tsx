@@ -23,7 +23,6 @@ const data = {
     {
       name: "DCS",
       logo: "dcs-logo.png",
-      plan: "Administrator",
     },
   ],
   navMain: [

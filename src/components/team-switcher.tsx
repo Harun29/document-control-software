@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useAuth } from "@/context/AuthContext"
 
 export function TeamSwitcher({
   teams,
@@ -19,11 +20,11 @@ export function TeamSwitcher({
   teams: {
     name: string
     logo: string
-    plan: string
   }[]
 }) {
   const { isMobile } = useSidebar()
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const {user} = useAuth();
 
   return (
     <SidebarMenu>
@@ -41,7 +42,7 @@ export function TeamSwitcher({
                 <span className="truncate font-semibold">
                   {activeTeam.name}
                 </span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate text-xs">{user?.userInfo.role}</span>
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
