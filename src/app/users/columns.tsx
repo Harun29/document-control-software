@@ -24,7 +24,7 @@ export type Users = {
 
 export const columns = (
   handleModifyUser: (user: Users) => void,
-  handleDeleteUser: (user: Users) => void
+  handleSelectUserToDelete: (user: Users) => void
 ): ColumnDef<Users>[] => [
   {
     accessorKey: "id",
@@ -73,30 +73,9 @@ export const columns = (
               <Copy />
               Copy user ID
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleSelectUserToDelete(user)}>
               <Trash />
-              <AlertDialog>
-                <AlertDialogTrigger>Delete User</AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Proceed deleting this user?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      this user and remove its data from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>
-                      <Button onClick={() => handleDeleteUser(user)}>
-                        Delete
-                      </Button>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              Delete user
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleModifyUser(user)}>

@@ -27,6 +27,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import DeleteUserDialog from "@/components/delete-user-alers";
 
 const ManageUsers = () => {
   const [data, setData] = useState<Users[]>([]);
@@ -35,6 +36,11 @@ const ManageUsers = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [selectedUser, setSelectedUser] = useState<Users | null>(null);
+  const [userToDelete, setUserToDelete] = useState<Users | null>(null);
+
+  const handleSelectUserToDelete = (user: Users) => {
+    setUserToDelete(user);
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -59,29 +65,14 @@ const ManageUsers = () => {
     setSelectedUser(user);
   };
 
-  const handleDeleteUser = async (user: Users) => {
-    try {
-      await deleteDoc(doc(db, "users", user.id));
-
-      const orgRef = doc(db, "org", user.org);
-      await updateDoc(orgRef, {
-        users: arrayRemove(user.id),
-      });
-
-      setData((prevData) => prevData.filter((u) => u.id !== user.id));
-      console.log("User deleted from Firestore and removed from organization");
-    } catch (error) {
-      console.error("Error deleting user: ", error);
-    }
-  };
-
   const handleClose = () => {
     setSelectedUser(null);
+    setUserToDelete(null);
   };
 
   const table = useReactTable({
     data,
-    columns: columns(handleModifyUser, handleDeleteUser),
+    columns: columns(handleModifyUser, handleSelectUserToDelete),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -224,6 +215,10 @@ const ManageUsers = () => {
           </Button>
         </div>
       </div>
+      {userToDelete && <DeleteUserDialog
+        userToDelete={userToDelete}
+        onClose={handleClose}
+      />}
       {selectedUser && (
         <UpdateUserCard user={selectedUser} onClose={handleClose} />
       )}

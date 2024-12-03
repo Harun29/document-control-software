@@ -88,11 +88,6 @@ const ManageOrgs = () => {
     setSelectedOrg(org);
   };
 
-  useEffect(() => {
-    console.log("orgToDelete: ", orgToDelete);
-    console.log("selectedOrg: ", selectedOrg);
-  }, [orgToDelete, selectedOrg])
-
   // const handleDeleteOrg = async (org: Orgs) => {
   //   try {
   //     if (!org.users[0]) {
