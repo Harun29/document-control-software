@@ -20,7 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { auth, db } from "../config/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +37,7 @@ import { Terminal } from "lucide-react";
 import { useEffect } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { Orgs } from "@/app/orgs/columns";
+import { useAuth } from "@/context/AuthContext";
 
 const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [email, setEmail] = useState("");
@@ -48,6 +49,8 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Orgs[]>([]);
+  const {user}= useAuth();
+  const currentUserEmail = user?.userInfo.email;
 
   useEffect(() => {
     const fetchOrgs = async () => {
@@ -76,6 +79,35 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
     setShowPassword((prevState) => !prevState);
   };
 
+    // Commented out handleAddUser for later use
+  /*
+  const handleAddUser = async () => {
+    if (!email || !password || !firstName || !lastName || !role || !org) {
+      alert("Please fill out all fields before proceeding.");
+      return;
+    }
+
+    try {
+      const response = await fetch("https://us-central1-document-control-software.cloudfunctions.net/createUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, firstName, lastName, role, org }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error creating user");
+      }
+
+      const data = await response.json();
+      console.log("User registered and added to Firestore with UID:", data.uid);
+    } catch (error) {
+      console.error("Error registering user: ", error);
+    }
+  };
+  */
+
   const handleAddUser = async () => {
     if (!email || !password || !firstName || !lastName || !role || !org) {
       alert("Please fill out all fields before proceeding.");
@@ -102,6 +134,17 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
         users: [...(orgData?.users || []), user.uid],
       });
 
+      try {
+        await addDoc(collection(db, "history"), {
+          author: currentUserEmail || "Unknown",
+          action: "created user",
+          result: email,
+          timestamp: serverTimestamp(),
+        });
+        console.log("History record added to Firestore");
+      } catch (historyError) {
+        console.error("Error adding history record: ", historyError);
+      }
       console.log("User registered and added to Firestore");
     } catch (error) {
       console.error("Error registering user: ", error);
