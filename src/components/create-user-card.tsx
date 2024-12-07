@@ -50,7 +50,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Orgs[]>([]);
   const {user}= useAuth();
-  const currentUserEmail = user?.userInfo.email;
+  const {createUser}= useAuth();
 
   useEffect(() => {
     const fetchOrgs = async () => {
@@ -79,8 +79,6 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
     setShowPassword((prevState) => !prevState);
   };
 
-    // Commented out handleAddUser for later use
-  /*
   const handleAddUser = async () => {
     if (!email || !password || !firstName || !lastName || !role || !org) {
       alert("Please fill out all fields before proceeding.");
@@ -88,63 +86,8 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
     }
 
     try {
-      const response = await fetch("https://us-central1-document-control-software.cloudfunctions.net/createUser", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, firstName, lastName, role, org }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error creating user");
-      }
-
-      const data = await response.json();
-      console.log("User registered and added to Firestore with UID:", data.uid);
-    } catch (error) {
-      console.error("Error registering user: ", error);
-    }
-  };
-  */
-
-  const handleAddUser = async () => {
-    if (!email || !password || !firstName || !lastName || !role || !org) {
-      alert("Please fill out all fields before proceeding.");
-      return;
-    }
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        email,
-        firstName,
-        lastName,
-        role,
-        org,
-        orgName: data.find((o) => o.id === org)?.name,
-      });
-
-      const orgRef = doc(db, "org", org);
-      const orgDoc = await getDoc(orgRef);
-      const orgData = orgDoc.data();
-      await updateDoc(orgRef, {
-        users: [...(orgData?.users || []), user.uid],
-      });
-
-      try {
-        await addDoc(collection(db, "history"), {
-          author: currentUserEmail || "Unknown",
-          action: "created user",
-          result: email,
-          timestamp: serverTimestamp(),
-        });
-        console.log("History record added to Firestore");
-      } catch (historyError) {
-        console.error("Error adding history record: ", historyError);
-      }
+      await createUser(email, password, firstName, lastName, role, org);
+      alert('User created successfully');
       console.log("User registered and added to Firestore");
     } catch (error) {
       console.error("Error registering user: ", error);

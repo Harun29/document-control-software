@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { deleteDoc, getDoc, doc, addDoc, collection, serverTimestamp, updateDoc, arrayRemove } from "firebase/firestore";
-import { db } from "@/config/firebaseConfig";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Users } from "@/app/users/columns";
 import { useAuth } from "@/context/AuthContext";
@@ -11,48 +9,13 @@ interface DeleteUserDialogProps {
 }
 
 const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({ userToDelete, onClose }) => {
-  const {user}= useAuth();
-  const currentUserEmail = user?.userInfo.email;
+  const {deleteUser} = useAuth();
   
     const handleDeleteUser = async () => {
       if (!userToDelete) return;
   
       try {
-        const userRef = doc(db, "users", userToDelete.id);
-        const userDoc = await getDoc(userRef);
-  
-        if (userDoc.exists()) {
-          const userName = userDoc.data().firstName + " " + userDoc.data().lastName;
-          const userOrgId = userDoc.data().org;
-  
-          const orgRef = doc(db, "org", userOrgId);
-          const orgDoc = await getDoc(orgRef);
-  
-          if (orgDoc.exists()) {
-            await updateDoc(orgRef, {
-              users: arrayRemove(userToDelete.id)
-            });
-  
-            await deleteDoc(userRef);
-  
-            try {
-              await addDoc(collection(db, "history"), {
-                author: currentUserEmail || "Unknown",
-                action: "deleted user",
-                result: userName,
-                timestamp: serverTimestamp(),
-              });
-              console.log("History record added to Firestore");
-            } catch (historyError) {
-              console.error("Error adding history record: ", historyError);
-            }
-            onClose();
-          } else {
-            alert("Organization does not exist.");
-          }
-        } else {
-          alert("User does not exist.");
-        }
+        deleteUser(userToDelete.id, userToDelete.email);
       } catch (error) {
         console.error("Error deleting user: ", error);
       }

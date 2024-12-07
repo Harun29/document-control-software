@@ -1,47 +1,71 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
-import * as cors from "cors";
-import serviceAccount from "./serviceAccountKey.json";
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://document-control-software.firebaseio.com",
 });
 
-const corsHandler = cors({ origin: true });
+// Function to create a user
+module.exports.createUser = functions.https.onCall(async (data) => {
 
-export const createUser = functions.https.onRequest((req, res) => {
-  corsHandler(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send({ error: "Method not allowed" });
-    }
+  const { email, password, firstName, lastName, role, org } = data;
 
-    const { email, password, firstName, lastName, role, org } = req.body;
+  try {
+    const userRecord = await admin.auth().createUser({ email, password });
 
-    try {
-      const userRecord = await admin.auth().createUser({
-        email,
-        password,
-      });
+    await admin.firestore().collection("users").doc(userRecord.uid).set({
+      email,
+      firstName,
+      lastName,
+      role,
+      org,
+    });
 
-      await admin.firestore().collection("users").doc(userRecord.uid).set({
-        email,
-        firstName,
-        lastName,
-        role,
-        org,
-      });
+    const orgRef = admin.firestore().collection("org").doc(org);
+    await orgRef.update({
+      users: admin.firestore.FieldValue.arrayUnion(userRecord.uid),
+    });
 
-      const orgRef = admin.firestore().collection("orgs").doc(org);
-      const orgDoc = await orgRef.get();
-      const orgData = orgDoc.data();
+    return { message: "User created successfully", uid: userRecord.uid };
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw new functions.https.HttpsError("internal", "User creation failed");
+  }
+});
+
+// Function to delete a user
+module.exports.deleteUser = functions.https.onCall(async (data) => {
+  const { userId } = data;
+
+  if (!userId) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "The 'userId' parameter is required."
+    );
+  }
+
+  try {
+    await admin.auth().deleteUser(userId);
+
+    const userDocRef = admin.firestore().collection("users").doc(userId);
+    const userDoc = await userDocRef.get();
+
+    if (userDoc.exists) {
+      const userOrg = userDoc.data().org;
+
+      const orgRef = admin.firestore().collection("org").doc(userOrg);
       await orgRef.update({
-        users: [...(orgData?.users || []), userRecord.uid],
+        users: admin.firestore.FieldValue.arrayRemove(userId),
       });
 
-      res.status(200).send({ success: true, uid: userRecord.uid });
-    } catch (error) {
-      console.error("Error creating user: ", error);
-      res.status(500).send({ error: "Error creating user" });
+      await userDocRef.delete();
     }
-  });
+
+    return { message: "User deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw new functions.https.HttpsError("internal", "User deletion failed");
+  }
 });

@@ -17,6 +17,6 @@ module.exports = {
     "object-curly-spacing": ["error", "always"],
     "eol-last": ["error", "always"],
     "@typescript-eslint/no-unused-vars": ["error"],
-    "@typescript-eslint/no-require-imports": ["error"],
+    "@typescript-eslint/no-require-imports": "off",
   },
 };
