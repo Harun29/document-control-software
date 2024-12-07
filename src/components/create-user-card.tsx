@@ -46,6 +46,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<string | null>(null);
   const [org, setOrg] = useState<string | null>(null);
+  const [orgName, setOrgName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Orgs[]>([]);
@@ -71,6 +72,10 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
     fetchOrgs();
   }, []);
 
+  useEffect(() => {
+    setOrgName(data.find((o) => o.id === org)?.name || "");
+  }, [org])
+
   const handlePropagation = (event: React.MouseEvent) => {
     event.stopPropagation();
   };
@@ -86,7 +91,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
     }
 
     try {
-      await createUser(email, password, firstName, lastName, role, org);
+      await createUser(email, password, firstName, lastName, role, org, orgName);
       alert('User created successfully');
       console.log("User registered and added to Firestore");
     } catch (error) {

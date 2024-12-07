@@ -21,7 +21,8 @@ interface AuthContextProps {
     firstName: string,
     lastName: string,
     role: string,
-    org: string
+    org: string,
+    orgName: string
   ) => Promise<void>; // Add createUser function
   deleteUser: (userId: string, email: string) => Promise<void>; // Add deleteUser function
   loading: boolean;
@@ -61,7 +62,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     firstName: string,
     lastName: string,
     role: string,
-    org: string
+    org: string,
+    orgName: string
   ) => {
     try {
       const currentUser = auth.currentUser;
@@ -80,7 +82,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         firstName,
         lastName,
         role,
-        org
+        org,
+        orgName
       });
 
       try {

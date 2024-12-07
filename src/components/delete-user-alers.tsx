@@ -23,12 +23,12 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({ userToDelete, onClo
 
   return (
     <div className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10" onClick={onClose}>
-      <Card className="w-96">
+      <Card className="w-100">
         <CardHeader>
           <CardTitle className="leading-8">Are you sure you want to delete this user?</CardTitle>
           <CardDescription>This user will be deleted from our servers and removed from organization!</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="justify-self-end">
           <Button variant="outline" onClick={onClose} className="me-4">Cancel</Button>
           <Button variant="destructive" onClick={handleDeleteUser}>Delete</Button>
         </CardContent>

@@ -9,35 +9,62 @@ admin.initializeApp({
 
 // Function to create a user
 module.exports.createUser = functions.https.onCall(async (data) => {
+  console.log("Received data:", data.data);
 
-  const { email, password, firstName, lastName, role, org } = data;
+  const { email, password, firstName, lastName, role, org, orgName } = data.data;
+
+  if (!email || !password || !firstName || !lastName || !role || !org || !orgName) {
+    console.error("Missing required fields in the input data:", data.data);
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "All fields (email, password, firstName, lastName, role, org) are required."
+    );
+  }
 
   try {
+    console.log("Creating Firebase Auth user with email:", email);
     const userRecord = await admin.auth().createUser({ email, password });
+    console.log("Firebase Auth user created successfully:", userRecord.uid);
 
+    console.log("Saving user data to Firestore for UID:", userRecord.uid);
     await admin.firestore().collection("users").doc(userRecord.uid).set({
       email,
       firstName,
       lastName,
       role,
       org,
+      orgName
     });
+    console.log("User data saved to Firestore for UID:", userRecord.uid);
 
+    console.log("Updating organization document for org:", org);
     const orgRef = admin.firestore().collection("org").doc(org);
     await orgRef.update({
       users: admin.firestore.FieldValue.arrayUnion(userRecord.uid),
     });
+    console.log("Organization document updated successfully for org:", org);
 
     return { message: "User created successfully", uid: userRecord.uid };
   } catch (error) {
-    console.error("Error creating user:", error);
-    throw new functions.https.HttpsError("internal", "User creation failed");
+    console.error("Error during user creation process:", error);
+
+    // More specific error logging based on Firebase Auth or Firestore
+    if (error.code === "auth/email-already-exists") {
+      console.error("The email is already associated with an existing user:", email);
+      throw new functions.https.HttpsError("already-exists", "Email already exists.");
+    } else if (error.code === "auth/invalid-password") {
+      console.error("The password does not meet the security requirements.");
+      throw new functions.https.HttpsError("invalid-argument", "Invalid password.");
+    } else {
+      console.error("Unhandled error during user creation:", error.message);
+      throw new functions.https.HttpsError("internal", "User creation failed.");
+    }
   }
 });
 
 // Function to delete a user
 module.exports.deleteUser = functions.https.onCall(async (data) => {
-  const { userId } = data;
+  const { userId } = data.data;
 
   if (!userId) {
     throw new functions.https.HttpsError(
