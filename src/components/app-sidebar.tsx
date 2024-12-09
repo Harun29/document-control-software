@@ -90,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/docs",
           },
           {
-            title: "Create document",
+            title: "Add document",
             url: "/docs/create",
           },
           {
@@ -104,7 +104,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: FileTextIcon,
         items:[
           {
-            title: "Create documents",
+            title: "Add documents",
             url: "/docs/create",
           },
           {
