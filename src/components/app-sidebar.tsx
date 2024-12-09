@@ -18,84 +18,7 @@ import CreateUserCard from "@/components/create-user-card";
 import CreateOrgCard from "@/components/create-org-card";
 import { useAuth } from "@/context/AuthContext";
 
-const data = {
-  teams: [
-    {
-      name: "DCS",
-      logo: "dcs-logo.png",
-    },
-  ],
-  navMain: [
-    {
-      title: "Home",
-      url: "/",
-      icon: Home,
-    },
-    {
-      title: "Organizations",
-      icon: Users2,
-      isActive: true,
-      items: [
-        {
-          title: "Create organization",
-          action: "createOrg",
-        },
-        {
-          title: "Manage organizations",
-          url: "/orgs",
-        },
-      ],
-    },
-    {
-      title: "Users",
-      icon: User2,
-      items: [
-        {
-          title: "Create user",
-          action: "createUser",
-        },
-        {
-          title: "Manage users",
-          url: "/users",
-        },
-      ],
-    },
-    {
-      title: "Documents",
-      url: "docs",
-      icon: FileText,
-    },
-    {
-      title: "History",
-      url: "/history",
-      icon: History,
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-    },
-  ],
-};
+
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [createUser, setCreateUser] = useState(false);
@@ -103,6 +26,94 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const createOrgRef = useRef<HTMLDivElement | null>(null);
   const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
+  const {isAdmin} = useAuth();
+
+  const data = {
+    teams: [
+      {
+        name: "DCS",
+        logo: "dcs-logo.png",
+      },
+    ],
+    navMain: [
+      {
+        title: "Home",
+        url: "/",
+        icon: Home,
+      },
+      ...(isAdmin ? [{ 
+        title: "Organizations",
+        icon: Users2,
+        isActive: true,
+        items: [
+          {
+            title: "Create organization",
+            action: "createOrg",
+          },
+          {
+            title: "Manage organizations",
+            url: "/orgs",
+          },
+        ],
+      }] : [{
+        title: "Organizations",
+        url: "/orgs",
+        icon: Users2,
+      }]),
+      ...(isAdmin ? [{
+        title: "Users",
+        icon: User2,
+        items: [
+          {
+            title: "Create user",
+            action: "createUser",
+          },
+          {
+            title: "Manage users",
+            url: "/users",
+          },
+        ],
+      }] : [{
+        title: "Users",
+        url: "/users",
+        icon: User2,
+      }]),
+      {
+        title: "Documents",
+        url: "docs",
+        icon: FileText,
+      },
+      {
+        title: "History",
+        url: "/history",
+        icon: History,
+      },
+      {
+        title: "Documentation",
+        url: "#",
+        icon: BookOpen,
+        items: [
+          {
+            title: "Introduction",
+            url: "#",
+          },
+          {
+            title: "Get Started",
+            url: "#",
+          },
+          {
+            title: "Tutorials",
+            url: "#",
+          },
+        ],
+      },
+      {
+        title: "Settings",
+        url: "#",
+        icon: Settings2,
+      },
+    ],
+  };
 
   const handleClickOutside = (event: MouseEvent) => {
     const clickedOutsideUser =
