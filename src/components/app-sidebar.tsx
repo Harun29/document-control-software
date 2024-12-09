@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { BookOpen, FileText, History, Home, Settings2, User2, Users2 } from "lucide-react";
+import { FileTextIcon } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -27,6 +28,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
   const {isAdmin} = useAuth();
+  const {isEditor} = useAuth();
 
   const data = {
     teams: [
@@ -78,11 +80,39 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/users",
         icon: User2,
       }]),
-      {
+      ...((isEditor || isAdmin) ? [
+        {
         title: "Documents",
-        url: "docs",
-        icon: FileText,
-      },
+        icon: FileTextIcon,
+        items:[
+          {
+            title: "Manage documents",
+            url: "/docs",
+          },
+          {
+            title: "Create document",
+            url: "/docs/create",
+          },
+          {
+            title: "Document requests",
+            url: "/docs/requests",
+          }
+        ]
+        }
+      ]:[{
+        title: "Documents",
+        icon: FileTextIcon,
+        items:[
+          {
+            title: "Create documents",
+            url: "/docs/create",
+          },
+          {
+            title: "View documents",
+            url: "/docs",
+          }
+        ]
+      }]),
       {
         title: "History",
         url: "/history",

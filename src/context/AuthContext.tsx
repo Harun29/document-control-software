@@ -27,6 +27,7 @@ interface AuthContextProps {
   deleteUser: (userId: string, email: string) => Promise<void>; // Add deleteUser function
   loading: boolean;
   isAdmin: boolean;
+  isEditor: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<(User & { userInfo?: any }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isEditor, setIsEditor] = useState(false);
 
   const functions = getFunctions(); // Initialize Cloud Functions
 
@@ -142,6 +144,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const userInfo = await fetchUserInfo(currentUser.uid);
           const idTokenResult = await currentUser.getIdTokenResult();
           setIsAdmin(!!idTokenResult.claims.admin);
+          setIsEditor(!!userInfo?.role && userInfo.role === "editor");
           console.log("isAdmin in context: ", !!idTokenResult.claims.admin);
           setUser({ ...currentUser, userInfo });
         } catch (error) {
@@ -177,6 +180,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         deleteUser,
         loading,
         isAdmin,
+        isEditor
       }}
     >
       {!loading && children}
