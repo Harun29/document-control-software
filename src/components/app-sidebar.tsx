@@ -34,7 +34,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     teams: [
       {
         name: "DCS",
-        logo: "dcs-logo.png",
+        logo: "/dcs-logo.png",
       },
     ],
     navMain: [
