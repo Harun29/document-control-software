@@ -27,7 +27,7 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
   const [name, setName] = useState(org.name);
   const [description, setDescription] = useState(org.description);
   const {user}= useAuth();
-  const currentUserEmail = user?.userInfo.email;
+  const currentUserEmail = user?.userInfo?.email;
 
   const handlePropagation = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -99,5 +99,5 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
     </div>
   );
 });
-
+UpdateOrgCard.displayName = "UpdateOrgCard";
 export default UpdateOrgCard;

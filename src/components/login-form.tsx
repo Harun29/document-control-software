@@ -27,8 +27,8 @@ export function LoginForm() {
 
     try {
       await login(email, password);
-    } catch (err: any) {
-      setError(err.message || "Failed to login");
+    } catch (err) {
+      setError((err as Error).message || "Failed to login");
     }
   };
 

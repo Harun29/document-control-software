@@ -54,7 +54,7 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
 
       try {
         await addDoc(collection(db, "history"), {
-          author: user?.userInfo.email || "Unknown",
+          author: user?.userInfo?.email || "Unknown",
           action: "created organization",
           result: orgName,
           timestamp: serverTimestamp(),

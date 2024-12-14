@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { db } from "@/config/firebaseConfig";
 import {
   collection,
-  getDocs,
-  deleteDoc,
-  doc
+  getDocs
 } from "firebase/firestore";
 import { Orgs, orgsColumns } from "./columns";
 import UpdateOrgCard from "../../components/update-org-card";
@@ -39,17 +37,6 @@ import {
 } from "@/components/ui/table";
 import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertDialog, AlertDialogContent } from "@radix-ui/react-alert-dialog";
-import {
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogDescription,
-  AlertDialogTitle,
-} from "@radix-ui/react-alert-dialog";
-import {
-  AlertDialogFooter,
-  AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
 import DeleteOrgDialog from "@/components/delete-org-alert";
 
 const ManageOrgs = () => {

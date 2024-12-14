@@ -37,6 +37,7 @@ export function NavUser({
     lastName: string
     email: string
     org: string
+    orgName: string
     role: string
   }
 }) {

@@ -19,7 +19,6 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@radix-ui/react-alert-dialog";
 import {
   AlertDialogFooter,
@@ -31,7 +30,7 @@ export type History = {
   author: string;
   action: string;
   result: string;
-  timestamp: any;
+  timestamp: { seconds: number };
 };
 
 export const historyColumns = (

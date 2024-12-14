@@ -31,6 +31,101 @@ export type Orgs = {
   docs: string[];
 };
 
+// Separate component for rendering Users cell
+const UsersCell = ({ orgUsers }: { orgUsers: string[] }) => {
+  const [users, setUsers] = useState<
+    { id: string; firstName: string; lastName: string }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const usersList = await Promise.all(
+        orgUsers.map(async (userId) => {
+          const userDoc = await getDoc(doc(db, "users", userId));
+          return { id: userDoc.id, ...userDoc.data() } as {
+            id: string;
+            firstName: string;
+            lastName: string;
+          };
+        })
+      );
+      setUsers(usersList);
+    };
+
+    fetchUsers();
+  }, [orgUsers]);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Users</DropdownMenuLabel>
+        {users.length > 0 ? (
+          users.map((user) => (
+            <DropdownMenuItem key={user.id}>
+              <User2 />
+              {user.firstName} {user.lastName}
+            </DropdownMenuItem>
+          ))
+        ) : (
+          <DropdownMenuItem disabled>No users</DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+// Separate component for rendering Documents cell
+const DocumentsCell = ({ orgDocs }: { orgDocs: string[] }) => {
+  const [docs, setDocs] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchDocs = async () => {
+      const docsList = await Promise.all(
+        orgDocs.map(async (docId) => {
+          const docDoc = await getDoc(doc(db, "documents", docId));
+          return { id: docDoc.id, ...docDoc.data() } as {
+            id: string;
+            name: string;
+          };
+        })
+      );
+      setDocs(docsList);
+    };
+
+    fetchDocs();
+  }, [orgDocs]);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Documents</DropdownMenuLabel>
+        {docs.length > 0 ? (
+          docs.map((doc) => (
+            <DropdownMenuItem key={doc.id}>
+              <FileText />
+              {doc.name}
+            </DropdownMenuItem>
+          ))
+        ) : (
+          <DropdownMenuItem disabled>No documents</DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 export const orgsColumns = (
   handleModifyOrg: (org: Orgs) => void,
   handleSelectOrgToDelete: (org: Orgs) => void
@@ -59,103 +154,12 @@ export const orgsColumns = (
   {
     accessorKey: "users",
     header: "Users",
-    cell: ({ row }) => {
-      const [users, setUsers] = useState<
-        { id: string; firstName: string; lastName: string }[]
-      >([]);
-      const orgUsers = row.getValue("users") as string[];
-
-      useEffect(() => {
-        const fetchUsers = async () => {
-          const usersList = await Promise.all(
-            orgUsers.map(async (userId) => {
-              const userDoc = await getDoc(doc(db, "users", userId));
-              return { id: userDoc.id, ...userDoc.data() } as {
-                id: string;
-                firstName: string;
-                lastName: string;
-              };
-            })
-          );
-          setUsers(usersList);
-        };
-
-        fetchUsers();
-      }, [orgUsers]);
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Users</DropdownMenuLabel>
-            {users.length > 0 ? (
-              users.map((user) => (
-                <DropdownMenuItem key={user.id}>
-                  <User2 />
-                  {user.firstName} {user.lastName}
-                </DropdownMenuItem>
-              ))
-            ) : (
-              <DropdownMenuItem disabled>No users</DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <UsersCell orgUsers={row.getValue("users") as string[]} />,
   },
   {
     accessorKey: "docs",
     header: "Documents",
-    cell: ({ row }) => {
-      const [docs, setDocs] = useState<{ id: string; name: string }[]>([]);
-      const orgDocs = row.getValue("docs") as string[];
-
-      useEffect(() => {
-        const fetchDocs = async () => {
-          const docsList = await Promise.all(
-            orgDocs.map(async (docId) => {
-              const docDoc = await getDoc(doc(db, "documents", docId));
-              return { id: docDoc.id, ...docDoc.data() } as {
-                id: string;
-                name: string;
-              };
-            })
-          );
-          setDocs(docsList);
-        };
-
-        fetchDocs();
-      }, [orgDocs]);
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Documents</DropdownMenuLabel>
-            {docs.length > 0 ? (
-              docs.map((doc) => (
-                <DropdownMenuItem key={doc.id}>
-                  <FileText />
-                  {doc.name}
-                </DropdownMenuItem>
-              ))
-            ) : (
-              <DropdownMenuItem disabled>No documents</DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <DocumentsCell orgDocs={row.getValue("docs") as string[]} />,
   },
   {
     id: "actions",

@@ -34,7 +34,7 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(({ user, 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{ id: string; name: string }[]>([]);
   const { user: authUser } = useAuth();
-  const currentUserEmail = authUser?.userInfo.email;
+  const currentUserEmail = authUser?.userInfo?.email;
 
   useEffect(() => {
     const fetchOrgs = async () => {
@@ -177,4 +177,5 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(({ user, 
   );
 });
 
+UpdateUserCard.displayName = "UpdateUserCard";
 export default UpdateUserCard;

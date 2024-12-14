@@ -18,9 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { auth, db } from "../config/firebaseConfig";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, updateDoc, getDoc, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../config/firebaseConfig";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,7 +48,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Orgs[]>([]);
-  const {user}= useAuth();
+  // const {user}= useAuth();
   const {createUser}= useAuth();
 
   useEffect(() => {
@@ -74,7 +72,8 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
 
   useEffect(() => {
     setOrgName(data.find((o) => o.id === org)?.name || "");
-  }, [org])
+  }, [org, data])
+  // potential issue
 
   const handlePropagation = (event: React.MouseEvent) => {
     event.stopPropagation();

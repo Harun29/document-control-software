@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, deleteDoc, doc, updateDoc, arrayRemove } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Users, columns } from "./columns";
 import UpdateUserCard from "../../components/update-user-card";

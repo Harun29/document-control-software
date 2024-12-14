@@ -7,13 +7,10 @@ import {
   getDocs,
   deleteDoc,
   doc,
-  updateDoc,
-  arrayRemove,
   query,
   orderBy,
 } from "firebase/firestore";
 import { History, historyColumns } from "./columns";
-import UpdateOrgCard from "../../components/update-org-card";
 import {
   ColumnFiltersState,
   SortingState,

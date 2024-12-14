@@ -11,8 +11,17 @@ import {
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
+interface UserInfo {
+  email: string;
+  role: string;
+  org: string;
+  orgName: string;
+  firstName?: string;
+  lastName?: string;
+}
+
 interface AuthContextProps {
-  user: (User & { userInfo?: any }) | null; // Include optional userInfo
+  user: (User & { userInfo?: UserInfo }) | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   createUser: (
@@ -34,7 +43,7 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<(User & { userInfo?: any }) | null>(null);
+  const [user, setUser] = useState<(User & { userInfo?: UserInfo }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditor, setIsEditor] = useState(false);
@@ -149,7 +158,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setIsEditor(!!userInfo?.role && userInfo.role === "editor");
           setUsersOrg(userInfo?.org);
           console.log("isAdmin in context: ", !!idTokenResult.claims.admin);
-          setUser({ ...currentUser, userInfo });
+          setUser({ ...currentUser, userInfo: userInfo as UserInfo || undefined });
         } catch (error) {
           console.error("Failed to fetch user info:", error);
           setUser(currentUser);

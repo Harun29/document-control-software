@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, FileText, History, Home, Settings2, User2, Users2 } from "lucide-react";
+import { BookOpen, History, Home, Settings2, User2, Users2 } from "lucide-react";
 import { FileTextIcon } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -200,7 +200,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navItems} onAction={handleNavAction} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user?.userInfo} />
+        <NavUser user={{
+          firstName: user?.userInfo?.firstName ?? "",
+          lastName: user?.userInfo?.lastName ?? "",
+          email: user?.userInfo?.email ?? "",
+          org: user?.userInfo?.org ?? "",
+          orgName: user?.userInfo?.orgName ?? "",
+          role: user?.userInfo?.role ?? ""
+        }} />
       </SidebarFooter>
       <SidebarRail />
       {createUser && <CreateUserCard ref={createUserRef} />}

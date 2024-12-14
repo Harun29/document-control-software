@@ -12,7 +12,7 @@ interface DeleteOrgDialogProps {
 
 const DeleteOrgDialog: React.FC<DeleteOrgDialogProps> = ({ orgToDelete, onClose }) => {
   const {user}= useAuth();
-  const currentUserEmail = user?.userInfo.email;
+  const currentUserEmail = user?.userInfo?.email;
   
   const handleDeleteOrg = async () => {
     if (!orgToDelete) return;

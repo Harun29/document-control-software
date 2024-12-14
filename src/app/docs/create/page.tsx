@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
-import { useAi } from '@/context/AiContext';
+// import { useAi } from '@/context/AiContext';
 import { db } from '@/config/firebaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 
@@ -13,7 +13,7 @@ const AddDocument = () => {
   const [content, setContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const { usersOrg } = useAuth();
-  const { getAiSummarisation } = useAi();
+  // const { getAiSummarisation } = useAi();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,19 +48,19 @@ const AddDocument = () => {
       try {
         console.log('Extracting content from file...', selectedFile, formData.get('file'));
 
-        const response = await fetch('/api/extractContent', {
-          method: 'POST',
-          body: formData,
-        });
+        // const response = await fetch('/api/extractContent', {
+        //   method: 'POST',
+        //   body: formData,
+        // });
 
-        if (!response.ok) {
-          throw new Error('Failed to extract content');
-        }
+        // if (!response.ok) {
+        //   throw new Error('Failed to extract content');
+        // }
 
-        const data = await response.json();
-        console.log(data.content);
-        const contentSummary = await getAiSummarisation(data.content);
-        setContent(contentSummary ? contentSummary : "Failed to summarise content");
+        // const data = await response.json();
+        // console.log(data.content);
+        // const contentSummary = await getAiSummarisation(data.content);
+        // setContent(contentSummary ? contentSummary : "Failed to summarise content");
       } catch (error) {
         console.error('Error extracting content:', error);
       }
