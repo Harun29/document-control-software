@@ -19,6 +19,19 @@ import { Worker, Viewer } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const AddDocument = () => {
   const [title, setTitle] = useState("");
@@ -51,15 +64,26 @@ const AddDocument = () => {
       return;
     }
 
+    const storage = getStorage();
+    const randomWords = uuidv4();
+    const extendedFileName = `${
+      file.name.split(".")[0]
+    }-${randomWords}.${file.name.split(".").pop()}`;
+    const storageRef = ref(storage, `documents/${extendedFileName}`);
+
     try {
+      await uploadBytes(storageRef, file);
+      const fileURL = await getDownloadURL(storageRef);
+
       const docRef = await addDoc(
         collection(db, "org", usersOrg, "docRequests"),
         {
           title,
-          content,
+          summary: content,
           label,
-          fileName: file.name,
+          fileName: extendedFileName,
           fileType: file.type,
+          fileURL,
           createdAt: new Date(),
           status: "pending",
         }
@@ -120,8 +144,7 @@ const AddDocument = () => {
   return (
     <div className="lg:flex lg:space-x-6 h-full min-h-[100vh-4rem]">
       {/* Form Section */}
-      <form
-        onSubmit={handleSubmit}
+      <div
         className="lg:w-2/3 flex flex-col space-y-6 p-6 bg-white shadow-md rounded-lg flex-grow"
       >
         <h1 className="text-3xl mb-1">Add Document</h1>
@@ -148,7 +171,7 @@ const AddDocument = () => {
             htmlFor="content"
             className="block text-sm font-medium text-gray-700"
           >
-            Content
+            Summary
           </label>
           <textarea
             className="resize-none h-40 w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -210,12 +233,35 @@ const AddDocument = () => {
         {/* Buttons */}
         <div className="flex justify-between">
           <div className="gap-4 flex">
-            <Button
+            {/* <Button
               type="submit"
               className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Add Document
-            </Button>
+            </Button> */}
+            <AlertDialog>
+              <AlertDialogTrigger
+                disabled={title === "" || content === "" || label === ""}
+                className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-slate-400"
+              >
+                Add Document
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription className="flex flex-col gap-2">
+                    Do you want to add this document?
+                    <span>Title:{title}</span>
+                    <span>Summary: {content.substring(0, 50) + "..."}</span>
+                    <span>Label: {label}</span>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleSubmit}>Continue</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button
               type="button"
               onClick={handleViewDocument}
@@ -232,7 +278,7 @@ const AddDocument = () => {
             Clear Document Selection
           </Button>
         </div>
-      </form>
+      </div>
 
       {/* Preview Section */}
       <div className="lg:w-1/3 bg-gray-50 shadow-md rounded-lg p-4 flex flex-col flex-grow">
@@ -243,7 +289,7 @@ const AddDocument = () => {
               <strong>Title:</strong> {title || "Untitled"}
             </p>
             <p className="mt-1 text-sm text-gray-600">
-              <strong>Content:</strong>{" "}
+              <strong>Summary:</strong>{" "}
               {content
                 ? content.substring(0, 100) + "..."
                 : "No content available"}
