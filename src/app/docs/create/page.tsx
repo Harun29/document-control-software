@@ -48,7 +48,7 @@ const AddDocument = () => {
       try {
         console.log('Extracting content from file...', selectedFile, formData.get('file'));
 
-        const response = await fetch('/api/extractContent', {
+        const response = await fetch('http://127.0.0.1:8000/extractContent', {
           method: 'POST',
           body: formData,
         });
