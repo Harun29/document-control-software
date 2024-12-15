@@ -25,7 +25,7 @@ export const AiProvider = ({ children }: { children: React.ReactNode }) => {
         messages: [
           {
             role: "system",
-            content: "You are a helpful assistant that provides summarisation of the document content in maximum of 100 words.",
+            content: "You are a helpful assistant that provides summarisation of the document content in maximum of 200 words in bosnian language.",
           },
           {
             role: "user",
