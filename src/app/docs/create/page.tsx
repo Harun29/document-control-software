@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
 import { useAi } from "@/context/AiContext";
 import { db } from "@/config/firebaseConfig";
+import { storage } from "@/config/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 import {
   Select,
@@ -19,7 +20,7 @@ import { Worker, Viewer } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import DocViewer, { DocViewerRenderers } from "react-doc-viewer";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import {
   AlertDialog,
@@ -64,7 +65,6 @@ const AddDocument = () => {
       return;
     }
 
-    const storage = getStorage();
     const randomWords = uuidv4();
     const extendedFileName = `${
       file.name.split(".")[0]
