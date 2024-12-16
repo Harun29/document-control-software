@@ -1,12 +1,9 @@
-"use client";
-
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { AiProvider } from "@/context/AiContext";
 import AuthenticatedLayout from "@/components/authenticated-layout";
-import { useEffect } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,29 +16,19 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-// export const metadata: Metadata = {
-//   title: {
-//     default: "DCS",
-//     template: "DCS | %s",
-//   },
-//   description: "Document Control System",
-// };
+export const metadata: Metadata = {
+  title: {
+    default: "DCS",
+    template: "DCS | %s",
+  },
+  description: "Document Control System",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  useEffect(() => {
-    if (true) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, []);
 
   return (
     <html lang="en">

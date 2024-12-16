@@ -33,6 +33,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 const AddDocument = () => {
   const [title, setTitle] = useState("");
@@ -144,37 +146,26 @@ const AddDocument = () => {
   return (
     <div className="lg:flex lg:space-x-6 h-full min-h-[100vh-4rem]">
       {/* Form Section */}
-      <div
-        className="lg:w-2/3 flex flex-col space-y-6 p-6 bg-white shadow-md rounded-lg flex-grow"
-      >
+      <div className="lg:w-2/3 flex flex-col space-y-6 p-6 bg-background shadow-md rounded-lg flex-grow">
         <h1 className="text-3xl mb-1">Add Document</h1>
-        <p className="text-[#505050]">Add a document to your organization</p>
+        <p className="text-muted-foreground">
+          Add a document to your organization
+        </p>
         {/* Title Input */}
         <div className="space-y-2">
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Title
-          </label>
+          <Label htmlFor="title">Title</Label>
           <Input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter document title"
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         {/* Content Input */}
         <div className="space-y-2">
-          <label
-            htmlFor="content"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Summary
-          </label>
-          <textarea
-            className="resize-none h-40 w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          <Label htmlFor="content">Summary</Label>
+          <Textarea
+            className="h-32"
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -183,17 +174,12 @@ const AddDocument = () => {
         </div>
         {/* Document Type Select */}
         <div className="space-y-2">
-          <label
-            htmlFor="document-type"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Document Type
-          </label>
+          <Label htmlFor="document-type">Document Type</Label>
           <Select onValueChange={(value) => setLabel(value)}>
-            <SelectTrigger className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+            <SelectTrigger>
               <SelectValue placeholder="Select Document Type" />
             </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-300 rounded-md shadow-lg">
+            <SelectContent>
               <SelectItem value="report">Report</SelectItem>
               <SelectItem value="invoice">Invoice</SelectItem>
               <SelectItem value="contract">Contract</SelectItem>
@@ -206,7 +192,7 @@ const AddDocument = () => {
         <div
           onDrop={handleFileDrop}
           onDragOver={(e) => e.preventDefault()}
-          className="border-dashed border-2 border-gray-300 p-4 rounded-md text-center bg-gray-50 hover:bg-gray-100 cursor-pointer"
+          className="border-dashed border-2 p-4 rounded-md text-center bg-background cursor-pointer"
         >
           <input
             type="file"
@@ -214,11 +200,11 @@ const AddDocument = () => {
             className="hidden"
             id="file-upload"
           />
-          <label htmlFor="file-upload" className="cursor-pointer text-gray-500">
+          <label htmlFor="file-upload" className="cursor-pointer text-primary">
             Drag and drop a file here, or click to select a file
           </label>
           {file && (
-            <div className="mt-4 text-gray-700">
+            <div className="mt-4 text-muted-foreground">
               {file.type === "application/pdf" && (
                 <FaFilePdf size={40} className="text-red-500 mx-auto" />
               )}
@@ -242,7 +228,7 @@ const AddDocument = () => {
             <AlertDialog>
               <AlertDialogTrigger
                 disabled={title === "" || content === "" || label === ""}
-                className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-slate-400"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-blue-600 text-white hover:bg-primary/90 h-10 px-4 py-2"
               >
                 Add Document
               </AlertDialogTrigger>
@@ -258,14 +244,16 @@ const AddDocument = () => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleSubmit}>Continue</AlertDialogAction>
+                  <AlertDialogAction onClick={handleSubmit}>
+                    Continue
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
             <Button
               type="button"
               onClick={handleViewDocument}
-              className="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              variant="default"
             >
               View Document
             </Button>
@@ -281,20 +269,20 @@ const AddDocument = () => {
       </div>
 
       {/* Preview Section */}
-      <div className="lg:w-1/3 bg-gray-50 shadow-md rounded-lg p-4 flex flex-col flex-grow">
-        <h2 className="text-lg font-medium text-gray-700">Document Preview</h2>
+      <div className="lg:w-1/3 bg-background shadow-md rounded-lg p-4 flex flex-col flex-grow">
+        <h2 className="text-lg font-medium text-primary">Document Preview</h2>
         {file ? (
           <>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               <strong>Title:</strong> {title || "Untitled"}
             </p>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-muted-foreground">
               <strong>Summary:</strong>{" "}
               {content
                 ? content.substring(0, 100) + "..."
                 : "No content available"}
             </p>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-muted-foreground">
               <strong>Label:</strong> {label || "No label selected"}
             </p>
             {/* Scrollable Viewer */}

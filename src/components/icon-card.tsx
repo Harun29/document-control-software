@@ -10,7 +10,7 @@ export function IconCard({ bgColor, icon: Icon, label, href}: { bgColor: string;
           boxShadow: `0px 4px 6px rgba(0, 0, 0, 0.1), inset 0px 2px 10px rgba(0, 0, 0, 0.1)`,
         }}
       >
-        <div className="bg-white h-16 w-16 rounded-full flex items-center justify-center">
+        <div className="bg-background h-16 w-16 rounded-full flex items-center justify-center">
           <Icon color={bgColor} size={36} strokeWidth={2} />
         </div>
       </Link>
