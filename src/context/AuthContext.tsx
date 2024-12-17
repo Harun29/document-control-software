@@ -155,7 +155,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const userInfo = await fetchUserInfo(currentUser.uid);
           const idTokenResult = await currentUser.getIdTokenResult();
           setIsAdmin(!!idTokenResult.claims.admin);
-          setIsEditor(!!userInfo?.role && userInfo.role === "editor");
+          setIsEditor(!!userInfo?.role && userInfo.role === "Editor");
           setUsersOrg(userInfo?.org);
           console.log("isAdmin in context: ", !!idTokenResult.claims.admin);
           setUser({ ...currentUser, userInfo: userInfo as UserInfo || undefined });
