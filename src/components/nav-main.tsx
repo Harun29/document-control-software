@@ -17,8 +17,12 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useGeneral } from "@/context/GeneralContext";
 
-export function NavMain({ items, onAction }: { 
+export function NavMain({
+  items,
+  onAction,
+}: {
   items: Array<{
     title: string;
     url?: string;
@@ -26,8 +30,10 @@ export function NavMain({ items, onAction }: {
     isActive?: boolean;
     items?: Array<{ title: string; url?: string; action?: string }>;
   }>;
-  onAction?: (action: string) => void; 
+  onAction?: (action: string) => void;
 }) {
+  const { numberOfRequests } = useGeneral();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -67,11 +73,19 @@ export function NavMain({ items, onAction }: {
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items.map((subItem) => (
-                      <SidebarMenuSubItem className="cursor-pointer" key={subItem.title}>
+                      <SidebarMenuSubItem
+                        className="cursor-pointer"
+                        key={subItem.title}
+                      >
                         {subItem.url ? (
                           <Link href={subItem.url}>
-                            <SidebarMenuSubButton asChild>
+                            <SidebarMenuSubButton>
                               <span>{subItem.title}</span>
+                              {subItem.title === "Document requests" && (
+                                <div className="inline-block translate-x-2/4 rotate-0 skew-x-0 skew-y-0 scale-x-100 scale-y-100 whitespace-nowrap rounded-full bg-indigo-700 px-2.5 py-1 text-center align-baseline text-xs font-bold leading-none text-white">
+                                  {numberOfRequests}
+                                </div>
+                              )}
                             </SidebarMenuSubButton>
                           </Link>
                         ) : (
@@ -95,4 +109,3 @@ export function NavMain({ items, onAction }: {
     </SidebarGroup>
   );
 }
-

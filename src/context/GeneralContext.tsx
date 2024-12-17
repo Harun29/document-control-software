@@ -6,6 +6,7 @@ import { db } from "@/config/firebaseConfig";
 
 interface GeneralContextProps {
   docRequests: any[];
+  numberOfRequests: number;
 }
 
 const GeneralContext = createContext<GeneralContextProps | null>(null);
@@ -14,12 +15,14 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
   const { isEditor } = useAuth();
   const { usersOrg } = useAuth();
   const [docRequests, setDocRequests] = useState<any[]>([]);
+  const [numberOfRequests, setNumberOfRequests] = useState(0)
 
   useEffect(() => {
     const fetchRequests = async () => {
       const requests = await getDocs(collection(db, "org", usersOrg, "docRequests"));
       const newDocRequests = requests.docs.map((doc) => doc.data());
       setDocRequests(newDocRequests);
+      setNumberOfRequests(newDocRequests.length)
     };
 
     if (isEditor) {
@@ -36,6 +39,7 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
     <GeneralContext.Provider
       value={{
         docRequests,
+        numberOfRequests
       }}
     >
       {children}

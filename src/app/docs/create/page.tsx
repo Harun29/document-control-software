@@ -35,12 +35,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { ArrowRightCircle, FileTextIcon, XCircleIcon } from "lucide-react";
 
 const AddDocument = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [label, setLabel] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const { user } = useAuth();
   const { usersOrg } = useAuth();
   const { getAiSummarisation } = useAi();
 
@@ -88,6 +90,7 @@ const AddDocument = () => {
           fileURL,
           createdAt: new Date(),
           status: "pending",
+          reqBy: user?.userInfo?.email,
         }
       );
 
@@ -228,9 +231,10 @@ const AddDocument = () => {
             <AlertDialog>
               <AlertDialogTrigger
                 disabled={title === "" || content === "" || label === ""}
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-blue-600 text-white hover:bg-primary/90 h-10 px-4 py-2"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-blue-600 text-white hover:bg-blue-800 h-10 px-4 py-2"
               >
-                Add Document
+                <ArrowRightCircle className="w-4 h-4" />
+                Submit
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -251,10 +255,12 @@ const AddDocument = () => {
               </AlertDialogContent>
             </AlertDialog>
             <Button
+              disabled={!file}
               type="button"
               onClick={handleViewDocument}
               variant="default"
             >
+              <FileTextIcon className="w-4 h-4" />
               View Document
             </Button>
           </div>
@@ -263,6 +269,7 @@ const AddDocument = () => {
             variant="destructive"
             onClick={clearDocSelection}
           >
+            <XCircleIcon className="w-4 h-4" />
             Clear Document Selection
           </Button>
         </div>
