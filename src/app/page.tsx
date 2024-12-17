@@ -51,7 +51,6 @@ export default function Home() {
 
 
   return (
-
       <div className="h-full">
         <div>
           <div className="flex justify-center">
