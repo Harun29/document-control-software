@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/config/firebaseConfig";
-import {
-  collection,
-  getDocs
-} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { Orgs, orgsColumns } from "./columns";
 import UpdateOrgCard from "../../components/update-org-card";
 import {
@@ -35,7 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, UsersRound } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DeleteOrgDialog from "@/components/delete-org-alert";
 
@@ -115,7 +112,10 @@ const ManageOrgs = () => {
   if (loading) {
     return (
       <div className="w-full p-10">
-        <h1 className="text-3xl mb-1">Manage Users</h1>
+        <h1 className="text-3xl mb-1 flex">
+          <UsersRound className="w-8 h-8 mr-2" />
+          Manage Users
+        </h1>
         <p className="text-[#505050]">View, modify and delete users.</p>
         <div className="flex items-center py-4">
           <Skeleton className="max-w-sm h-10" />
@@ -132,7 +132,10 @@ const ManageOrgs = () => {
 
   return (
     <div className="w-full p-10">
-      <h1 className="text-3xl mb-1">Manage Organizations</h1>
+      <h1 className="text-3xl mb-1 flex">
+        <UsersRound className="w-8 h-8 mr-2" />
+        Manage Organizations
+      </h1>
       <p className="text-[#505050]">View, modify and delete organizations.</p>
       <div className="flex items-center py-4">
         <Input
@@ -240,10 +243,9 @@ const ManageOrgs = () => {
           </Button>
         </div>
       </div>
-      {orgToDelete && <DeleteOrgDialog
-        orgToDelete={orgToDelete}
-        onClose={handleClose}
-      />}
+      {orgToDelete && (
+        <DeleteOrgDialog orgToDelete={orgToDelete} onClose={handleClose} />
+      )}
       {selectedOrg && <UpdateOrgCard org={selectedOrg} onClose={handleClose} />}
     </div>
   );

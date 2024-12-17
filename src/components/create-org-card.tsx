@@ -24,7 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal } from "lucide-react";
+import { PlusCircle, Terminal } from "lucide-react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../config/firebaseConfig";
 import { useAuth } from "@/context/AuthContext";
@@ -73,7 +73,10 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
     <div className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10">
       <Card className="w-96" ref={ref}>
         <CardHeader>
-          <CardTitle>Create New Organization</CardTitle>
+          <CardTitle className="flex">
+            <PlusCircle className="h-6 w-6 mr-2" />
+            Create New Organization
+          </CardTitle>
           <CardDescription>Create a new organization in the company</CardDescription>
         </CardHeader>
         <CardContent>

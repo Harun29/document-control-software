@@ -38,7 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, HistoryIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ViewHistory = () => {
@@ -110,7 +110,10 @@ const ViewHistory = () => {
   if (loading) {
     return (
       <div className="w-full p-10">
-        <h1 className="text-3xl mb-1">History</h1>
+        <h1 className="text-3xl mb-1 flex">
+          <HistoryIcon className="w-8 h-8 mr-2" />
+          History
+        </h1>
         <p className="text-[#505050]">
           View all the things happening on the DCS
         </p>
@@ -129,7 +132,10 @@ const ViewHistory = () => {
 
   return (
     <div className="w-full p-10">
-      <h1 className="text-3xl mb-1">History</h1>
+      <h1 className="text-3xl mb-1 flex">
+        <HistoryIcon className="w-8 h-8 mr-2" />
+        History
+      </h1>
       <p className="text-[#505050]">View all the things happening on the DCS</p>
       <div className="flex items-center py-4">
         <Input

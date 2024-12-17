@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Users } from "@/app/users/columns";
 import { useAuth } from "@/context/AuthContext";
+import { Trash2 } from "lucide-react";
 
 interface DeleteUserDialogProps {
   userToDelete: Users | null;
@@ -28,9 +29,12 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({ userToDelete, onClo
           <CardTitle className="leading-8">Are you sure you want to delete this user?</CardTitle>
           <CardDescription>This user will be deleted from our servers and removed from organization!</CardDescription>
         </CardHeader>
-        <CardContent className="justify-self-end">
+        <CardContent className="flex justify-end content-end">
           <Button variant="outline" onClick={onClose} className="me-4">Cancel</Button>
-          <Button variant="destructive" onClick={handleDeleteUser}>Delete</Button>
+          <Button variant="destructive" onClick={handleDeleteUser}>
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </Button>
         </CardContent>
       </Card>
     </div>

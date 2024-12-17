@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRightCircle, FileTextIcon, XCircleIcon } from "lucide-react";
+import { ArrowRightCircle, FilePlus2, FileTextIcon, XCircleIcon } from "lucide-react";
 
 const AddDocument = () => {
   const [title, setTitle] = useState("");
@@ -150,7 +150,10 @@ const AddDocument = () => {
     <div className="lg:flex lg:space-x-6 h-full min-h-[100vh-4rem]">
       {/* Form Section */}
       <div className="lg:w-2/3 flex flex-col space-y-6 p-6 bg-background shadow-md rounded-lg flex-grow">
-        <h1 className="text-3xl mb-1">Add Document</h1>
+        <h1 className="text-3xl mb-0 flex">
+          <FilePlus2 className="w-8 h-8 mr-2" />
+          Add Document
+        </h1>
         <p className="text-muted-foreground">
           Add a document to your organization
         </p>

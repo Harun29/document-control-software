@@ -4,6 +4,7 @@ import { db } from "@/config/firebaseConfig";
 import { Orgs } from "@/app/orgs/columns";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { useAuth } from "@/context/AuthContext";
+import { Trash2 } from "lucide-react";
 
 interface DeleteOrgDialogProps {
   orgToDelete: Orgs | null;
@@ -51,9 +52,12 @@ const DeleteOrgDialog: React.FC<DeleteOrgDialogProps> = ({ orgToDelete, onClose 
           <CardTitle className="leading-8">Are you sure you want to delete this organization?</CardTitle>
           <CardDescription>This organization will be deleted from our servers with all its data!</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex content-end justify-end">
           <Button variant="outline" onClick={onClose} className="me-4">Cancel</Button>
-          <Button variant="destructive" onClick={handleDeleteOrg}>Delete</Button>
+          <Button variant="destructive" onClick={handleDeleteOrg}>
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </Button>
         </CardContent>
       </Card>
     </div>

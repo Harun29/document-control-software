@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal } from "lucide-react";
+import { Pen, PencilIcon, PenIcon, Terminal } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface Org {
@@ -68,9 +68,11 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
 
   return (
     <div className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10" onClick={onClose}>
-      <Card className="w-96" ref={ref} onClick={handlePropagation}>
+      <Card className="w-100" ref={ref} onClick={handlePropagation}>
         <CardHeader>
-          <CardTitle>Update Organization Information</CardTitle>
+          <CardTitle className="flex">
+            <PencilIcon className="h-6 w-6 mr-2" />
+            Update Organization Information</CardTitle>
           <CardDescription>Update the information of an existing organization</CardDescription>
         </CardHeader>
         <CardContent>

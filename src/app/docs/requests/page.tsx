@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftCircleIcon, CheckCircle2, ChevronDown, FileTextIcon } from "lucide-react";
+import { ArrowLeftCircleIcon, CheckCircle2, ChevronDown, FileInput, FileTextIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -121,7 +121,10 @@ const DocRequests = () => {
   if (loading) {
     return (
       <div className="w-full p-10">
-        <h1 className="text-3xl mb-1">Document Requests</h1>
+        <h1 className="text-3xl mb-1">
+          <FileInput className="w-8 h-8 mr-2" />
+          Document Requests
+        </h1>
         <p className="text-[#505050]">
           View, modify and accept document requests.
         </p>
@@ -140,7 +143,10 @@ const DocRequests = () => {
 
   return (
     <div className="w-full p-10">
-      <h1 className="text-3xl mb-1">Document Requests</h1>
+      <h1 className="text-3xl mb-1 flex">
+        <FileInput className="w-8 h-8 mr-2" />
+        Document Requests
+      </h1>
       <p className="text-[#505050]">
         View, modify and accept document requests.
       </p>

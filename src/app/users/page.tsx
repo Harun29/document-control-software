@@ -14,7 +14,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  flexRender
+  flexRender,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,15 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChevronDown } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ChevronDown, User2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DeleteUserDialog from "@/components/delete-user-alers";
 
@@ -90,7 +97,10 @@ const ManageUsers = () => {
   if (loading) {
     return (
       <div className="w-full p-10">
-        <h1 className="text-3xl mb-1">Manage Users</h1>
+        <h1 className="text-3xl mb-1 flex">
+          <User2 className="w-8 h-8 mr-2" />
+          Manage Users
+        </h1>
         <p className="text-[#505050]">View, modify and delete users.</p>
         <div className="flex items-center py-4">
           <Skeleton className="max-w-sm h-10" />
@@ -107,7 +117,10 @@ const ManageUsers = () => {
 
   return (
     <div className="w-full p-10">
-      <h1 className="text-3xl mb-1">Manage Users</h1>
+      <h1 className="text-3xl mb-1 flex">
+        <User2 className="w-8 h-8 mr-2" />
+        Manage Users
+      </h1>
       <p className="text-[#505050]">View, modify and delete users.</p>
       <div className="flex items-center py-4">
         <Input
@@ -215,10 +228,9 @@ const ManageUsers = () => {
           </Button>
         </div>
       </div>
-      {userToDelete && <DeleteUserDialog
-        userToDelete={userToDelete}
-        onClose={handleClose}
-      />}
+      {userToDelete && (
+        <DeleteUserDialog userToDelete={userToDelete} onClose={handleClose} />
+      )}
       {selectedUser && (
         <UpdateUserCard user={selectedUser} onClose={handleClose} />
       )}

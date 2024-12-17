@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal } from "lucide-react";
+import { PencilIcon, Terminal } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface User {
@@ -112,7 +112,9 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(({ user, 
     <div className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10" onClick={onClose}>
       <Card className="w-96" ref={ref} onClick={handlePropagation}>
         <CardHeader>
-          <CardTitle>Update User Information</CardTitle>
+          <CardTitle className="flex">
+            <PencilIcon className="h-6 w-6 mr-2" />
+            Update User Information</CardTitle>
           <CardDescription>Update the information of an existing user</CardDescription>
         </CardHeader>
         <CardContent>
