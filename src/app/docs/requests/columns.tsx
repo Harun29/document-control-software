@@ -18,6 +18,7 @@ export type DocRequest = {
   summary: string;
   title: string;
   reqBy: string;
+  reqByID: string;
 };
 
 export const columns = (

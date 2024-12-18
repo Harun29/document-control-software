@@ -120,16 +120,14 @@ const DocRequests = () => {
     console.log("Review document:", doc);
   };
 
-  useEffect(() => {
-    newDocVersion && console.log("New document version:", newDocVersion);
-  }, [newDocVersion]);
-
   const handleAcceptDoc = async (selectedDoc: DocRequest, newDoc: DocRequest | null) => {
     try {
       const userOrg = usersOrg;
       const docRequestsRef = collection(db, 'org', userOrg, 'docRequests');
       const q = query(docRequestsRef, where('fileName', '==', selectedDoc.fileName));
       const querySnapshot = await getDocs(q);
+
+      const userRequestedNotifRef = collection(db, 'users', selectedDoc.reqByID, 'notifications');
   
       let docRequestId = null;
       querySnapshot.forEach((doc) => {
@@ -141,6 +139,12 @@ const DocRequests = () => {
         const docRequestRef = doc(db, 'org', userOrg, 'docRequests', docRequestId);
   
         await addDoc(newDocRef, newDoc || selectedDoc);
+        await addDoc(userRequestedNotifRef, {
+          title: "Document Accepted",
+          message: `Your document request for ${selectedDoc.title} has been accepted.`,
+          createdAt: new Date().toISOString(),
+          read: false,
+        })
         await deleteDoc(docRequestRef);
   
         console.log("Document accepted successfully");
