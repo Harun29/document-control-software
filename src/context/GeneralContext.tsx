@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 
 interface GeneralContextProps {
@@ -18,17 +18,21 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
   const [numberOfRequests, setNumberOfRequests] = useState(0)
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      const requests = await getDocs(collection(db, "org", usersOrg, "docRequests"));
-      const newDocRequests = requests.docs.map((doc) => doc.data());
-      setDocRequests(newDocRequests);
-      setNumberOfRequests(newDocRequests.length)
-    };
-
-    if (isEditor) {
-      fetchRequests();
-    }
+    const unsubscribe = onSnapshot(
+      collection(db, "org", usersOrg, "docRequests"),
+      (snapshot) => {
+        const newDocRequests = snapshot.docs.map((doc) => doc.data());
+        setDocRequests(newDocRequests);
+        setNumberOfRequests(newDocRequests.length);
+      },
+      (error) => {
+        console.error("Error fetching doc requests: ", error);
+      }
+    );
+  
     console.log("is editor: ", isEditor);
+  
+    return () => unsubscribe();
   }, [isEditor, usersOrg]);
 
   useEffect(() => {
