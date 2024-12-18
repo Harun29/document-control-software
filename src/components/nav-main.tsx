@@ -81,7 +81,7 @@ export function NavMain({
                           <Link href={subItem.url}>
                             <SidebarMenuSubButton>
                               <span>{subItem.title}</span>
-                              {subItem.title === "Document requests" && (
+                              {subItem.title === "Document requests" && numberOfRequests > 0 && (
                                 <div className="inline-block translate-x-2/4 rotate-0 skew-x-0 skew-y-0 scale-x-100 scale-y-100 whitespace-nowrap rounded-full bg-indigo-700 px-2.5 py-1 text-center align-baseline text-xs font-bold leading-none text-white">
                                   {numberOfRequests}
                                 </div>

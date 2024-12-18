@@ -85,8 +85,10 @@ const ViewHistory = () => {
       return "bg-[#ff4d4faa]";
     } else if (action.includes("created")) {
       return "bg-[#52c41aaa]";
-    } else {
+    } else if (action.includes("Added")) {
       return "bg-[#1890ffaa]";
+    } else {
+      return "bg-[#faad14aa]";
     }
   };
 

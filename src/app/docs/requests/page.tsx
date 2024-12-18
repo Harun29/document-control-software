@@ -2,11 +2,11 @@
 
 import { useGeneral } from "@/context/GeneralContext";
 import { useState, useEffect, useRef } from "react";
-import { columns, DocRequest } from "./columns";
+import { columns } from "./columns";
+import { DocRequest } from "../types";
 import {
   ColumnFiltersState,
   SortingState,
-  VisibilityState,
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
@@ -82,12 +82,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { db } from "@/config/firebaseConfig";
-import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 
 const DocRequests = () => {
   const { docRequests } = useGeneral();
-  const {usersOrg} = useAuth();
+  const { usersOrg } = useAuth();
+  const { user } = useAuth();
+  const { createDoc } = useGeneral();
   const [data, setData] = useState<DocRequest[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -120,33 +131,58 @@ const DocRequests = () => {
     console.log("Review document:", doc);
   };
 
-  const handleAcceptDoc = async (selectedDoc: DocRequest, newDoc: DocRequest | null) => {
+  const handleAcceptDoc = async (
+    selectedDoc: DocRequest,
+    newDoc: DocRequest | null
+  ) => {
     try {
       const userOrg = usersOrg;
-      const docRequestsRef = collection(db, 'org', userOrg, 'docRequests');
-      const q = query(docRequestsRef, where('fileName', '==', selectedDoc.fileName));
+      const docRequestsRef = collection(db, "org", userOrg, "docRequests");
+      const q = query(
+        docRequestsRef,
+        where("fileName", "==", selectedDoc.fileName)
+      );
       const querySnapshot = await getDocs(q);
 
-      const userRequestedNotifRef = collection(db, 'users', selectedDoc.reqByID, 'notifications');
-  
+      const userRequestedNotifRef = collection(
+        db,
+        "users",
+        selectedDoc.reqByID,
+        "notifications"
+      );
+
       let docRequestId = null;
       querySnapshot.forEach((doc) => {
         docRequestId = doc.id;
       });
-  
+
       if (docRequestId) {
-        const newDocRef = collection(db, 'org', userOrg, 'docs');
-        const docRequestRef = doc(db, 'org', userOrg, 'docRequests', docRequestId);
-  
+        const newDocRef = collection(db, "org", userOrg, "docs");
+        const docRequestRef = doc(
+          db,
+          "org",
+          userOrg,
+          "docRequests",
+          docRequestId
+        );
+        const historyRef = collection(db, "history");
+
         await addDoc(newDocRef, newDoc || selectedDoc);
         await addDoc(userRequestedNotifRef, {
           title: "Document Accepted",
           message: `Your document request for ${selectedDoc.title} has been accepted.`,
           createdAt: new Date().toISOString(),
           read: false,
-        })
+        });
+        await createDoc(newDoc || selectedDoc);
+        await addDoc(historyRef, {
+          author: user?.userInfo?.email || "Unknown",
+          action: "Added a new document",
+          result: newDoc?.title || selectedDoc.title,
+          timestamp: serverTimestamp(),
+        });
         await deleteDoc(docRequestRef);
-  
+
         console.log("Document accepted successfully");
       } else {
         console.error("No matching document found");
@@ -428,7 +464,9 @@ const DocRequests = () => {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => handleAcceptDoc(selectedDoc!, newDocVersion)}
+                        onClick={() =>
+                          handleAcceptDoc(selectedDoc!, newDocVersion)
+                        }
                       >
                         Continue
                       </AlertDialogAction>

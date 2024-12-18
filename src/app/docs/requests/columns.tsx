@@ -7,25 +7,28 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DocRequest } from "../types";
+import { FaFilePdf, FaFileWord } from "react-icons/fa";
 
-export type DocRequest = {
-  createdAt: string;
-  fileName: string;
-  fileType: string;
-  fileURL: string;
-  label: string;
-  status: string;
-  summary: string;
-  title: string;
-  reqBy: string;
-  reqByID: string;
-};
 
 export const columns = (
   handleReviewDoc: (doc: DocRequest) => void,
   handleAcceptDoc: (selectedDoc: DocRequest, newDoc: DocRequest | null) => Promise<void>,
   handleReturnDoc: (doc: DocRequest) => void
 ): ColumnDef<DocRequest>[] => [
+  {
+      accessorKey: "fileType",
+      header: "File Type",
+      cell: ({ row }) => {
+        const fileType = row.getValue("fileType");
+  
+        if (fileType === "application/pdf") {
+          return <FaFilePdf className="w-6 h-6 text-red-500" />;
+        }
+  
+        return <FaFileWord className="w-6 h-6" />;
+      }
+    },
   {
     accessorKey: "createdAt",
     header: "Created At",
@@ -36,19 +39,6 @@ export const columns = (
   {
     accessorKey: "reqBy",
     header: "Requested By",
-  },
-  {
-    accessorKey: "fileURL",
-    header: "File URL",
-    cell: ({ row }) => (
-      <a
-        href={row.getValue("fileURL")}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View File
-      </a>
-    ),
   },
   {
     accessorKey: "label",
