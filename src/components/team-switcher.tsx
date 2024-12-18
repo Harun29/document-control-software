@@ -78,6 +78,10 @@ export function TeamSwitcher({
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+          <div className="fixed top-0 right-0 z-10 m-5 text-muted-foreground">
+            <span>{user?.userInfo?.email}</span>{" | "}
+            <span>{user?.userInfo?.role}</span>
+          </div>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
