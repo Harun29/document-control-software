@@ -22,7 +22,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftCircleIcon, CheckCircle2, ChevronDown, FileInput, FileTextIcon } from "lucide-react";
+import {
+  ArrowLeftCircleIcon,
+  CheckCircle2,
+  ChevronDown,
+  FileInput,
+  FileTextIcon,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -68,15 +74,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { db } from "@/config/firebaseConfig";
+import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import { useAuth } from "@/context/AuthContext";
 
 const DocRequests = () => {
   const { docRequests } = useGeneral();
+  const {usersOrg} = useAuth();
   const [data, setData] = useState<DocRequest[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedDoc, setSelectedDoc] = useState<DocRequest | null>(null);
+  const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -97,13 +115,50 @@ const DocRequests = () => {
     setSelectedDoc(doc);
     if (drawerTriggerRef.current) {
       drawerTriggerRef.current.click();
+      setNewDocVersion(doc);
     }
     console.log("Review document:", doc);
   };
 
+  useEffect(() => {
+    newDocVersion && console.log("New document version:", newDocVersion);
+  }, [newDocVersion]);
+
+  const handleAcceptDoc = async (selectedDoc: DocRequest, newDoc: DocRequest | null) => {
+    try {
+      const userOrg = usersOrg;
+      const docRequestsRef = collection(db, 'org', userOrg, 'docRequests');
+      const q = query(docRequestsRef, where('fileName', '==', selectedDoc.fileName));
+      const querySnapshot = await getDocs(q);
+  
+      let docRequestId = null;
+      querySnapshot.forEach((doc) => {
+        docRequestId = doc.id;
+      });
+  
+      if (docRequestId) {
+        const newDocRef = collection(db, 'org', userOrg, 'docs');
+        const docRequestRef = doc(db, 'org', userOrg, 'docRequests', docRequestId);
+  
+        await addDoc(newDocRef, newDoc || selectedDoc);
+        await deleteDoc(docRequestRef);
+  
+        console.log("Document accepted successfully");
+      } else {
+        console.error("No matching document found");
+      }
+    } catch (error) {
+      console.error("Error accepting document: ", error);
+    }
+  };
+
+  const handleReturnDoc = (doc: DocRequest) => {
+    console.log("Return document:", doc);
+  };
+
   const table = useReactTable({
     data,
-    columns: columns(handleReviewDoc),
+    columns: columns(handleReviewDoc, handleAcceptDoc, handleReturnDoc),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -258,8 +313,11 @@ const DocRequests = () => {
       </div>
       <Drawer>
         <DrawerTrigger>
-          <Button ref={drawerTriggerRef} variant="outline" className="hidden">
-          </Button>
+          <Button
+            ref={drawerTriggerRef}
+            variant="outline"
+            className="hidden"
+          ></Button>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerClose />
@@ -268,8 +326,22 @@ const DocRequests = () => {
             <DrawerDescription>
               Review and accept the document request.
             </DrawerDescription>
-            <p className="mt-2 text-sm text-muted-foreground">
-              <strong>Title:</strong> {selectedDoc?.title || "Untitled"}
+            <p className="mt-2 text-sm text-muted-foreground flex items-center gap-2">
+              <strong>Title:</strong>
+              <Input
+                defaultValue={selectedDoc?.title || "Untitled"}
+                onChange={(e) =>
+                  setNewDocVersion(
+                    newDocVersion
+                      ? { ...newDocVersion, title: e.target.value }
+                      : null
+                  )
+                }
+              />
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              <strong>File Name:</strong>{" "}
+              {selectedDoc?.fileName || "No file name available"}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               <strong>Requested At:</strong> {"29. 03. 2001."}
@@ -277,16 +349,40 @@ const DocRequests = () => {
             <p className="mt-1 text-sm text-muted-foreground">
               <strong>Author:</strong> {selectedDoc?.reqBy || "Unknown"}
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-sm text-muted-foreground flex items-center gap-2">
               <strong>Label:</strong>{" "}
-              {selectedDoc?.label || "No label available"}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              <strong>File Name:</strong>{" "}
-              {selectedDoc?.fileName || "No file name available"}
+              <Select
+                onValueChange={(value) =>
+                  setNewDocVersion(
+                    newDocVersion ? { ...newDocVersion, label: value } : null
+                  )
+                }
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue
+                    placeholder={selectedDoc?.label || "No label available"}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="report">Report</SelectItem>
+                  <SelectItem value="invoice">Invoice</SelectItem>
+                  <SelectItem value="contract">Contract</SelectItem>
+                  <SelectItem value="presentation">Presentation</SelectItem>
+                  <SelectItem value="memo">Memo</SelectItem>
+                </SelectContent>
+              </Select>
             </p>
             <strong className="text-muted-foreground">Summary:</strong>{" "}
-            <Textarea className="h-48 mt-1 text-sm text-muted-foreground">
+            <Textarea
+              onChange={(e) =>
+                setNewDocVersion(
+                  newDocVersion
+                    ? { ...newDocVersion, summary: e.target.value }
+                    : null
+                )
+              }
+              className="h-32 mt-1 text-sm text-muted-foreground"
+            >
               {selectedDoc?.summary
                 ? selectedDoc.summary
                 : "No content available"}
@@ -327,22 +423,24 @@ const DocRequests = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => {}}>
+                      <AlertDialogAction
+                        onClick={() => handleAcceptDoc(selectedDoc!, newDocVersion)}
+                      >
                         Continue
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                  <a
-                    href={selectedDoc?.fileURL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                <Button variant="default">
+                <a
+                  href={selectedDoc?.fileURL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="default">
                     <FileTextIcon className="w-4 h-4" />
                     View
-                </Button>
-                  </a>
+                  </Button>
+                </a>
               </div>
               <Dialog>
                 <DialogTrigger asChild>
@@ -355,12 +453,13 @@ const DocRequests = () => {
                   <DialogHeader>
                     <DialogTitle>Are you absolutely sure?</DialogTitle>
                     <DialogDescription>
-                      Return the document to the requester {selectedDoc?.reqBy} with a note:
+                      Return the document to the requester {selectedDoc?.reqBy}{" "}
+                      with a note:
                     </DialogDescription>
                     <Textarea></Textarea>
                   </DialogHeader>
                   <DialogFooter className="sm:justify-start">
-                    <Button>
+                    <Button onClick={() => handleReturnDoc(selectedDoc!)}>
                       Confirm
                     </Button>
                     <DialogClose asChild>

@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { BookCheck } from "lucide-react";
+import { BookCheck, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export type DocRequest = {
   createdAt: string;
@@ -15,12 +21,16 @@ export type DocRequest = {
 };
 
 export const columns = (
-  handleReviewDoc: (doc: DocRequest) => void
+  handleReviewDoc: (doc: DocRequest) => void,
+  handleAcceptDoc: (selectedDoc: DocRequest, newDoc: DocRequest | null) => Promise<void>,
+  handleReturnDoc: (doc: DocRequest) => void
 ): ColumnDef<DocRequest>[] => [
   {
     accessorKey: "createdAt",
     header: "Created At",
-    cell: ({ row }) => <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+    cell: ({ row }) => (
+      <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>
+    ),
   },
   {
     accessorKey: "reqBy",
@@ -30,7 +40,11 @@ export const columns = (
     accessorKey: "fileURL",
     header: "File URL",
     cell: ({ row }) => (
-      <a href={row.getValue("fileURL")} target="_blank" rel="noopener noreferrer">
+      <a
+        href={row.getValue("fileURL")}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         View File
       </a>
     ),
@@ -45,13 +59,38 @@ export const columns = (
   },
   {
     id: "actions",
-    header: "Actions",
     cell: ({ row }) => (
-      <div className="flex space-x-2">
+      <div className="flex space-x-4 justify-self-end">
         <Button variant="outline" onClick={() => handleReviewDoc(row.original)}>
-        <BookCheck className="w-4 h-4" />
+          <BookCheck className="w-4 h-4" />
           Review
         </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
+              onClick={() => handleAcceptDoc(row.original, null)}
+            >
+              <CheckCircle2 color="green" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Quick Accept</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
+              onClick={() => handleReturnDoc(row.original)}
+            >
+              <XCircle color="red" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Quick Return</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     ),
   },

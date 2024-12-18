@@ -33,7 +33,7 @@ const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
           className="bg-[#f7f7f7] dark:bg-[#0a0a0a] flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 relative"
         >
           <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
+            <SidebarTrigger className="-ml-1 z-50" />
           </div>
           <div className="w-[1.5rem] h-[3rem] bg-transparent rounded-tl-full absolute left-0 -bottom-12 shadow-[0_-25px_0px_0px] shadow-[#f7f7f7] dark:shadow-[#0a0a0a]"></div>
         </header>
