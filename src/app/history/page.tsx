@@ -202,7 +202,7 @@ const ViewHistory = () => {
                   key={row.id}
                   className={`${getRowBackgroundColor(
                     row.original.action
-                  )} text-white text-base hover:text-black`} // Change the height class here
+                  )}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell className="px-4 py-2" key={cell.id}>
