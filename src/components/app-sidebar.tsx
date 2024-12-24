@@ -57,11 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/orgs",
           },
         ],
-      }] : [{
-        title: "Organizations",
-        url: "/orgs",
-        icon: Users2,
-      }]),
+      }] : []),
       ...(isAdmin ? [{
         title: "Users",
         icon: User2,
@@ -75,11 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/users",
           },
         ],
-      }] : [{
-        title: "Users",
-        url: "/users",
-        icon: User2,
-      }]),
+      }] : []),
       ...((isEditor || isAdmin) ? [
         {
         title: "Documents",

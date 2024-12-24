@@ -1,7 +1,13 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
-import { collection, getDocs, onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 
 export type DocRequest = {
@@ -22,13 +28,20 @@ interface GeneralContextProps {
   numberOfRequests: number;
   docs: DocRequest[];
   createDoc: (doc: DocRequest) => Promise<void>;
-  updateDocument: (fileName: string, updatedDoc: Partial<DocRequest>) => Promise<void>;
+  updateDocument: (
+    fileName: string,
+    updatedDoc: Partial<DocRequest>
+  ) => Promise<void>;
   deleteDoc: (fileName: string) => Promise<void>;
 }
 
 const GeneralContext = createContext<GeneralContextProps | null>(null);
 
-export const GeneralProvider = ({ children }: { children: React.ReactNode }) => {
+export const GeneralProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const { isEditor, usersOrg } = useAuth();
   const [docRequests, setDocRequests] = useState<DocRequest[]>([]);
   const [numberOfRequests, setNumberOfRequests] = useState(0);
@@ -38,7 +51,9 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
     const unsubscribe = onSnapshot(
       collection(db, "org", usersOrg, "docRequests"),
       (snapshot) => {
-        const newDocRequests = snapshot.docs.map((doc) => doc.data() as DocRequest);
+        const newDocRequests = snapshot.docs.map(
+          (doc) => doc.data() as DocRequest
+        );
         setDocRequests(newDocRequests);
         setNumberOfRequests(newDocRequests.length);
       },
@@ -46,9 +61,7 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
         console.error("Error fetching doc requests: ", error);
       }
     );
-  
     console.log("is editor: ", isEditor);
-  
     return () => unsubscribe();
   }, [isEditor, usersOrg]);
 
@@ -58,7 +71,7 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
 
   useEffect(() => {
     const docRef = doc(db, "docs", "alldocs");
-  
+
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -79,7 +92,7 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        console.log(data)
+        console.log(data);
         const updatedDocs = [...data.docs, newDoc];
         await updateDoc(docRef, { docs: updatedDocs });
         setDocs(updatedDocs);
@@ -89,7 +102,10 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
     }
   };
 
-  const updateDocument = async (fileName: string, updatedDoc: Partial<DocRequest>) => {
+  const updateDocument = async (
+    fileName: string,
+    updatedDoc: Partial<DocRequest>
+  ) => {
     try {
       const docRef = doc(db, "docs", "alldocs");
       const docSnap = await getDoc(docRef);
@@ -112,7 +128,9 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        const updatedDocs = data.docs.filter((doc: DocRequest) => doc.fileName !== fileName);
+        const updatedDocs = data.docs.filter(
+          (doc: DocRequest) => doc.fileName !== fileName
+        );
         await updateDoc(docRef, { docs: updatedDocs });
         setDocs(updatedDocs);
       }
@@ -129,7 +147,7 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
         docs,
         createDoc,
         updateDocument,
-        deleteDoc
+        deleteDoc,
       }}
     >
       {children}

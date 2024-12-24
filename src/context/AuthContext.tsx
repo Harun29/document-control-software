@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isEditor, setIsEditor] = useState(false);
   const [usersOrg, setUsersOrg] = useState("");
 
-  const functions = getFunctions(); // Initialize Cloud Functions
+  const functions = getFunctions();
 
   const fetchUserInfo = async (uid: string) => {
     try {
@@ -164,6 +164,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(currentUser);
         }
       } else {
+        console.log("No user is currently logged in.");
         setUser(null);
         setIsAdmin(false);
       }
