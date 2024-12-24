@@ -8,8 +8,15 @@ import {
   signOut,
   User,
 } from "firebase/auth";
-import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, or, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
+
+export interface Notifs {
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+}
 
 interface UserInfo {
   email: string;
@@ -38,6 +45,7 @@ interface AuthContextProps {
   isAdmin: boolean;
   isEditor: boolean;
   usersOrg: string;
+  usersNotifs: Notifs[];
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -48,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditor, setIsEditor] = useState(false);
   const [usersOrg, setUsersOrg] = useState("");
+  const [usersNotifs, setUsersNotifs] = useState<Notifs[]>([]);
 
   const functions = getFunctions();
 
@@ -154,6 +163,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const userInfo = await fetchUserInfo(currentUser.uid);
           const idTokenResult = await currentUser.getIdTokenResult();
+          const q = query(collection(db, "users", currentUser.uid, "notifications"), orderBy("createdAt", "desc"));
+          const usersNotifsData = await getDocs(q);
+          
+          if (!usersNotifsData.empty) {
+            console.log("usersNotifsData: ", usersNotifsData.docs);
+            const usersNotifsArray = usersNotifsData.docs.map(doc => doc.data());
+            setUsersNotifs(usersNotifsArray as Notifs[]);
+          } else {
+            console.log("No notifications found for the user.");
+            setUsersNotifs([]);
+          }
+
           setIsAdmin(!!idTokenResult.claims.admin);
           setIsEditor(!!userInfo?.role && userInfo.role === "Editor");
           setUsersOrg(userInfo?.org);
@@ -167,6 +188,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("No user is currently logged in.");
         setUser(null);
         setIsAdmin(false);
+        setIsEditor(false);
+        setUsersNotifs([]);
       }
       setLoading(false);
     });
@@ -194,7 +217,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loading,
         isAdmin,
         isEditor,
-        usersOrg
+        usersOrg,
+        usersNotifs
       }}
     >
       {!loading && children}

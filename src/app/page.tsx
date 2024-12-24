@@ -1,9 +1,9 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { Notifs, useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
-import { collection, getDocs, limit, query } from "firebase/firestore";
+import { collection, getDocs, limit, or, orderBy, query } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { FaFilePdf } from "react-icons/fa";
 import { Dot, FileInput, FilePlus2, FileText } from "lucide-react";
@@ -36,9 +36,10 @@ export default function Home() {
   const createOrgRef = useRef<HTMLDivElement | null>(null);
   const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
+  const {usersNotifs} = useAuth();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [history, setHistory] = useState<History[]>([]);
-  const [notifications, setNotifications] = useState<string[]>([]);
+  const [notifications, setNotifications] = useState<Notifs[]>([]);
 
   useEffect(() => {
     try {
@@ -57,7 +58,7 @@ export default function Home() {
             }));
 
             // Fetch History
-            const historyQuery = query(collection(db, "history"), limit(5));
+            const historyQuery = query(collection(db, "history"), limit(5), orderBy("timestamp", "desc"));
             const historySnapshot = await getDocs(historyQuery);
             const historyList = historySnapshot.docs.map((doc) => ({
               id: doc.id,
@@ -71,14 +72,7 @@ export default function Home() {
       };
 
       const fetchNotifications = async () => {
-        // Mock notifications (replace with actual logic to fetch notifications)
-        setNotifications([
-          "New document request received.",
-          "Your recent document submission was approved.",
-          "New document request received.",
-          "Document #1209 requires your attention.",
-          "Document #4927 requires your attention.",
-        ]);
+        setNotifications(usersNotifs.slice(0, 5) as Notifs[]);
       };
 
       fetchDocs();
@@ -219,7 +213,7 @@ export default function Home() {
         <div className="flex flex-col">
           <span className="text-xl font-bold mb-6">Notifications</span>
           <div className="border-l-2 p-5 space-y-3">
-            {notifications.map((note, index) => (
+            {notifications.map((notif, index) => (
               <div
                 key={index}
                 className="text-muted-foreground hover:text-secondary-foreground flex items-center space-x-2 cursor-pointer hover:scale-105 transform transition-all"
@@ -228,7 +222,9 @@ export default function Home() {
                   <span className="font-bold">!</span>
                 </div>
                 <div className="flex flex-col m-2">
-                  <span>{note}</span>
+                  <span>
+                    {notif.title}{': '}
+                    {notif.message.substring(0, 15)}...</span>
                 </div>
               </div>
             ))}
