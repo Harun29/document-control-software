@@ -67,16 +67,6 @@ const AllDocumentsTable = () => {
     console.log("Modifying doc: ", doc);
   };
 
-  const getRowBackgroundColor = (action: string) => {
-    if (action.toLowerCase().includes("deleted")) {
-      return "bg-[#ff4d4faa]";
-    } else if (action.includes("created")) {
-      return "bg-[#52c41aaa]";
-    } else {
-      return "bg-[#1890ffaa]";
-    }
-  };
-
   useEffect(() => {
     console.log(viewType);
   }, [viewType]);
