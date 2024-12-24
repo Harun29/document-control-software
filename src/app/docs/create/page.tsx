@@ -35,14 +35,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRightCircle, FilePlus2, FileTextIcon, XCircleIcon } from "lucide-react";
-import { time } from "console";
+import { ArrowRightCircle, Bot, FilePlus2, FileTextIcon, XCircleIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AddDocument = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [label, setLabel] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
   const { user } = useAuth();
   const { usersOrg } = useAuth();
   const { getAiSummarisation } = useAi();
@@ -130,6 +131,7 @@ const AddDocument = () => {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
+    setLoadingSummary(true);
     if (
       selectedFile &&
       (selectedFile.type === "application/pdf" ||
@@ -139,27 +141,28 @@ const AddDocument = () => {
       setFile(selectedFile);
       const formData = new FormData();
       formData.append("file", selectedFile);
+      setTitle(selectedFile.name);
 
       try {
         const response = await fetch("http://127.0.0.1:8000/extractContent", {
           method: "POST",
           body: formData,
         });
-
         if (!response.ok) {
           throw new Error("Failed to extract content");
         }
-
         const data = await response.json();
         const contentSummary = await getAiSummarisation(data.content);
         setContent(
           contentSummary ? contentSummary : "Failed to summarise content"
         );
-        setTitle(selectedFile.name);
+        setLoadingSummary(false);
       } catch (error) {
         console.error("Error extracting content:", error);
+        setLoadingSummary(false);
       }
     } else {
+      setLoadingSummary(false);
       alert("Please upload a valid .pdf or .docx file.");
       setFile(null);
     }
@@ -198,13 +201,15 @@ const AddDocument = () => {
         {/* Content Input */}
         <div className="space-y-2">
           <Label htmlFor="content">Summary</Label>
-          <Textarea
+          {!loadingSummary ? <Textarea
             className="h-32"
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Enter document content"
-          />
+          /> : <Skeleton className="bg-indigo-500 bg-opacity-25 h-32 flex items-center justify-center rounded-md">
+            <Bot className="animate-spin w-8 h-8 mx-auto" />
+            </Skeleton>}
         </div>
         {/* Document Type Select */}
         <div className="space-y-2">
