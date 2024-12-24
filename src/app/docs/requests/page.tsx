@@ -106,6 +106,7 @@ const DocRequests = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDoc, setSelectedDoc] = useState<DocRequest | null>(null);
   const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
+  const [documentRejectionNote, setDocumentRejectionNote] = useState("");
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -192,8 +193,53 @@ const DocRequests = () => {
     }
   };
 
-  const handleReturnDoc = (doc: DocRequest) => {
-    console.log("Return document:", doc);
+  const handleReturnDoc = async (
+    selectedDoc: DocRequest
+  ) => {
+    try {
+      const userOrg = usersOrg;
+      const docRequestsRef = collection(db, "org", userOrg, "docRequests");
+      const q = query(
+        docRequestsRef,
+        where("fileName", "==", selectedDoc.fileName)
+      );
+      const querySnapshot = await getDocs(q);
+
+      const userRequestedNotifRef = collection(
+        db,
+        "users",
+        selectedDoc.reqByID,
+        "notifications"
+      );
+
+      let docRequestId = null;
+      querySnapshot.forEach((doc) => {
+        docRequestId = doc.id;
+      });
+
+      if (docRequestId) {
+        const newDocRef = collection(db, "org", userOrg, "docs");
+        const docRequestRef = doc(
+          db,
+          "org",
+          userOrg,
+          "docRequests",
+          docRequestId
+        );
+        await addDoc(userRequestedNotifRef, {
+          title: "Document Rejected",
+          message: `Your document request for ${selectedDoc.title} has been rejected: ${documentRejectionNote}.`,
+          createdAt: new Date().toISOString(),
+          read: false,
+        });
+        await deleteDoc(docRequestRef);
+        console.log("Document returned successfully");
+      } else {
+        console.error("No matching document found");
+      }
+    } catch (error) {
+      console.error("Error returning document: ", error);
+    }
   };
 
   const table = useReactTable({
@@ -498,7 +544,7 @@ const DocRequests = () => {
                       Return the document to the requester {selectedDoc?.reqBy}{" "}
                       with a note:
                     </DialogDescription>
-                    <Textarea></Textarea>
+                    <Textarea onChange={(e) => setDocumentRejectionNote(e.target.value)}></Textarea>
                   </DialogHeader>
                   <DialogFooter className="sm:justify-start">
                     <Button onClick={() => handleReturnDoc(selectedDoc!)}>
