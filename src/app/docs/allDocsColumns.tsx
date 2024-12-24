@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DocRequest } from "./types";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
+import Link from "next/link";
 
 export const columns = (
   handleModifyDoc: (doc: DocRequest) => void,
@@ -49,6 +50,18 @@ export const columns = (
   {
     accessorKey: "title",
     header: "Title",
+  },
+  {
+    id: "fileName",
+    accessorKey: "fileName",
+    header: "",
+    cell: ({ row }) => {
+      const fileName = row.getValue("fileName") as string;
+      return (
+        <Button variant="ghost" className="text-blue-500">
+          <Link href={`/docs/${fileName}`}>View Doc</Link>
+        </Button>)
+    }
   },
   {
     id: "actions",

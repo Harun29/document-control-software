@@ -49,6 +49,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
+import Link from "next/link";
 
 const AllDocumentsTable = ({ org }: { org: string }) => {
   const { docs } = useGeneral();
@@ -254,7 +255,8 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       {viewType === "grid" && (
         <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 py-4">
           {data.map((doc) => (
-            <div
+            <Link
+              href={`/docs/${doc.fileName}`}
               key={doc.fileName}
               className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
             >
@@ -297,7 +299,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
               <div className="mt-2 text-center text-sm font-medium truncate">
                 {doc.title.substring(0, 15)}...
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
