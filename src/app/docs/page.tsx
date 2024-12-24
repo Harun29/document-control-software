@@ -34,7 +34,7 @@ const ManageDocs = () => {
         <Tabs defaultValue="alldocuments" className="w-full">
           <TabsList className="flex justify-evenly">
             <TabsTrigger value="alldocuments">All Documents</TabsTrigger>
-            {orgs.map(org => <TabsTrigger value={org}>{org}</TabsTrigger>)}
+            {orgs.map(org => <TabsTrigger key={org} value={org}>{org}</TabsTrigger>)}
           </TabsList>
           <TabsContent value="alldocuments">
             <AllDocumentsTable org=""/>

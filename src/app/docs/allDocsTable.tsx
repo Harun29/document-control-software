@@ -19,6 +19,9 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -29,7 +32,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, Grid, TableIcon } from "lucide-react";
+import {
+  ChevronDown,
+  Copy,
+  EllipsisVertical,
+  Grid,
+  MoreHorizontal,
+  Pencil,
+  TableIcon,
+  Trash,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGeneral } from "@/context/GeneralContext";
 import { DocRequest } from "./types";
@@ -40,7 +52,7 @@ import { db } from "@/config/firebaseConfig";
 
 const AllDocumentsTable = ({ org }: { org: string }) => {
   const { docs } = useGeneral();
-  const {docsByOrg} = useGeneral();
+  const { docsByOrg } = useGeneral();
   const [data, setData] = useState<DocRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -51,9 +63,9 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        if(org === ""){
+        if (org === "") {
           setData(docs);
-        }else{
+        } else {
           setData(docsByOrg.find((doc) => doc.org === org)?.docs ?? []);
         }
       } catch (error) {
@@ -244,8 +256,38 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           {data.map((doc) => (
             <div
               key={doc.fileName}
-              className="flex flex-col items-center justify-center cursor-pointer"
+              className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
             >
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
+                  >
+                    <span className="sr-only">Open menu</span>
+                    <EllipsisVertical />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onClick={() => navigator.clipboard.writeText(doc.fileURL)}
+                  >
+                    <Copy />
+                    Copy File URL
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDeleteDocs(doc)}>
+                    <Trash />
+                    Delete Document
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => handleModifyDoc(doc)}>
+                    <Pencil />
+                    Modify Document
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               {doc.fileType === "application/pdf" ? (
                 <FaFilePdf className="text-red-500 w-16 h-16" />
               ) : (
