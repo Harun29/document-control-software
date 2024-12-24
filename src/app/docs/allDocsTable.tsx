@@ -35,9 +35,12 @@ import { useGeneral } from "@/context/GeneralContext";
 import { DocRequest } from "./types";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/config/firebaseConfig";
 
-const AllDocumentsTable = () => {
+const AllDocumentsTable = ({ org }: { org: string }) => {
   const { docs } = useGeneral();
+  const {docsByOrg} = useGeneral();
   const [data, setData] = useState<DocRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -48,7 +51,11 @@ const AllDocumentsTable = () => {
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        setData(docs);
+        if(org === ""){
+          setData(docs);
+        }else{
+          setData(docsByOrg.find((doc) => doc.org === org)?.docs ?? []);
+        }
       } catch (error) {
         console.error("Error fetching documents: ", error);
       } finally {
@@ -57,7 +64,7 @@ const AllDocumentsTable = () => {
     };
 
     fetchDocs();
-  }, [docs]);
+  }, [docs, org]);
 
   const handleDeleteDocs = async (doc: DocRequest) => {
     console.log("Deleting doc: ", doc);
@@ -246,7 +253,7 @@ const AllDocumentsTable = () => {
               )}
 
               <div className="mt-2 text-center text-sm font-medium truncate">
-                {doc.title}
+                {doc.title.substring(0, 15)}...
               </div>
             </div>
           ))}

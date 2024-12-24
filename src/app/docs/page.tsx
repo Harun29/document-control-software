@@ -8,7 +8,6 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 
 const ManageDocs = () => {
-
   const [orgs, setOrgs] = useState<string[]>([]);
   useEffect(() => {
     const fetchOrgs = async() => {
@@ -35,11 +34,14 @@ const ManageDocs = () => {
         <Tabs defaultValue="alldocuments" className="w-full">
           <TabsList className="flex justify-evenly">
             <TabsTrigger value="alldocuments">All Documents</TabsTrigger>
-          {orgs.map(org => <TabsTrigger value={org}>{org}</TabsTrigger>)}
+            {orgs.map(org => <TabsTrigger value={org}>{org}</TabsTrigger>)}
           </TabsList>
           <TabsContent value="alldocuments">
-            <AllDocumentsTable />
+            <AllDocumentsTable org=""/>
           </TabsContent>
+            {orgs.map(org => <TabsContent value={org}>
+            <AllDocumentsTable org={org} />
+          </TabsContent>)}
           <TabsContent value="password">Change your password here.</TabsContent>
         </Tabs>
       </div>

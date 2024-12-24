@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 
@@ -33,6 +34,12 @@ interface GeneralContextProps {
     updatedDoc: Partial<DocRequest>
   ) => Promise<void>;
   deleteDoc: (fileName: string) => Promise<void>;
+  docsByOrg: DocsByOrg[];
+}
+
+export type DocsByOrg = {
+  org: string;
+  docs: DocRequest[];
 }
 
 const GeneralContext = createContext<GeneralContextProps | null>(null);
@@ -46,6 +53,7 @@ export const GeneralProvider = ({
   const [docRequests, setDocRequests] = useState<DocRequest[]>([]);
   const [numberOfRequests, setNumberOfRequests] = useState(0);
   const [docs, setDocs] = useState<DocRequest[]>([]);
+  const [docsByOrg, setDocsByOrg] = useState<DocsByOrg[]>([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -71,11 +79,21 @@ export const GeneralProvider = ({
 
   useEffect(() => {
     const docRef = doc(db, "docs", "alldocs");
-
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    const unsubscribe = onSnapshot(docRef, async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setDocs(data.docs || []);
+        const orgs = await getDocs(collection(db, "org"));
+        const docsByOrgPromises = orgs.docs.map(async (org) => {
+          const docsByOrg = await getDocs(collection(db, "org", org.id, "docs"));
+          const docs = docsByOrg.docs.map((doc) => doc.data() as DocRequest);
+          return { org: org.data().name, docs };
+        });
+        const docsByOrgArray = await Promise.all(docsByOrgPromises);
+        setDocsByOrg(docsByOrgArray);
+        docsByOrgArray.forEach((docFromOrg) => {
+          console.log("docs by org: ", docFromOrg.org, docFromOrg.docs);
+        });
       } else {
         console.error("No such document!");
       }
@@ -148,6 +166,7 @@ export const GeneralProvider = ({
         createDoc,
         updateDocument,
         deleteDoc,
+        docsByOrg
       }}
     >
       {children}
