@@ -8,6 +8,8 @@ import {
   getDoc,
   updateDoc,
   getDocs,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 
@@ -83,10 +85,16 @@ export const GeneralProvider = ({
     const unsubscribe = onSnapshot(docRef, async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
+        data.docs.sort((a: DocRequest, b: DocRequest) => {
+          const dateA = (a.createdAt as any).toDate();
+          const dateB = (b.createdAt as any).toDate();
+          return dateB.getTime() - dateA.getTime();
+        });
         setDocs(data.docs || []);
         const orgs = await getDocs(collection(db, "org"));
         const docsByOrgPromises = orgs.docs.map(async (org) => {
-          const docsByOrg = await getDocs(collection(db, "org", org.id, "docs"));
+          const q = query(collection(db, "org", org.id, "docs"), orderBy("createdAt", "desc"));
+          const docsByOrg = await getDocs(q);
           const docs = docsByOrg.docs.map((doc) => doc.data() as DocRequest);
           return { org: org.data().name, docs };
         });

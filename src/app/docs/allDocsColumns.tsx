@@ -32,9 +32,11 @@ export const columns = (
   {
     accessorKey: "createdAt",
     header: "Created At",
-    cell: ({ row }) => (
-      <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>
-    ),
+    cell: ({ row }) => {
+      const createdAt = row.getValue("createdAt") as string | number | Date;
+      const date = (createdAt as any).toDate();
+      return <div>{isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleString()}</div>;
+    },
   },
   {
     accessorKey: "reqBy",

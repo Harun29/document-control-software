@@ -42,7 +42,6 @@ const ManageDocs = () => {
             {orgs.map(org => <TabsContent value={org}>
             <AllDocumentsTable org={org} />
           </TabsContent>)}
-          <TabsContent value="password">Change your password here.</TabsContent>
         </Tabs>
       </div>
     </div>
