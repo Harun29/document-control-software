@@ -7,7 +7,16 @@ import { useAuth } from "@/context/AuthContext";
 import { useAi } from "@/context/AiContext";
 import { db } from "@/config/firebaseConfig";
 import { storage } from "@/config/firebaseConfig";
-import { collection, addDoc, or, doc, setDoc, arrayUnion, updateDoc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  or,
+  doc,
+  setDoc,
+  arrayUnion,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
 import {
   Select,
   SelectContent,
@@ -35,7 +44,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRightCircle, Bot, FilePlus2, FileTextIcon, XCircleIcon } from "lucide-react";
+import {
+  ArrowRightCircle,
+  Bot,
+  FilePlus2,
+  FileTextIcon,
+  XCircleIcon,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const AddDocument = () => {
@@ -108,7 +123,7 @@ const AddDocument = () => {
             user: user?.userInfo?.email,
             org: user?.userInfo?.orgName,
             timeStamp: new Date(),
-          })
+          }),
         });
       } else {
         await setDoc(docHistoryRef, {
@@ -118,8 +133,8 @@ const AddDocument = () => {
               user: user?.userInfo?.email,
               org: user?.userInfo?.orgName,
               timeStamp: new Date(),
-            }
-          ]
+            },
+          ],
         });
       }
 
@@ -201,15 +216,19 @@ const AddDocument = () => {
         {/* Content Input */}
         <div className="space-y-2">
           <Label htmlFor="content">Summary</Label>
-          {!loadingSummary ? <Textarea
-            className="h-32"
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Enter document content"
-          /> : <Skeleton className="bg-indigo-500 bg-opacity-25 h-32 flex items-center justify-center rounded-md">
-            <Bot className="animate-spin w-8 h-8 mx-auto" />
-            </Skeleton>}
+          {!loadingSummary ? (
+            <Textarea
+              className="h-36"
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Enter document content"
+            />
+          ) : (
+            <Skeleton className="bg-indigo-500 bg-opacity-25 h-36 flex items-center justify-center rounded-md">
+              <Bot className="animate-spin w-8 h-8 mx-auto" />
+            </Skeleton>
+          )}
         </div>
         {/* Document Type Select */}
         <div className="space-y-2">

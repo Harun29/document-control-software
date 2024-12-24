@@ -3,7 +3,14 @@ import { useRef, useState, useEffect } from "react";
 import { Notifs, useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
-import { collection, getDocs, limit, or, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  limit,
+  or,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { FaFilePdf } from "react-icons/fa";
 import { Dot, FileInput, FilePlus2, FileText } from "lucide-react";
@@ -36,7 +43,7 @@ export default function Home() {
   const createOrgRef = useRef<HTMLDivElement | null>(null);
   const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
-  const {usersNotifs} = useAuth();
+  const { usersNotifs } = useAuth();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [history, setHistory] = useState<History[]>([]);
   const [notifications, setNotifications] = useState<Notifs[]>([]);
@@ -49,7 +56,8 @@ export default function Home() {
             // Fetch Recent Docs
             const docsQuery = query(
               collection(db, "org", user.userInfo.org, "docs"),
-              limit(6)
+              limit(6),
+              orderBy("createdAt", "desc")
             );
             const docsSnapshot = await getDocs(docsQuery);
             const docsList = docsSnapshot.docs.map((doc) => ({
@@ -58,7 +66,11 @@ export default function Home() {
             }));
 
             // Fetch History
-            const historyQuery = query(collection(db, "history"), limit(5), orderBy("timestamp", "desc"));
+            const historyQuery = query(
+              collection(db, "history"),
+              limit(5),
+              orderBy("timestamp", "desc")
+            );
             const historySnapshot = await getDocs(historyQuery);
             const historyList = historySnapshot.docs.map((doc) => ({
               id: doc.id,
@@ -130,32 +142,39 @@ export default function Home() {
               {user?.userInfo?.firstName} {user?.userInfo?.lastName}
             </span>
             <span>
-            <Dot className="inline-block" />
-              {user?.userInfo?.role}</span>
+              <Dot className="inline-block" />
+              {user?.userInfo?.role}
+            </span>
             <Link className="font-bold" href={`/orgs/${user?.userInfo?.org}`}>
-            <Dot className="inline-block" />
+              <Dot className="inline-block" />
               <span>{user?.userInfo?.orgName}</span>
             </Link>
           </div>
         </div>
         <div className="grid grid-cols-3 gap-10 m-auto">
           <Link href="/docs" className="pointer hover:scale-105 transition-all">
-          <div className="flex flex-col justify-center items-center">
-            <FileText className="w-32 h-32 mr-2" strokeWidth={1}/>
-            <span className="text-2xl">Documents</span>
-          </div>
+            <div className="flex flex-col justify-center items-center">
+              <FileText className="w-32 h-32 mr-2" strokeWidth={1} />
+              <span className="text-2xl">Documents</span>
+            </div>
           </Link>
-          <Link href="/docs/create" className="pointer hover:scale-105 transition-all">
-          <div className="flex flex-col justify-center items-center">
-            <FilePlus2 className="w-32 h-32 mr-2" strokeWidth={1}/>
-            <span className="text-2xl">Add Documents</span>
-          </div>
+          <Link
+            href="/docs/create"
+            className="pointer hover:scale-105 transition-all"
+          >
+            <div className="flex flex-col justify-center items-center">
+              <FilePlus2 className="w-32 h-32 mr-2" strokeWidth={1} />
+              <span className="text-2xl">Add Documents</span>
+            </div>
           </Link>
-          <Link href="/docs/requests" className="pointer hover:scale-105 transition-all">
-          <div className="flex flex-col justify-center items-center">
-            <FileInput className="w-32 h-32 mr-2" strokeWidth={1}/>
-            <span className="text-2xl">Document Requests</span>
-          </div>
+          <Link
+            href="/docs/requests"
+            className="pointer hover:scale-105 transition-all"
+          >
+            <div className="flex flex-col justify-center items-center">
+              <FileInput className="w-32 h-32 mr-2" strokeWidth={1} />
+              <span className="text-2xl">Document Requests</span>
+            </div>
           </Link>
         </div>
       </div>
@@ -167,10 +186,8 @@ export default function Home() {
           <span className="text-xl font-bold mb-6">Recent</span>
           <div className="border-l-2 p-5 grid grid-cols-2 gap-x-20 gap-y-5">
             {docs.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition-all"
-              >
+              <Link href={`/docs/${doc.fileName}`} key={doc.id}
+                className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition-all">
                 {doc.fileType === "application/pdf" && (
                   <FaFilePdf className="text-red-500 w-10 h-10 me-2" />
                 )}
@@ -182,7 +199,7 @@ export default function Home() {
                     {doc.reqBy}
                   </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -223,8 +240,10 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col m-2">
                   <span>
-                    {notif.title}{': '}
-                    {notif.message.substring(0, 15)}...</span>
+                    {notif.title}
+                    {": "}
+                    {notif.message.substring(0, 15)}...
+                  </span>
                 </div>
               </div>
             ))}
