@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useAi } from "@/context/AiContext";
 import { db } from "@/config/firebaseConfig";
 import { storage } from "@/config/firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, or, doc, setDoc, arrayUnion, updateDoc, getDoc } from "firebase/firestore";
 import {
   Select,
   SelectContent,
@@ -36,6 +36,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ArrowRightCircle, FilePlus2, FileTextIcon, XCircleIcon } from "lucide-react";
+import { time } from "console";
 
 const AddDocument = () => {
   const [title, setTitle] = useState("");
@@ -92,8 +93,34 @@ const AddDocument = () => {
           status: "pending",
           reqBy: user?.userInfo?.email,
           reqByID: user?.uid,
+          org: user?.userInfo?.orgName,
         }
       );
+
+      const docHistoryRef = doc(db, "docHistory", extendedFileName);
+      const docSnap = await getDoc(docHistoryRef);
+
+      if (docSnap.exists()) {
+        await updateDoc(docHistoryRef, {
+          history: arrayUnion({
+            action: "User requested document",
+            user: user?.userInfo?.email,
+            org: user?.userInfo?.orgName,
+            timeStamp: new Date(),
+          })
+        });
+      } else {
+        await setDoc(docHistoryRef, {
+          history: [
+            {
+              action: "User requested document",
+              user: user?.userInfo?.email,
+              org: user?.userInfo?.orgName,
+              timeStamp: new Date(),
+            }
+          ]
+        });
+      }
 
       console.log("Document request submitted with ID:", docRef.id);
     } catch (error) {

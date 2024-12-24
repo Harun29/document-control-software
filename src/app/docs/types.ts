@@ -9,4 +9,5 @@ export type DocRequest = {
   title: string;
   reqBy: string;
   reqByID: string;
+  org: string;
 };

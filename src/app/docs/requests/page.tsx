@@ -91,6 +91,8 @@ import {
   deleteDoc,
   doc,
   serverTimestamp,
+  updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 
@@ -181,6 +183,15 @@ const DocRequests = () => {
           action: "Added a new document",
           result: newDoc?.title || selectedDoc.title,
           timestamp: serverTimestamp(),
+        });
+        const docHistoryRef = doc(db, "docHistory", selectedDoc.fileName);
+        await updateDoc(docHistoryRef, {
+          history: arrayUnion({
+            action: "Document accepted",
+            user: user?.userInfo?.email,
+            org: user?.userInfo?.orgName,
+            timeStamp: new Date(),
+          })
         });
         await deleteDoc(docRequestRef);
 
