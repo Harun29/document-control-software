@@ -16,8 +16,13 @@ import "../app/globals.css";
 import Link from "next/link";
 import { db } from "@/config/firebaseConfig";
 import { doc, getDoc, updateDoc, writeBatch } from "firebase/firestore";
+import { AnimatePresence, motion } from "framer-motion";
 
-const Notifications = forwardRef<HTMLDivElement>((_, ref) => {
+interface NotificationsProps {
+  closeNotifs: () => void;
+}
+
+const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNotifs }, ref) => {
   const { usersNotifs } = useAuth();
   const { usersUnreadNotifs } = useAuth();
   const { user } = useAuth();
@@ -41,6 +46,7 @@ const Notifications = forwardRef<HTMLDivElement>((_, ref) => {
           await updateDoc(notifRef, { read: true });
         }
         setData(data.map((n) => (n.id === notif.id ? { ...n, read: true } : n)));
+        closeNotifs();
       }
     } catch (error) {
       console.error("Error updating notification:", error);
@@ -70,7 +76,13 @@ const Notifications = forwardRef<HTMLDivElement>((_, ref) => {
   };
 
   return (
-    <div className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10">
+    <AnimatePresence>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.1 }}
+    className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10">
       <Card className="w-[600px] shadow-lg rounded-lg" ref={ref}>
         <CardHeader className="p-4">
           <CardTitle className="leading-8 text-xl font-semibold">
@@ -96,7 +108,7 @@ const Notifications = forwardRef<HTMLDivElement>((_, ref) => {
               <Link
                 href={`/docs/${notif.documentURL ? notif.documentURL : ""}`}
                 onClick={() => handleViewNotif(notif)}
-                className="flex flex-col m-2"
+                className="flex flex-col m-2 w-4/5"
               >
                 <span>
                   {notif.title}
@@ -119,7 +131,8 @@ const Notifications = forwardRef<HTMLDivElement>((_, ref) => {
           Mark All as Read
         </Button>
       </Card>
-    </div>
+    </motion.div>
+    </AnimatePresence>
   );
 });
 

@@ -15,6 +15,7 @@ import { db } from "@/config/firebaseConfig";
 import { FaFilePdf } from "react-icons/fa";
 import { Dot, FileInput, FilePlus2, FileText } from "lucide-react";
 import Notifications from "@/components/notifications";
+import { Button } from "@/components/ui/button";
 
 export type Doc = {
   id: string;
@@ -48,6 +49,8 @@ export default function Home() {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [history, setHistory] = useState<History[]>([]);
   const [notifications, setNotifications] = useState<Notifs[]>([]);
+  const [showNotifs, setShowNotifs] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     try {
@@ -102,13 +105,17 @@ export default function Home() {
     const clickedOutsideOrg =
       createOrgRef.current &&
       !createOrgRef.current.contains(event.target as Node);
+    const clickedOutsideNotifications =
+    notificationsRef.current &&
+    !notificationsRef.current.contains(event.target as Node);
 
+    if (clickedOutsideNotifications) setShowNotifs(false);
     if (clickedOutsideUser) setCreateUser(false);
     if (clickedOutsideOrg) setCreateOrg(false);
   };
 
   useEffect(() => {
-    if (createUser || createOrg) {
+    if (createUser || createOrg || notifications) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -117,7 +124,7 @@ export default function Home() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [createUser, createOrg]);
+  }, [createUser, createOrg, notifications]);
 
   return (
     <div className="p-16 pb-0 h-full">
@@ -247,7 +254,9 @@ export default function Home() {
                 </div>
               </div>
             ))}
+            <Button onClick={() => setShowNotifs(true)} variant="secondary">View all</Button>
           </div>
+          {showNotifs && <Notifications ref={notificationsRef} closeNotifs={() => setShowNotifs(false)}/>}
         </div>
       </div>
     </div>

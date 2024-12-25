@@ -135,7 +135,7 @@ export function NavUser({
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
-      {notifications && <Notifications ref={notificationsRef}/>}
+      {notifications && <Notifications ref={notificationsRef} closeNotifs={() => setNotifications(false)}/>}
     </SidebarMenu>
 
   )
