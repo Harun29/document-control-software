@@ -14,6 +14,7 @@ import {
 import { db } from "@/config/firebaseConfig";
 import { FaFilePdf } from "react-icons/fa";
 import { Dot, FileInput, FilePlus2, FileText } from "lucide-react";
+import Notifications from "@/components/notifications";
 
 export type Doc = {
   id: string;
@@ -120,7 +121,6 @@ export default function Home() {
 
   return (
     <div className="p-16 pb-0 h-full">
-      {/* User Info */}
       <div className="flex items-center justify-between mb-12 ">
         <div className="flex items-center border-2 rounded-xl p-7">
           <div>

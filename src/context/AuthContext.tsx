@@ -14,8 +14,10 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 export interface Notifs {
   title: string;
   message: string;
-  timestamp: string;
+  createdAt: string;
   read: boolean;
+  documentURL: string;
+  id: string; 
 }
 
 interface UserInfo {
@@ -46,6 +48,8 @@ interface AuthContextProps {
   isEditor: boolean;
   usersOrg: string;
   usersNotifs: Notifs[];
+  usersNotifsNumber: number;
+  usersUnreadNotifs: number;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -57,6 +61,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isEditor, setIsEditor] = useState(false);
   const [usersOrg, setUsersOrg] = useState("");
   const [usersNotifs, setUsersNotifs] = useState<Notifs[]>([]);
+  const [usersNotifsNumber, setUsersNotifsNumber] = useState(0);
+  const [usersUnreadNotifs, setUsersUnreadNotifs] = useState(0);
 
   const functions = getFunctions();
 
@@ -168,8 +174,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           
           if (!usersNotifsData.empty) {
             console.log("usersNotifsData: ", usersNotifsData.docs);
-            const usersNotifsArray = usersNotifsData.docs.map(doc => doc.data());
-            setUsersNotifs(usersNotifsArray as Notifs[]);
+            const usersNotifsArray = usersNotifsData.docs.map(doc => ({
+              title: doc.data().title,
+              message: doc.data().message,
+              createdAt: doc.data().createdAt,
+              read: doc.data().read,
+              documentURL: doc.data().documentURL,
+              id: doc.id,
+            }));
+            setUsersNotifs(usersNotifsArray);
+            setUsersNotifsNumber(usersNotifsArray.length);
+            setUsersUnreadNotifs(usersNotifsArray.filter(notif => !notif.read).length);
           } else {
             console.log("No notifications found for the user.");
             setUsersNotifs([]);
@@ -218,7 +233,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAdmin,
         isEditor,
         usersOrg,
-        usersNotifs
+        usersNotifs,
+        usersNotifsNumber,
+        usersUnreadNotifs,
       }}
     >
       {!loading && children}

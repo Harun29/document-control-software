@@ -174,6 +174,7 @@ const DocRequests = () => {
         await addDoc(userRequestedNotifRef, {
           title: "Document Accepted",
           message: `Your document request for ${selectedDoc.title} has been accepted.`,
+          documentURL: selectedDoc.fileName,
           createdAt: new Date().toISOString(),
           read: false,
         });
