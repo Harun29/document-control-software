@@ -49,6 +49,7 @@ import {
   Bot,
   FilePlus2,
   FileTextIcon,
+  LoaderCircle,
   XCircleIcon,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -59,6 +60,8 @@ const AddDocument = () => {
   const [label, setLabel] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loadingSummary, setLoadingSummary] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const alertDialogCancelRef = React.useRef<HTMLButtonElement | null>(null);
   const { user } = useAuth();
   const { usersOrg } = useAuth();
   const { getAiSummarisation } = useAi();
@@ -85,13 +88,14 @@ const AddDocument = () => {
       alert("Please upload a file.");
       return;
     }
-
+    
+    setLoading(true);
     const randomWords = uuidv4();
     const extendedFileName = `${
       file.name.split(".")[0]
     }-${randomWords}.${file.name.split(".").pop()}`;
     const storageRef = ref(storage, `documents/${extendedFileName}`);
-
+    
     try {
       await uploadBytes(storageRef, file);
       const fileURL = await getDownloadURL(storageRef);
@@ -139,6 +143,9 @@ const AddDocument = () => {
       }
 
       console.log("Document request submitted with ID:", docRef.id);
+      clearDocSelection();
+      alertDialogCancelRef.current?.click();
+      setLoading(false);
     } catch (error) {
       console.error("Error adding document request:", error);
     }
@@ -302,8 +309,9 @@ const AddDocument = () => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleSubmit}>
+                  <AlertDialogCancel ref={alertDialogCancelRef}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleSubmit} disabled={loading}>
+                    {loading && <LoaderCircle className="animate-spin w-4 h-4" />}
                     Continue
                   </AlertDialogAction>
                 </AlertDialogFooter>
