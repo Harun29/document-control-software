@@ -8,7 +8,7 @@ import {
   signOut,
   User,
 } from "firebase/auth";
-import { addDoc, collection, doc, getDoc, getDocs, or, orderBy, query, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, or, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 export interface Notifs {
@@ -169,7 +169,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const userInfo = await fetchUserInfo(currentUser.uid);
           const idTokenResult = await currentUser.getIdTokenResult();
-          const q = query(collection(db, "users", currentUser.uid, "notifications"), orderBy("createdAt", "desc"));
+          const q = query(collection(db, "users", currentUser.uid, "notifications"), orderBy("createdAt", "desc"), orderBy("read", "asc"));
           const usersNotifsData = await getDocs(q);
           
           if (!usersNotifsData.empty) {
@@ -211,6 +211,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (user?.uid) {
+      const notifQuery = query(
+        collection(db, "users", user.uid, "notifications"),
+        orderBy("read", "asc"),
+        orderBy("createdAt", "desc"),
+      );
+
+      const unsubscribeNotifs = onSnapshot(notifQuery, (snapshot) => {
+        if (!snapshot.empty) {
+          const notifications = snapshot.docs.map((doc) => ({
+            ...(doc.data() as Notifs),
+            id: doc.id,
+          }));
+          setUsersNotifs(notifications as Notifs[]);
+          setUsersNotifsNumber(notifications.length);
+          setUsersUnreadNotifs(
+            notifications.filter((notif) => !notif.read).length
+          );
+        } else {
+          setUsersNotifs([]);
+          setUsersNotifsNumber(0);
+          setUsersUnreadNotifs(0);
+        }
+      });
+
+      return () => unsubscribeNotifs();
+    } else {
+      setUsersNotifs([]);
+      setUsersNotifsNumber(0);
+      setUsersUnreadNotifs(0);
+    }
+  }, [user, db]);
+
+  useEffect(() => {
+    console.log("Users notifications: ", usersNotifs);
+  }, [usersNotifs]);
 
   const login = async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password);

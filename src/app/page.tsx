@@ -46,6 +46,7 @@ export default function Home() {
   const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
   const { usersNotifs } = useAuth();
+  const {usersUnreadNotifs} = useAuth();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [history, setHistory] = useState<History[]>([]);
   const [notifications, setNotifications] = useState<Notifs[]>([]);
@@ -236,8 +237,9 @@ export default function Home() {
         {/* Notifications Section */}
         <div className="flex flex-col">
           <span className="text-xl font-bold mb-6">Notifications</span>
-          <div className="border-l-2 p-5 space-y-3">
+          <div className="border-l-2 p-5 space-y-3 flex flex-col items-center">
             {notifications.map((notif, index) => (
+              !notif.read && (
               <div
                 key={index}
                 className="text-muted-foreground hover:text-secondary-foreground flex items-center space-x-2 cursor-pointer hover:scale-105 transform transition-all"
@@ -253,8 +255,13 @@ export default function Home() {
                   </span>
                 </div>
               </div>
-            ))}
-            <Button onClick={() => setShowNotifs(true)} variant="secondary">View all</Button>
+            )))}
+            {usersUnreadNotifs === 0 && (
+              <span className="text-muted-foreground">You don't have any new notifications!</span>
+            )}
+            <Button onClick={() => setShowNotifs(true)} variant="secondary">
+              {usersUnreadNotifs > 0 ? "View All" : "View"}
+            </Button>
           </div>
           {showNotifs && <Notifications ref={notificationsRef} closeNotifs={() => setShowNotifs(false)}/>}
         </div>
