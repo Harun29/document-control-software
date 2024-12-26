@@ -52,6 +52,8 @@ interface AuthContextProps {
   usersNotifs: Notifs[];
   usersNotifsNumber: number;
   usersUnreadNotifs: number;
+  viewNotifications: boolean;
+  handleViewNotifications: (bool: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -65,6 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [usersNotifs, setUsersNotifs] = useState<Notifs[]>([]);
   const [usersNotifsNumber, setUsersNotifsNumber] = useState(0);
   const [usersUnreadNotifs, setUsersUnreadNotifs] = useState(0);
+  const [viewNotifications, setViewNotifications] = useState(false);
 
   const functions = getFunctions();
 
@@ -214,6 +217,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
+  const handleViewNotifications = (bool: boolean) => {
+    setViewNotifications(bool);
+  }
+
   useEffect(() => {
     if (user?.uid) {
       const notifQuery = query(
@@ -229,7 +236,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             id: doc.id,
           }));
           if(notifications.length !== usersNotifs.length){
-            toast.message("New notification received")
+            toast("You received new notification!", {
+              action: {
+                label: "View",
+                onClick: () => handleViewNotifications(true),
+              },
+            })
           }
           setUsersNotifs(notifications as Notifs[]);
           setUsersNotifsNumber(notifications.length);
@@ -279,6 +291,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         usersNotifs,
         usersNotifsNumber,
         usersUnreadNotifs,
+        viewNotifications,
+        handleViewNotifications,
       }}
     >
       {!loading && children}

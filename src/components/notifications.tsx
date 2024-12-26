@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { useAuth } from "@/context/AuthContext";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { Notifs } from "@/context/AuthContext";
 import "../app/globals.css";
 import Link from "next/link";
@@ -22,11 +22,13 @@ interface NotificationsProps {
   closeNotifs: () => void;
 }
 
-const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNotifs }, ref) => {
+const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNotifs }) => {
   const { usersNotifs } = useAuth();
   const { usersUnreadNotifs } = useAuth();
   const { user } = useAuth();
   const [data, setData] = useState<Notifs[]>([]);
+  const { handleViewNotifications } = useAuth();
+  const notifRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setData(usersNotifs);
@@ -35,6 +37,25 @@ const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNot
   useEffect(() => {
     data && console.log(data);
   }, [data]);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    const clickedOutsideNotifications =
+      (notifRef && 'current' in notifRef && notifRef.current) &&
+      !notifRef.current.contains(event.target as Node);
+
+    if (clickedOutsideNotifications) {
+      closeNotifs();
+      handleViewNotifications(false);
+    };
+  };
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+  
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
 
   const handleViewNotif = async (notif: Notifs) => {
     try {
@@ -47,6 +68,7 @@ const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNot
         }
         setData(data.map((n) => (n.id === notif.id ? { ...n, read: true } : n)));
         closeNotifs();
+        handleViewNotifications(false);
       }
     } catch (error) {
       console.error("Error updating notification:", error);
@@ -83,7 +105,7 @@ const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNot
       exit={{ opacity: 0 }}
       transition={{ duration: 0.1 }}
     className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10">
-      <Card className="w-[600px] shadow-lg rounded-lg" ref={ref}>
+      <Card className="w-[600px] shadow-lg rounded-lg" ref={notifRef}>
         <CardHeader className="p-4">
           <CardTitle className="leading-8 text-xl font-semibold">
             Notifications

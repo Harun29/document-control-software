@@ -47,28 +47,10 @@ export function NavUser({
   const { isMobile } = useSidebar()
   const {logout} = useAuth();
   const [notifications, setNotifications] = useState(false);
-  const notificationsRef = useRef<HTMLDivElement | null>(null);
   const {usersUnreadNotifs} = useAuth();
+  const {handleViewNotifications} = useAuth();
+  const {viewNotifications} = useAuth();
 
-  const handleClickOutside = (event: MouseEvent) => {
-    const clickedOutsideNotifications =
-      notificationsRef.current &&
-      !notificationsRef.current.contains(event.target as Node);
-
-    if (clickedOutsideNotifications) setNotifications(false);
-  };
-
-    useEffect(() => {
-      if (notifications) {
-        document.addEventListener("mousedown", handleClickOutside);
-      } else {
-        document.removeEventListener("mousedown", handleClickOutside);
-      }
-  
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, [notifications]);
 
   return (
     <SidebarMenu>
@@ -135,7 +117,7 @@ export function NavUser({
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
-      {notifications && <Notifications ref={notificationsRef} closeNotifs={() => setNotifications(false)}/>}
+      {(notifications || viewNotifications) && <Notifications closeNotifs={() => setNotifications(false)}/>}
     </SidebarMenu>
 
   )

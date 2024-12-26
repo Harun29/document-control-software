@@ -47,6 +47,7 @@ export default function Home() {
   const { user } = useAuth();
   const { usersNotifs } = useAuth();
   const {usersUnreadNotifs} = useAuth();
+  const {viewNotifications} = useAuth();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [history, setHistory] = useState<History[]>([]);
   const [notifications, setNotifications] = useState<Notifs[]>([]);
@@ -73,7 +74,7 @@ export default function Home() {
             // Fetch History
             const historyQuery = query(
               collection(db, "history"),
-              limit(5),
+              limit(4),
               orderBy("timestamp", "desc")
             );
             const historySnapshot = await getDocs(historyQuery);
@@ -106,17 +107,13 @@ export default function Home() {
     const clickedOutsideOrg =
       createOrgRef.current &&
       !createOrgRef.current.contains(event.target as Node);
-    const clickedOutsideNotifications =
-    notificationsRef.current &&
-    !notificationsRef.current.contains(event.target as Node);
 
-    if (clickedOutsideNotifications) setShowNotifs(false);
     if (clickedOutsideUser) setCreateUser(false);
     if (clickedOutsideOrg) setCreateOrg(false);
   };
 
   useEffect(() => {
-    if (createUser || createOrg || notifications) {
+    if (createUser || createOrg) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -125,7 +122,7 @@ export default function Home() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [createUser, createOrg, notifications]);
+  }, [createUser, createOrg]);
 
   return (
     <div className="p-16 pb-0 h-full">
@@ -188,7 +185,7 @@ export default function Home() {
       </div>
 
       {/* Content Section */}
-      <div className="flex justify-start space-x-10 border-2 rounded-xl p-10">
+      <div className="grid space-x-10 border-2 rounded-xl p-10" style={{ gridTemplateColumns: "2fr 3fr 2fr" }}>
         {/* Recent Documents */}
         <div className="flex flex-col">
           <span className="text-xl font-bold mb-6">Recent</span>
@@ -263,7 +260,7 @@ export default function Home() {
               {usersUnreadNotifs > 0 ? "View All" : "View"}
             </Button>
           </div>
-          {showNotifs && <Notifications ref={notificationsRef} closeNotifs={() => setShowNotifs(false)}/>}
+          {(showNotifs || viewNotifications) && <Notifications ref={notificationsRef} closeNotifs={() => setShowNotifs(false)}/>}
         </div>
       </div>
     </div>
