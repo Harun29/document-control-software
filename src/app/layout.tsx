@@ -5,6 +5,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import { AiProvider } from "@/context/AiContext";
 import { GeneralProvider } from "@/context/GeneralContext";
 import AuthenticatedLayout from "@/components/authenticated-layout";
+import { Toaster } from "@/components/ui/sonner"
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,7 +41,10 @@ export default function RootLayout({
         <AuthProvider>
           <GeneralProvider>
             <AiProvider>
-              <AuthenticatedLayout>{children}</AuthenticatedLayout>
+              <AuthenticatedLayout>
+                {children}
+                <Toaster />
+              </AuthenticatedLayout>
             </AiProvider>
           </GeneralProvider>
         </AuthProvider>

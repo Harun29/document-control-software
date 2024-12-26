@@ -53,6 +53,7 @@ import {
   XCircleIcon,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 const AddDocument = () => {
   const [title, setTitle] = useState("");
@@ -146,6 +147,7 @@ const AddDocument = () => {
       clearDocSelection();
       alertDialogCancelRef.current?.click();
       setLoading(false);
+      toast.success("Document request submitted successfully.");
     } catch (error) {
       console.error("Error adding document request:", error);
     }

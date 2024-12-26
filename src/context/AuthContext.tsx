@@ -10,6 +10,8 @@ import {
 } from "firebase/auth";
 import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, or, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { toast } from "sonner";
+import Link from "next/link";
 
 export interface Notifs {
   title: string;
@@ -226,6 +228,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             ...(doc.data() as Notifs),
             id: doc.id,
           }));
+          if(notifications.length !== usersNotifs.length){
+            toast.message("New notification received")
+          }
           setUsersNotifs(notifications as Notifs[]);
           setUsersNotifsNumber(notifications.length);
           setUsersUnreadNotifs(

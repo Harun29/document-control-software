@@ -95,6 +95,7 @@ import {
   arrayUnion,
 } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 const DocRequests = () => {
   const { docRequests } = useGeneral();
@@ -109,6 +110,7 @@ const DocRequests = () => {
   const [selectedDoc, setSelectedDoc] = useState<DocRequest | null>(null);
   const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
   const [documentRejectionNote, setDocumentRejectionNote] = useState("");
+  const closeDrawerRef = useRef<HTMLButtonElement>(null);
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -185,6 +187,8 @@ const DocRequests = () => {
           result: newDoc?.title || selectedDoc.title,
           timestamp: serverTimestamp(),
         });
+        await deleteDoc(docRequestRef);
+        toast.success("Document accepted successfully");
         const docHistoryRef = doc(db, "docHistory", selectedDoc.fileName);
         await updateDoc(docHistoryRef, {
           history: arrayUnion({
@@ -194,8 +198,8 @@ const DocRequests = () => {
             timeStamp: new Date(),
           })
         });
-        await deleteDoc(docRequestRef);
 
+        closeDrawerRef.current?.click();
         console.log("Document accepted successfully");
       } else {
         console.error("No matching document found");
@@ -238,13 +242,15 @@ const DocRequests = () => {
           "docRequests",
           docRequestId
         );
+        await deleteDoc(docRequestRef);
+        toast.success("Document returned successfully");
         await addDoc(userRequestedNotifRef, {
           title: "Document Rejected",
           message: `Your document request for ${selectedDoc.title} has been rejected: ${documentRejectionNote}.`,
           createdAt: new Date().toISOString(),
           read: false,
         });
-        await deleteDoc(docRequestRef);
+        closeDrawerRef.current?.click();
         console.log("Document returned successfully");
       } else {
         console.error("No matching document found");
@@ -418,7 +424,7 @@ const DocRequests = () => {
           ></Button>
         </DrawerTrigger>
         <DrawerContent>
-          <DrawerClose />
+          <DrawerClose ref={closeDrawerRef} />
           <DrawerHeader>
             <DrawerTitle>Document Review</DrawerTitle>
             <DrawerDescription>
