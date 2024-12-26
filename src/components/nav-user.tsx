@@ -48,7 +48,6 @@ export function NavUser({
   const {logout} = useAuth();
   const [notifications, setNotifications] = useState(false);
   const {usersUnreadNotifs} = useAuth();
-  const {handleViewNotifications} = useAuth();
   const {viewNotifications} = useAuth();
 
 

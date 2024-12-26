@@ -10,12 +10,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  // useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import { MoonIcon, SunIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function TeamSwitcher({
   teams,
@@ -25,13 +24,27 @@ export function TeamSwitcher({
     logo: string;
   }[];
 }) {
-  // const { isMobile } = useSidebar()
-  // const [activeTeam, setActiveTeam] = React.useState(teams[0])
   const { user } = useAuth();
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("dark");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } else {
+      // Default to dark theme
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
+  }, []);
 
   const handleThemeChange = () => {
-    if (!document.documentElement.classList.contains("dark")) {
+    if (theme === "light") {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
       setTheme("dark");
@@ -59,22 +72,21 @@ export function TeamSwitcher({
                 <span className="truncate text-xs">{user?.userInfo?.role}</span>
               </div>
               <div>
-                {theme === "light" && (
+                {theme === "dark" ? (
                   <MoonIcon
                     size={24}
                     strokeWidth={1}
                     onClick={handleThemeChange}
                     className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
                   />
-                )}
-                {theme === "dark" && (
+                ): 
                   <SunIcon
                     size={24}
                     strokeWidth={1}
                     onClick={handleThemeChange}
                     className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
                   />
-                )}
+                }
               </div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
