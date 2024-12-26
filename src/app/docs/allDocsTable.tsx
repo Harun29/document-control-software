@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { columns } from "./allDocsColumns";
 import {
   ColumnFiltersState,
@@ -37,29 +37,40 @@ import {
   Copy,
   EllipsisVertical,
   Grid,
-  MoreHorizontal,
   Pencil,
   TableIcon,
   Trash,
 } from "lucide-react";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGeneral } from "@/context/GeneralContext";
 import { DocRequest } from "./types";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import Link from "next/link";
+import React from "react";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
+import DocumentReviewDrawer from "./modifyDoc";
 
 const AllDocumentsTable = ({ org }: { org: string }) => {
   const { docs } = useGeneral();
   const { docsByOrg } = useGeneral();
+  const { usersOrg } = useAuth();
+  const {updateDocument} = useGeneral();
   const [data, setData] = useState<DocRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [viewType, setViewType] = useState<"table" | "grid">("grid");
+  const [selectedDoc, setSelectedDoc] = useState<DocRequest | null>(null);
+  const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
+  const drawerTriggerRef = useRef<HTMLButtonElement>(null);
+  const closeDrawerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const fetchDocs = async () => {
@@ -83,8 +94,42 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
     console.log("Deleting doc: ", doc);
   };
 
-  const handleModifyDoc = async (doc: DocRequest) => {
-    console.log("Modifying doc: ", doc);
+  const handleModifyDoc = (doc: DocRequest) => {
+    setSelectedDoc(doc);
+    if (drawerTriggerRef.current) {
+      drawerTriggerRef.current.click();
+      setNewDocVersion(doc);
+    }
+    console.log("Modify document:", doc);
+  };
+
+  const handleConfirmModifyDoc = async (document: DocRequest, newDoc: DocRequest | null) => {
+    if (!newDoc) {
+      console.error("New document data is null");
+      return;
+    }
+    try {
+      const q = query(
+        collection(db, "org", usersOrg, "docs"),
+        where("fileName", "==", document.fileName)
+      );
+      const docSnapshot = await getDocs(q);
+  
+      if (docSnapshot.docs.length === 0) {
+        console.error("No document found with the specified fileName");
+        return;
+      }
+  
+      const docId = docSnapshot.docs[0].id;
+      const docs = collection(db, "org", usersOrg, "docs");
+      const docRef = doc(docs, docId);
+  
+      await updateDoc(docRef, newDoc);
+      await updateDocument(document.fileName, newDoc);
+      toast.success("Document updated successfully");
+    } catch (err) {
+      console.error("Error modifying document: ", err);
+    }
   };
 
   useEffect(() => {
@@ -283,7 +328,12 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
                     Delete Document
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => handleModifyDoc(doc)}>
+                  <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleModifyDoc(doc);
+                      }}
+                    >
                     <Pencil />
                     Modify Document
                   </DropdownMenuItem>
@@ -303,8 +353,17 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           ))}
         </div>
       )}
+      <DocumentReviewDrawer
+        drawerTriggerRef={drawerTriggerRef}
+        closeDrawerRef={closeDrawerRef}
+        selectedDoc={selectedDoc}
+        newDocVersion={newDocVersion}
+        handleConfirmModifyDoc={handleConfirmModifyDoc}
+        setNewDocVersion={setNewDocVersion}
+      />
     </div>
   );
 };
 
 export default AllDocumentsTable;
+

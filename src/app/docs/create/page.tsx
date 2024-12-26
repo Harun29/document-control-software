@@ -115,6 +115,7 @@ const AddDocument = () => {
           reqBy: user?.userInfo?.email,
           reqByID: user?.uid,
           org: user?.userInfo?.orgName,
+          orgID: usersOrg,
         }
       );
 

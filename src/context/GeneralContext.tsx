@@ -25,6 +25,7 @@ export type DocRequest = {
   reqBy: string;
   reqByID: string;
   org: string;
+  orgID: string;
 };
 
 interface GeneralContextProps {

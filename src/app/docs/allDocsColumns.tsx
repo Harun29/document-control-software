@@ -28,7 +28,7 @@ export const columns = (
       }
 
       return <FaFileWord className="w-6 h-6" />;
-    }
+    },
   },
   {
     accessorKey: "createdAt",
@@ -36,7 +36,11 @@ export const columns = (
     cell: ({ row }) => {
       const createdAt = row.getValue("createdAt") as string | number | Date;
       const date = (createdAt as any).toDate();
-      return <div>{isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleString()}</div>;
+      return (
+        <div>
+          {isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleString()}
+        </div>
+      );
     },
   },
   {
@@ -60,15 +64,15 @@ export const columns = (
       return (
         <Button variant="ghost" className="text-blue-500">
           <Link href={`/docs/${fileName}`}>View Doc</Link>
-        </Button>)
-    }
+        </Button>
+      );
+    },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
       const doc = row.original;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
