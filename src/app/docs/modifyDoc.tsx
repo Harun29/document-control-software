@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Drawer,
   DrawerTrigger,
@@ -37,21 +36,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 
 interface DocumentReviewDrawerProps {
   drawerTriggerRef: React.RefObject<HTMLButtonElement>;
   closeDrawerRef: React.RefObject<HTMLButtonElement>;
   selectedDoc: DocRequest | null;
-  setNewDocVersion: (docVersion: DocRequest) => void;
+  setNewDocVersion: (docVersion: DocRequest | null) => void;
   newDocVersion: any;
   handleConfirmModifyDoc: (
     selectedDoc: DocRequest,
@@ -65,8 +56,9 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
   selectedDoc,
   setNewDocVersion,
   newDocVersion,
-  handleConfirmModifyDoc,
+  handleConfirmModifyDoc
 }) => {
+
   return (
     <Drawer>
       <DrawerTrigger>
@@ -77,7 +69,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
         ></Button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerClose ref={closeDrawerRef} />
+        <DrawerClose ref={closeDrawerRef}/>
         <DrawerHeader>
           <DrawerTitle>Modify Document</DrawerTitle>
           <DrawerDescription>

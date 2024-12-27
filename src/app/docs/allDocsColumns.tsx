@@ -1,21 +1,14 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Copy, MoreHorizontal, Pencil, Trash } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Copy, Pencil, Trash } from "lucide-react";
 import { DocRequest } from "./types";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
 import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const columns = (
-  handleModifyDoc: (doc: DocRequest) => void,
-  handleDeleteDocs: (doc: DocRequest) => void
+  handleDeleteDocs: (doc: DocRequest) => void,
+  handleModifyDoc: (doc: DocRequest) => void
 ): ColumnDef<DocRequest>[] => [
   {
     accessorKey: "fileType",
@@ -70,36 +63,49 @@ export const columns = (
   },
   {
     id: "actions",
-    enableHiding: false,
     cell: ({ row }) => {
-      const doc = row.original;
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(doc.fileURL)}
+        <div className="flex space-x-4 justify-self-end">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
+              onClick={() => handleModifyDoc(row.original)}
             >
-              <Copy />
-              Copy File URL
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDeleteDocs(doc)}>
-              <Trash />
-              Delete Document
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleModifyDoc(doc)}>
-              <Pencil />
-              Modify Document
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <Pencil strokeWidth={1}/>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Modify</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
+              onClick={() => navigator.clipboard.writeText(row.original.fileURL)}
+            >
+              <Copy strokeWidth={1}/>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Copy</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger
+              className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
+              onClick={() => handleDeleteDocs(row.original)}
+            >
+              <Trash color="red" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Delete Document</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
       );
     },
   },
