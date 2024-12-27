@@ -12,7 +12,7 @@ import {
   Trash,
   UserRoundPlus,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DocRequest } from "../types";
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -27,12 +27,24 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
+import DocumentReviewDrawer from "../modifyDoc";
+import { collection, query, where, doc, getDocs, updateDoc } from "firebase/firestore";
+import { toast } from "sonner";
+import { db } from "@/config/firebaseConfig";
+import { useAuth } from "@/context/AuthContext";
 
 const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { docs } = useGeneral();
+  const {updateDocument} = useGeneral();
+  const { usersOrg } = useAuth();
   const [docId, setDocId] = useState<string | null>(null);
-  const [doc, setDoc] = useState<DocRequest>();
+  const [document, setDocument] = useState<DocRequest>();
   const [loading, setLoading] = useState(false);
+  const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
+  const [loadingAction, setLoadingAction] = useState(false);
+  const drawerTriggerRef = useRef<HTMLButtonElement>(null);
+  const closeDrawerRef = useRef<HTMLButtonElement>(null);
+    
 
   useEffect(() => {
     const unwrapParams = async () => {
@@ -46,10 +58,51 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     setLoading(true);
     if (docs && docId) {
       const doc = docs.find((doc) => doc.fileName === docId);
-      setDoc(doc);
+      setDocument(doc);
     }
     setLoading(false);
   }, [docs, docId]);
+
+  const handleModifyDoc = () => {
+      if (drawerTriggerRef.current) {
+        drawerTriggerRef.current.click();
+        setNewDocVersion(document as DocRequest);
+      }
+      console.log("Modify document:", doc);
+    };
+
+    const handleDeleteDocs = async (doc: DocRequest) => {
+      console.log("Deleting doc: ", doc);
+    };
+  
+    const handleConfirmModifyDoc = async (document: DocRequest, newDoc: DocRequest | null) => {
+      if (!newDoc) {
+        console.error("New document data is null");
+        return;
+      }
+      try {
+        const q = query(
+          collection(db, "org", usersOrg, "docs"),
+          where("fileName", "==", document.fileName)
+        );
+        const docSnapshot = await getDocs(q);
+    
+        if (docSnapshot.docs.length === 0) {
+          console.error("No document found with the specified fileName");
+          return;
+        }
+    
+        const docId = docSnapshot.docs[0].id;
+        const docs = collection(db, "org", usersOrg, "docs");
+        const docRef = doc(docs, docId);
+    
+        await updateDoc(docRef, newDoc);
+        await updateDocument(document.fileName, newDoc);
+        toast.success("Document updated successfully");
+      } catch (err) {
+        console.error("Error modifying document: ", err);
+      }
+    };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -69,12 +122,12 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                 onClick={() => window.history.back()}
                 className="cursor-pointer w-8 h-8 mr-2 hover:scale-125 transition-all"
               />
-              {doc?.fileType === "application/pdf" ? (
+              {document?.fileType === "application/pdf" ? (
                 <FaFilePdf className="w-8 h-8 mr-2 text-red-500" />
               ) : (
                 <FaFileWord className="w-8 h-8 mr-2" />
               )}
-              Document - {doc?.title}
+              Document - {document?.title}
             </h1>
             <p className="text-muted-foreground">
               View and manage document details
@@ -83,7 +136,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline">{doc?.title}</Button>
+                    <Button variant="outline">{document?.title}</Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Document Title</p>
@@ -93,7 +146,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline">{doc?.org || "Unknown"}</Button>
+                    <Button variant="outline">{document?.org || "Unknown"}</Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Document Department</p>
@@ -103,7 +156,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline">{doc?.label}</Button>
+                    <Button variant="outline">{document?.label}</Button>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Document Type</p>
@@ -113,10 +166,10 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="content">Summary</Label>
-              <p>{doc?.summary}</p>
+              <p>{document?.summary}</p>
             </div>
             <div className="flex space-x-4">
-              <Button className="group flex items-center">
+              <Button onClick={handleModifyDoc} className="group flex items-center">
                 <Pencil className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-1000 ease-in-out">
                   Modify
@@ -167,22 +220,32 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             <>
               {/* Scrollable Viewer */}
               <div className="flex-grow h-[400px] overflow-auto border mt-4 rounded-md pt-4 pb-4">
-                {doc?.fileType === "application/pdf" && (
+                {document?.fileType === "application/pdf" && (
                   <Worker
                     workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}
                   >
-                    <Viewer fileUrl={doc?.fileURL} />
+                    <Viewer fileUrl={document?.fileURL} />
                   </Worker>
                 )}
-                {doc?.fileType ===
+                {document?.fileType ===
                   "application/vnd.openxmlformats-officedocument.wordprocessingml.document" && (
                   <DocViewer
-                    documents={[{ uri: doc?.fileURL }] as any}
+                    documents={[{ uri: document?.fileURL }] as any}
                     pluginRenderers={DocViewerRenderers}
                   />
                 )}
               </div>
             </>
+            <DocumentReviewDrawer
+              drawerTriggerRef={drawerTriggerRef}
+              closeDrawerRef={closeDrawerRef}
+              selectedDoc={document as DocRequest}
+              newDocVersion={newDocVersion}
+              handleConfirmModifyDoc={handleConfirmModifyDoc}
+              setNewDocVersion={setNewDocVersion}
+              handleDeleteDocs={handleDeleteDocs}
+              loadingAction={loadingAction}
+      />
           </div>
         </motion.div>
       </AnimatePresence>

@@ -135,7 +135,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
               )
             }
             className="h-32 mt-1 text-sm text-muted-foreground"
-            value={
+            defaultValue={
               selectedDoc?.summary
                 ? selectedDoc.summary
                 : "No content available"
