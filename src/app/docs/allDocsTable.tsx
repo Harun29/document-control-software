@@ -69,6 +69,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
   const [viewType, setViewType] = useState<"table" | "grid">("grid");
   const [selectedDoc, setSelectedDoc] = useState<DocRequest | null>(null);
   const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
+  const [loadingAction, setLoadingAction] = useState(false);
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
   const closeDrawerRef = useRef<HTMLButtonElement>(null);
 
@@ -300,45 +301,21 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       {viewType === "grid" && (
         <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 py-4">
           {data.map((doc) => (
+            <div className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group">
+              <div
+              className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleModifyDoc(doc);
+                  }}
+                >
+                <Pencil strokeWidth={1} size={20} className="hover:scale-110 transition-all"/>
+              </div>
             <Link
               href={`/docs/${doc.fileName}`}
               key={doc.fileName}
-              className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
+              className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
             >
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
-                  >
-                    <span className="sr-only">Open menu</span>
-                    <EllipsisVertical />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem
-                    onClick={() => navigator.clipboard.writeText(doc.fileURL)}
-                  >
-                    <Copy />
-                    Copy File URL
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDeleteDocs(doc)}>
-                    <Trash />
-                    Delete Document
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleModifyDoc(doc);
-                      }}
-                    >
-                    <Pencil />
-                    Modify Document
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
 
               {doc.fileType === "application/pdf" ? (
                 <FaFilePdf className="text-red-500 w-16 h-16" />
@@ -350,6 +327,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
                 {doc.title.substring(0, 15)}...
               </div>
             </Link>
+            </div>
           ))}
         </div>
       )}
@@ -360,6 +338,8 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
         newDocVersion={newDocVersion}
         handleConfirmModifyDoc={handleConfirmModifyDoc}
         setNewDocVersion={setNewDocVersion}
+        handleDeleteDocs={handleDeleteDocs}
+        loadingAction={loadingAction}
       />
     </div>
   );

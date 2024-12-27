@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, FileTextIcon } from "lucide-react";
+import { CheckCircle2, Copy, CopyIcon, FileTextIcon, LoaderCircle, Trash, TrashIcon } from "lucide-react";
 
 import {
   AlertDialog,
@@ -48,6 +48,8 @@ interface DocumentReviewDrawerProps {
     selectedDoc: DocRequest,
     newDocVersion: DocRequest
   ) => void;
+  handleDeleteDocs: (doc: DocRequest) => void;
+  loadingAction: boolean;
 }
 
 const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
@@ -56,7 +58,9 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
   selectedDoc,
   setNewDocVersion,
   newDocVersion,
-  handleConfirmModifyDoc
+  handleConfirmModifyDoc,
+  handleDeleteDocs,
+  loadingAction
 }) => {
 
   return (
@@ -154,7 +158,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
             )}
           </div>
           <div className="flex justify-between">
-            <div className="gap-4 flex">
+            <div className="gap-4 grid grid-cols-3 w-full">
               <AlertDialog>
                 <AlertDialogTrigger className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-blue-600 text-white hover:bg-blue-800 h-10 px-4 py-2">
                   <CheckCircle2 className="w-4 h-4" />
@@ -173,10 +177,13 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
+                    disabled={loadingAction}
                       onClick={() =>
                         handleConfirmModifyDoc(selectedDoc!, newDocVersion)
                       }
                     >
+                      {loadingAction && 
+                      <LoaderCircle className="w-4 h-4 animate-spin" />}
                       Continue
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -192,6 +199,35 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
                   View
                 </Button>
               </a>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">
+                    <Trash className="w-4 h-4" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription className="flex flex-col gap-2">
+                      Do you want to delete this document? {selectedDoc?.title}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                    disabled={loadingAction}
+                      onClick={() =>
+                        handleDeleteDocs(selectedDoc!)
+                      }
+                    >
+                      {loadingAction && 
+                      <LoaderCircle className="w-4 h-4 animate-spin" />}
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </DrawerHeader>
