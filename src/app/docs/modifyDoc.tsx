@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Copy, CopyIcon, FileTextIcon, LoaderCircle, Trash, TrashIcon } from "lucide-react";
+import { CheckCircle2, Copy, CopyIcon, FileTextIcon, LoaderCircle, SquareArrowOutUpRight, Trash, TrashIcon } from "lucide-react";
 
 import {
   AlertDialog,
@@ -195,8 +195,8 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
                 rel="noopener noreferrer"
               >
                 <Button variant="default">
-                  <FileTextIcon className="w-4 h-4" />
-                  View
+                  <SquareArrowOutUpRight className="w-4 h-4" />
+                  Open in new tab
                 </Button>
               </a>
               <AlertDialog>

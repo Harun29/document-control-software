@@ -71,8 +71,8 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
       console.log("Modify document:", doc);
     };
 
-    const handleDeleteDocs = async (doc: DocRequest) => {
-      console.log("Deleting doc: ", doc);
+    const handleDeleteDocs = async () => {
+      console.log("Deleting doc: ", document);
     };
   
     const handleConfirmModifyDoc = async (document: DocRequest, newDoc: DocRequest | null) => {
@@ -181,18 +181,20 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   History
                 </span>
               </Button>
-              <Button className="group flex items-center">
+              <Button onClick={() => document?.fileURL && navigator.clipboard.writeText(document.fileURL)} className="group flex items-center">
                 <Copy className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   Copy URL
                 </span>
               </Button>
+              <a target="_blank" href={document?.fileURL}>
               <Button className="group flex items-center">
                 <SquareArrowOutUpRight className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   Open In New Tab
                 </span>
               </Button>
+              </a>
               <Button className="group flex items-center">
                 <FileSymlink className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
@@ -205,7 +207,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   Assign to user
                 </span>
               </Button>
-              <Button variant="destructive" className="group flex items-center">
+              <Button onClick={handleDeleteDocs} variant="destructive" className="group flex items-center">
                 <Trash className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   Delete Document
