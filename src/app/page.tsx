@@ -85,16 +85,13 @@ export default function Home() {
 
             setDocs(docsList as Doc[]);
             setHistory(historyList as History[]);
+            console.log("Notifications: ", usersNotifs);
+            setNotifications(usersNotifs.slice(0, 5) as Notifs[]);
           }
         }
       };
 
-      const fetchNotifications = async () => {
-        setNotifications(usersNotifs.slice(0, 5) as Notifs[]);
-      };
-
       fetchDocs();
-      fetchNotifications();
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
@@ -248,7 +245,7 @@ export default function Home() {
                   <span>
                     {notif.title}
                     {": "}
-                    {notif.message.substring(0, 15)}...
+                    {notif.documentName}...
                   </span>
                 </div>
               </div>

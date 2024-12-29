@@ -31,6 +31,7 @@ const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNot
   const notifRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    console.log("usersNotifs: ", usersNotifs);
     setData(usersNotifs);
   }, [usersNotifs]);
 

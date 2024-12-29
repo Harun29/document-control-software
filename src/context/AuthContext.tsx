@@ -18,7 +18,8 @@ export interface Notifs {
   message: string;
   createdAt: string;
   read: boolean;
-  documentURL: string;
+  documentURL?: string;
+  documentName?: string;
   id: string; 
 }
 
@@ -174,7 +175,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const userInfo = await fetchUserInfo(currentUser.uid);
           const idTokenResult = await currentUser.getIdTokenResult();
-          const q = query(collection(db, "users", currentUser.uid, "notifications"), orderBy("createdAt", "desc"), orderBy("read", "asc"));
+          const q = query(collection(db, "users", currentUser.uid, "notifications"), orderBy("read", "asc"), orderBy("createdAt", "desc"));
           const usersNotifsData = await getDocs(q);
           
           if (!usersNotifsData.empty) {
@@ -185,6 +186,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               createdAt: doc.data().createdAt,
               read: doc.data().read,
               documentURL: doc.data().documentURL,
+              documentName: doc.data().documentName,
               id: doc.id,
             }));
             setUsersNotifs(usersNotifsArray);
@@ -300,7 +302,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextProps => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");

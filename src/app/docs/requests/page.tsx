@@ -177,6 +177,7 @@ const DocRequests = () => {
           title: "Document Accepted",
           message: `Your document request for ${selectedDoc.title} has been accepted.`,
           documentURL: selectedDoc.fileName,
+          documentName: selectedDoc.title,
           createdAt: new Date().toISOString(),
           read: false,
         });
@@ -234,7 +235,6 @@ const DocRequests = () => {
       });
 
       if (docRequestId) {
-        const newDocRef = collection(db, "org", userOrg, "docs");
         const docRequestRef = doc(
           db,
           "org",
@@ -246,6 +246,7 @@ const DocRequests = () => {
         toast.success("Document returned successfully");
         await addDoc(userRequestedNotifRef, {
           title: "Document Rejected",
+          documentName: selectedDoc.title,
           message: `Your document request for ${selectedDoc.title} has been rejected: ${documentRejectionNote}.`,
           createdAt: new Date().toISOString(),
           read: false,

@@ -57,7 +57,6 @@ const ManageDocs = () => {
               </TabsContent>
             ))}
           </Tabs>
-          
         </div>
       </motion.div>
     </AnimatePresence>

@@ -33,7 +33,7 @@ export const columns = (
     accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => (
-      <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>
+      <div>{(row.getValue("createdAt") as any).toDate().toLocaleDateString('en-GB')}</div>
     ),
   },
   {
