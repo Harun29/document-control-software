@@ -15,10 +15,11 @@ import {
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
-import {useAi} from "@/context/AiContext";
+import { useAi } from "@/context/AiContext";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Link from "next/link";
 
 export default function ChatSupport() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -35,7 +36,7 @@ export default function ChatSupport() {
     if (!isLoading) {
       setIsGenerating(false);
     }
-  }, [isLoading])
+  }, [isLoading]);
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -70,11 +71,10 @@ export default function ChatSupport() {
           <Button variant="secondary" onClick={() => setMessages([])}>
             New Chat
           </Button>
-          <Button variant="secondary">See FAQ</Button>
         </div>
       </ExpandableChatHeader>
       <ExpandableChatBody>
-        <ChatMessageList className="bg-muted/25" ref={messagesRef}>
+        <ChatMessageList className="bg-muted/25 custom-scrollbar" ref={messagesRef}>
           {/* Initial message */}
           <ChatBubble variant="received">
             <ChatBubbleAvatar src="" fallback="🤖" />
@@ -99,11 +99,33 @@ export default function ChatSupport() {
                 >
                   {message.content
                     .split("```")
-                    .map((part: string, index: number) => (
-                          <Markdown key={index} remarkPlugins={[remarkGfm]}>
-                            {part}
-                          </Markdown>
-                    ))}
+                    .map((part: string, index: number) => {
+                      // Search for FileName and handle it separately
+                      const match = part.match(/FileName:\s*(.+?\.\w+)/);
+                      if (match) {
+                        const fileName = match[1];
+                        const filePath = `/docs/${fileName}`;
+                        return (
+                          <span key={index}>
+                            {/* Keep text before/after the filename intact */}
+                            {part.replace(match[0], "")}
+                            <Link
+                              href={filePath}
+                              className="text-blue-500 underline"
+                            >
+                              View Document
+                            </Link>
+                          </span>
+                        );
+                      }
+
+                      // Render regular text/Markdown if no filename
+                      return (
+                        <Markdown key={index} remarkPlugins={[remarkGfm]}>
+                          {part}
+                        </Markdown>
+                      );
+                    })}
                 </ChatBubbleMessage>
               </ChatBubble>
             ))}

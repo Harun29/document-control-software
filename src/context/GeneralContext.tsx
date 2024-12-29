@@ -86,12 +86,17 @@ export const GeneralProvider = ({
     const unsubscribe = onSnapshot(docRef, async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        data.docs.sort((a: DocRequest, b: DocRequest) => {
+        
+        // Sorting documents based on createdAt field (latest to oldest)
+        const sortedDocs = (data.docs || []).sort((a: DocRequest, b: DocRequest) => {
           const dateA = (a.createdAt as any).toDate();
           const dateB = (b.createdAt as any).toDate();
           return dateB.getTime() - dateA.getTime();
         });
-        setDocs(data.docs || []);
+  
+        setDocs(sortedDocs);
+        console.log("Sorted docs: ", sortedDocs);
+  
         const orgs = await getDocs(collection(db, "org"));
         const docsByOrgPromises = orgs.docs.map(async (org) => {
           const q = query(collection(db, "org", org.id, "docs"), orderBy("createdAt", "desc"));
@@ -99,10 +104,12 @@ export const GeneralProvider = ({
           const docs = docsByOrg.docs.map((doc) => doc.data() as DocRequest);
           return { org: org.data().name, docs };
         });
+  
         const docsByOrgArray = await Promise.all(docsByOrgPromises);
         setDocsByOrg(docsByOrgArray);
+  
         docsByOrgArray.forEach((docFromOrg) => {
-          console.log("docs by org: ", docFromOrg.org, docFromOrg.docs);
+          console.log("Docs by org: ", docFromOrg.org, docFromOrg.docs);
         });
       } else {
         console.error("No such document!");
@@ -113,6 +120,7 @@ export const GeneralProvider = ({
   
     return () => unsubscribe();
   }, []);
+  
 
   const createDoc = async (newDoc: DocRequest) => {
     try {

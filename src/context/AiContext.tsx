@@ -65,6 +65,15 @@ export const AiProvider = ({ children }: { children: React.ReactNode }) => {
   const getAiResponse = async (message: string) => {
     if (message.trim() === "") return;
 
+    const filteredDocs = docs.map((doc) => ({
+      fileName: doc.fileName,
+      label: doc.label,
+      summary: doc.summary,
+      title: doc.title,
+      reqBy: doc.reqBy,
+      org: doc.org,
+    }));
+  
     try {
       const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -72,14 +81,26 @@ export const AiProvider = ({ children }: { children: React.ReactNode }) => {
           ...messages,
           {
             role: "system",
-            content:
-              "You are a helpful assistant that searches through a JSON array of documents. Based on the user's input, identify and provide response with the fileName at the end of your message. Documents may not be sorted by the latest date. For date-specific search, please use column createdAt to sort the documents.",
+            content: `
+            You are a helpful assistant that searches through a JSON array of documents. 
+            Your tasks are:
+            1. Search for the most relevant document based on the user's query.
+            2. Provide a brief summary of the matching document (maximum 10 words).
+            3. Always include the FileName field from the JSON document in this format: FileName: <fileName> (Do not add fullstop at the end). The FileName comes specifically from the "fileName" field of the document. Do not use the "title" field for this.
+            4. If the query does not match any document, Do not include the FileName at the end.
+            5. Documents are sorted from newest to oldest (most recent first).
+            Documents are structured as follows:
+            - fileName: string
+            - label: string
+            - summary: string
+            - title: string
+            - reqBy: string
+            - org: string
+            `
           },
           {
             role: "system",
-            content: `Here is the JSON array of documents: ${JSON.stringify(
-              docs
-            )}`,
+            content: `Here is the JSON array of documents:\n${JSON.stringify(filteredDocs)}`,
           },
           {
             role: "user",
@@ -87,15 +108,18 @@ export const AiProvider = ({ children }: { children: React.ReactNode }) => {
           },
         ],
       });
-
+  
       if (!response.choices || response.choices.length === 0) {
         throw new Error("Failed to get AI message");
       }
-
+  
       const aiMessage = response.choices[0].message.content;
+      console.log(aiMessage);
+  
       return aiMessage || undefined;
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching AI response:", err);
+      return "An error occurred while processing your request. Please try again.";
     }
   };
 
