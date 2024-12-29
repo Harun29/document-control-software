@@ -29,14 +29,9 @@ import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import DocumentReviewDrawer from "../modifyDoc";
 import { collection, query, where, doc, getDocs, updateDoc, Timestamp } from "firebase/firestore";
-import { toast } from "sonner";
-import { db } from "@/config/firebaseConfig";
-import { useAuth } from "@/context/AuthContext";
 
 const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { docs } = useGeneral();
-  const {updateDocument} = useGeneral();
-  const { usersOrg } = useAuth();
   const [docId, setDocId] = useState<string | null>(null);
   const [document, setDocument] = useState<DocRequest>();
   const [loading, setLoading] = useState(false);
@@ -45,7 +40,6 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
   const closeDrawerRef = useRef<HTMLButtonElement>(null);
     
-
   useEffect(() => {
     const unwrapParams = async () => {
       const resolvedParams = await params;
@@ -71,39 +65,10 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
       console.log("Modify document:", doc);
     };
 
-    const handleDeleteDocs = async () => {
+    const handleDeleteDoc = async () => {
       console.log("Deleting doc: ", document);
     };
   
-    const handleConfirmModifyDoc = async (document: DocRequest, newDoc: DocRequest | null) => {
-      if (!newDoc) {
-        console.error("New document data is null");
-        return;
-      }
-      try {
-        const q = query(
-          collection(db, "org", usersOrg, "docs"),
-          where("fileName", "==", document.fileName)
-        );
-        const docSnapshot = await getDocs(q);
-    
-        if (docSnapshot.docs.length === 0) {
-          console.error("No document found with the specified fileName");
-          return;
-        }
-    
-        const docId = docSnapshot.docs[0].id;
-        const docs = collection(db, "org", usersOrg, "docs");
-        const docRef = doc(docs, docId);
-    
-        await updateDoc(docRef, newDoc);
-        await updateDocument(document.fileName, newDoc);
-        toast.success("Document updated successfully");
-      } catch (err) {
-        console.error("Error modifying document: ", err);
-      }
-    };
-
   if (loading) {
     return <div>Loading...</div>;
   } else {
@@ -219,7 +184,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   Assign to user
                 </span>
               </Button>
-              <Button onClick={handleDeleteDocs} variant="destructive" className="group flex items-center">
+              <Button onClick={handleDeleteDoc} variant="destructive" className="group flex items-center">
                 <Trash className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   Delete Document
@@ -255,9 +220,8 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               closeDrawerRef={closeDrawerRef}
               selectedDoc={document as DocRequest}
               newDocVersion={newDocVersion}
-              handleConfirmModifyDoc={handleConfirmModifyDoc}
               setNewDocVersion={setNewDocVersion}
-              handleDeleteDocs={handleDeleteDocs}
+              handleDeleteDoc={handleDeleteDoc}
               loadingAction={loadingAction}
       />
           </div>

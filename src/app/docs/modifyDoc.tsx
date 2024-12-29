@@ -37,6 +37,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { useGeneral } from "@/context/GeneralContext";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
+import { db } from "@/config/firebaseConfig";
 
 interface DocumentReviewDrawerProps {
   drawerTriggerRef: React.RefObject<HTMLButtonElement>;
@@ -44,11 +49,7 @@ interface DocumentReviewDrawerProps {
   selectedDoc: DocRequest | null;
   setNewDocVersion: (docVersion: DocRequest | null) => void;
   newDocVersion: any;
-  handleConfirmModifyDoc: (
-    selectedDoc: DocRequest,
-    newDocVersion: DocRequest
-  ) => void;
-  handleDeleteDocs: (doc: DocRequest) => void;
+  handleDeleteDoc: (doc: DocRequest) => void;
   loadingAction: boolean;
 }
 
@@ -58,10 +59,41 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
   selectedDoc,
   setNewDocVersion,
   newDocVersion,
-  handleConfirmModifyDoc,
-  handleDeleteDocs,
+  handleDeleteDoc,
   loadingAction
 }) => {
+
+  const {updateDocument} = useGeneral();
+  const {usersOrg} = useAuth();
+
+  const handleConfirmModifyDoc = async (document: DocRequest, newDoc: DocRequest | null) => {
+    if (!newDoc) {
+      console.error("New document data is null");
+      return;
+    }
+    try {
+      const q = query(
+        collection(db, "org", usersOrg, "docs"),
+        where("fileName", "==", document.fileName)
+      );
+      const docSnapshot = await getDocs(q);
+  
+      if (docSnapshot.docs.length === 0) {
+        console.error("No document found with the specified fileName");
+        return;
+      }
+  
+      const docId = docSnapshot.docs[0].id;
+      const docs = collection(db, "org", usersOrg, "docs");
+      const docRef = doc(docs, docId);
+  
+      await updateDoc(docRef, newDoc);
+      await updateDocument(document.fileName, newDoc);
+      toast.success("Document updated successfully");
+    } catch (err) {
+      console.error("Error modifying document: ", err);
+    }
+  };
 
   return (
     <Drawer>
@@ -218,7 +250,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
                     <AlertDialogAction
                     disabled={loadingAction}
                       onClick={() =>
-                        handleDeleteDocs(selectedDoc!)
+                        handleDeleteDoc(selectedDoc!)
                       }
                     >
                       {loadingAction && 

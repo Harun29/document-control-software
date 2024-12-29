@@ -91,7 +91,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
     fetchDocs();
   }, [docs, org]);
 
-  const handleDeleteDocs = async (doc: DocRequest) => {
+  const handleDeleteDoc = async (doc: DocRequest) => {
     console.log("Deleting doc: ", doc);
   };
 
@@ -104,42 +104,13 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
     console.log("Modify document:", doc);
   };
 
-  const handleConfirmModifyDoc = async (document: DocRequest, newDoc: DocRequest | null) => {
-    if (!newDoc) {
-      console.error("New document data is null");
-      return;
-    }
-    try {
-      const q = query(
-        collection(db, "org", usersOrg, "docs"),
-        where("fileName", "==", document.fileName)
-      );
-      const docSnapshot = await getDocs(q);
-  
-      if (docSnapshot.docs.length === 0) {
-        console.error("No document found with the specified fileName");
-        return;
-      }
-  
-      const docId = docSnapshot.docs[0].id;
-      const docs = collection(db, "org", usersOrg, "docs");
-      const docRef = doc(docs, docId);
-  
-      await updateDoc(docRef, newDoc);
-      await updateDocument(document.fileName, newDoc);
-      toast.success("Document updated successfully");
-    } catch (err) {
-      console.error("Error modifying document: ", err);
-    }
-  };
-
   useEffect(() => {
     console.log(viewType);
   }, [viewType]);
 
   const table = useReactTable({
     data,
-    columns: columns(handleDeleteDocs, handleModifyDoc),
+    columns: columns(handleDeleteDoc, handleModifyDoc),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -336,9 +307,8 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
         closeDrawerRef={closeDrawerRef}
         selectedDoc={selectedDoc}
         newDocVersion={newDocVersion}
-        handleConfirmModifyDoc={handleConfirmModifyDoc}
         setNewDocVersion={setNewDocVersion}
-        handleDeleteDocs={handleDeleteDocs}
+        handleDeleteDoc={handleDeleteDoc}
         loadingAction={loadingAction}
       />
     </div>

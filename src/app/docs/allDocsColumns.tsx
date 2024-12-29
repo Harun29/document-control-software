@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const columns = (
-  handleDeleteDocs: (doc: DocRequest) => void,
+  handleDeleteDoc: (doc: DocRequest) => void,
   handleModifyDoc: (doc: DocRequest) => void
 ): ColumnDef<DocRequest>[] => [
   {
@@ -96,7 +96,7 @@ export const columns = (
           <Tooltip>
             <TooltipTrigger
               className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
-              onClick={() => handleDeleteDocs(row.original)}
+              onClick={() => handleDeleteDoc(row.original)}
             >
               <Trash color="red" />
             </TooltipTrigger>
