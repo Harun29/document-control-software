@@ -6,6 +6,8 @@ import { AiProvider } from "@/context/AiContext";
 import { GeneralProvider } from "@/context/GeneralContext";
 import AuthenticatedLayout from "@/components/authenticated-layout";
 import { Toaster } from "@/components/ui/sonner"
+import { Bot } from "lucide-react";
+import ChatSupport from "@/components/AIChat";
 
 
 const geistSans = localFont({
@@ -44,6 +46,7 @@ export default function RootLayout({
               <AuthenticatedLayout>
                 {children}
                 <Toaster />
+                <ChatSupport />
               </AuthenticatedLayout>
             </AiProvider>
           </GeneralProvider>
