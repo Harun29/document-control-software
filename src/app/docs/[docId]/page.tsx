@@ -28,7 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import DocumentReviewDrawer from "../modifyDoc";
-import { collection, query, where, doc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, query, where, doc, getDocs, updateDoc, Timestamp } from "firebase/firestore";
 import { toast } from "sonner";
 import { db } from "@/config/firebaseConfig";
 import { useAuth } from "@/context/AuthContext";
@@ -140,6 +140,18 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Document Title</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                  <Button variant="outline">
+                    {document?.createdAt ? (document.createdAt as any).toDate().toLocaleDateString('en-GB') : "Date not available"}
+                  </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Date Added</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

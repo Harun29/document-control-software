@@ -22,7 +22,7 @@ interface NotificationsProps {
   closeNotifs: () => void;
 }
 
-const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNotifs }) => {
+const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNotifs }, ref) => {
   const { usersNotifs } = useAuth();
   const { usersUnreadNotifs } = useAuth();
   const { user } = useAuth();
@@ -104,7 +104,7 @@ const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNot
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.1 }}
-    className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10">
+      className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10">
       <Card className="w-[600px] shadow-lg rounded-lg" ref={notifRef}>
         <CardHeader className="p-4">
           <CardTitle className="leading-8 text-xl font-semibold">
