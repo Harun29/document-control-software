@@ -53,7 +53,7 @@ export const historyColumns = (
     header: "Timestamp",
     cell: ({ row }) => {
       const timestamp = row.getValue<{ seconds: number }>("timestamp");
-      return timestamp ? new Date(timestamp.seconds * 1000).toLocaleString() : "N/A";
+      return timestamp ? new Date(timestamp.seconds * 1000).toLocaleString('en-GB') : "N/A";
     },
   },
   {

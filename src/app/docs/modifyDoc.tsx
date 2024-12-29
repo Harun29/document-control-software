@@ -11,7 +11,16 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Copy, CopyIcon, FileTextIcon, LoaderCircle, SquareArrowOutUpRight, Trash, TrashIcon } from "lucide-react";
+import {
+  CheckCircle2,
+  Copy,
+  CopyIcon,
+  FileTextIcon,
+  LoaderCircle,
+  SquareArrowOutUpRight,
+  Trash,
+  TrashIcon,
+} from "lucide-react";
 
 import {
   AlertDialog,
@@ -37,7 +46,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  getDocs,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { useGeneral } from "@/context/GeneralContext";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
@@ -60,13 +79,16 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
   setNewDocVersion,
   newDocVersion,
   handleDeleteDoc,
-  loadingAction
+  loadingAction,
 }) => {
+  const { updateDocument } = useGeneral();
+  const { usersOrg } = useAuth();
+  const { user } = useAuth();
 
-  const {updateDocument} = useGeneral();
-  const {usersOrg} = useAuth();
-
-  const handleConfirmModifyDoc = async (document: DocRequest, newDoc: DocRequest | null) => {
+  const handleConfirmModifyDoc = async (
+    document: DocRequest,
+    newDoc: DocRequest | null
+  ) => {
     if (!newDoc) {
       console.error("New document data is null");
       return;
@@ -77,16 +99,33 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
         where("fileName", "==", document.fileName)
       );
       const docSnapshot = await getDocs(q);
-  
+
       if (docSnapshot.docs.length === 0) {
         console.error("No document found with the specified fileName");
         return;
       }
-  
+
       const docId = docSnapshot.docs[0].id;
       const docs = collection(db, "org", usersOrg, "docs");
       const docRef = doc(docs, docId);
-  
+      const docHistoryRef = doc(db, "docHistory", document.fileName);
+      await updateDoc(docHistoryRef, {
+        history: arrayUnion({
+          action: "Document Modified",
+          user: user?.userInfo?.email,
+          org: user?.userInfo?.orgName,
+          timeStamp: new Date(),
+        }),
+      });
+
+      const historyRef = collection(db, "history");
+      await addDoc(historyRef, {
+        author: user?.userInfo?.email || "Unknown",
+        action: "Deleted a document",
+        result: document?.title,
+        timestamp: serverTimestamp(),
+      });
+
       await updateDoc(docRef, newDoc);
       await updateDocument(document.fileName, newDoc);
       toast.success("Document updated successfully");
@@ -105,7 +144,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
         ></Button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerClose ref={closeDrawerRef}/>
+        <DrawerClose ref={closeDrawerRef} />
         <DrawerHeader>
           <DrawerTitle>Modify Document</DrawerTitle>
           <DrawerDescription>
@@ -209,13 +248,14 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                    disabled={loadingAction}
+                      disabled={loadingAction}
                       onClick={() =>
                         handleConfirmModifyDoc(selectedDoc!, newDocVersion)
                       }
                     >
-                      {loadingAction && 
-                      <LoaderCircle className="w-4 h-4 animate-spin" />}
+                      {loadingAction && (
+                        <LoaderCircle className="w-4 h-4 animate-spin" />
+                      )}
                       Continue
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -248,13 +288,12 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                    disabled={loadingAction}
-                      onClick={() =>
-                        handleDeleteDoc(selectedDoc!)
-                      }
+                      disabled={loadingAction}
+                      onClick={() => handleDeleteDoc(selectedDoc!)}
                     >
-                      {loadingAction && 
-                      <LoaderCircle className="w-4 h-4 animate-spin" />}
+                      {loadingAction && (
+                        <LoaderCircle className="w-4 h-4 animate-spin" />
+                      )}
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>

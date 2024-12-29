@@ -37,7 +37,7 @@ interface GeneralContextProps {
     fileName: string,
     updatedDoc: Partial<DocRequest>
   ) => Promise<void>;
-  deleteDoc: (fileName: string) => Promise<void>;
+  deleteDocument: (fileName: string) => Promise<void>;
   docsByOrg: DocsByOrg[];
 }
 
@@ -158,7 +158,7 @@ export const GeneralProvider = ({
     }
   };
 
-  const deleteDoc = async (fileName: string) => {
+  const deleteDocument = async (fileName: string) => {
     try {
       const docRef = doc(db, "docs", "alldocs");
       const docSnap = await getDoc(docRef);
@@ -183,7 +183,7 @@ export const GeneralProvider = ({
         docs,
         createDoc,
         updateDocument,
-        deleteDoc,
+        deleteDocument,
         docsByOrg
       }}
     >

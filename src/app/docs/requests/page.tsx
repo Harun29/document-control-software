@@ -170,8 +170,7 @@ const DocRequests = () => {
           "docRequests",
           docRequestId
         );
-        const historyRef = collection(db, "history");
-
+        
         await addDoc(newDocRef, newDoc || selectedDoc);
         await addDoc(userRequestedNotifRef, {
           title: "Document Accepted",
@@ -182,6 +181,8 @@ const DocRequests = () => {
           read: false,
         });
         await createDoc(newDoc || selectedDoc);
+
+        const historyRef = collection(db, "history");
         await addDoc(historyRef, {
           author: user?.userInfo?.email || "Unknown",
           action: "Added a new document",
@@ -190,6 +191,7 @@ const DocRequests = () => {
         });
         await deleteDoc(docRequestRef);
         toast.success("Document accepted successfully");
+        
         const docHistoryRef = doc(db, "docHistory", selectedDoc.fileName);
         await updateDoc(docHistoryRef, {
           history: arrayUnion({

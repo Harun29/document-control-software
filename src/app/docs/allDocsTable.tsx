@@ -48,7 +48,17 @@ import { useGeneral } from "@/context/GeneralContext";
 import { DocRequest } from "./types";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
-import { collection, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import Link from "next/link";
 import React from "react";
@@ -58,9 +68,9 @@ import DocumentReviewDrawer from "./modifyDoc";
 
 const AllDocumentsTable = ({ org }: { org: string }) => {
   const { docs } = useGeneral();
+  const {deleteDocument} = useGeneral();
+  const {user} = useAuth();
   const { docsByOrg } = useGeneral();
-  const { usersOrg } = useAuth();
-  const {updateDocument} = useGeneral();
   const [data, setData] = useState<DocRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -91,8 +101,31 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
     fetchDocs();
   }, [docs, org]);
 
-  const handleDeleteDoc = async (doc: DocRequest) => {
-    console.log("Deleting doc: ", doc);
+  const handleDeleteDoc = async (document: DocRequest) => {
+    try{
+      setLoadingAction(true);
+      const docsRef = collection(db, "org", document.orgID, "docs");
+      const q = query(docsRef, where("fileName", "==", document.fileName));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+      await deleteDocument(document.fileName);
+
+      const historyRef = collection(db, "history");
+      await addDoc(historyRef, {
+        author: user?.userInfo?.email || "Unknown",
+        action: "Modified a document",
+        result: document?.title || document.title,
+        timestamp: serverTimestamp(),
+      });
+
+      toast.success("Document deleted successfully");
+      setLoadingAction(false);
+    }catch(error){
+      setLoadingAction(false);
+      console.error("Error deleting document: ", error);
+    }
   };
 
   const handleModifyDoc = (doc: DocRequest) => {
@@ -110,7 +143,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
 
   const table = useReactTable({
     data,
-    columns: columns(handleDeleteDoc, handleModifyDoc),
+    columns: columns(handleDeleteDoc, handleModifyDoc, loadingAction),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -274,30 +307,33 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           {data.map((doc) => (
             <div className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group">
               <div
-              className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleModifyDoc(doc);
-                  }}
-                >
-                <Pencil strokeWidth={1} size={20} className="hover:scale-110 transition-all"/>
+                className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModifyDoc(doc);
+                }}
+              >
+                <Pencil
+                  strokeWidth={1}
+                  size={20}
+                  className="hover:scale-110 transition-all"
+                />
               </div>
-            <Link
-              href={`/docs/${doc.fileName}`}
-              key={doc.fileName}
-              className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
-            >
+              <Link
+                href={`/docs/${doc.fileName}`}
+                key={doc.fileName}
+                className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
+              >
+                {doc.fileType === "application/pdf" ? (
+                  <FaFilePdf className="text-red-500 w-16 h-16" />
+                ) : (
+                  <FaFileWord className="text-blue-500 w-16 h-16" />
+                )}
 
-              {doc.fileType === "application/pdf" ? (
-                <FaFilePdf className="text-red-500 w-16 h-16" />
-              ) : (
-                <FaFileWord className="text-blue-500 w-16 h-16" />
-              )}
-
-              <div className="mt-2 text-center text-sm font-medium truncate">
-                {doc.title.substring(0, 15)}...
-              </div>
-            </Link>
+                <div className="mt-2 text-center text-sm font-medium truncate">
+                  {doc.title.substring(0, 15)}...
+                </div>
+              </Link>
             </div>
           ))}
         </div>
@@ -316,4 +352,3 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
 };
 
 export default AllDocumentsTable;
-
