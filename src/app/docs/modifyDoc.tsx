@@ -121,7 +121,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
       const historyRef = collection(db, "history");
       await addDoc(historyRef, {
         author: user?.userInfo?.email || "Unknown",
-        action: "Deleted a document",
+        action: "Modified a document",
         result: document?.title,
         timestamp: serverTimestamp(),
       });

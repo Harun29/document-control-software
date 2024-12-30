@@ -13,7 +13,7 @@ import {
   Trash,
   UserRoundPlus,
 } from "lucide-react";
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DocRequest } from "../types";
 import { Worker, Viewer } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -36,10 +36,10 @@ import {
   doc,
   getDocs,
   updateDoc,
-  Timestamp,
   deleteDoc,
   addDoc,
   serverTimestamp,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { toast } from "sonner";
@@ -55,6 +55,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import DocumentHistory, { historyRecord } from "@/components/docHistory";
 
 const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { docs } = useGeneral();
@@ -65,6 +66,8 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const [loading, setLoading] = useState(false);
   const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
   const [loadingAction, setLoadingAction] = useState(false);
+  const [documentHistory, setDocumentHistory] = useState<historyRecord[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
   const closeDrawerRef = useRef<HTMLButtonElement>(null);
 
@@ -76,13 +79,31 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     unwrapParams();
   }, [params]);
 
+  const closeHistory = () => {
+    setShowHistory(false);
+  };
+
+  const handleViewHistory = () => {
+    setShowHistory(true);
+  };
+
   useEffect(() => {
-    setLoading(true);
-    if (docs && docId) {
-      const doc = docs.find((doc) => doc.fileName === docId);
-      setDocument(doc);
-    }
-    setLoading(false);
+    const fetchDocument = async () => {
+      setLoading(true);
+      if (docs && docId) {
+        const document = docs.find((doc) => doc.fileName === docId);
+        if (document?.fileName) {
+          const historyRef = doc(db, "docHistory", document.fileName);
+          const docHistory = await getDoc(historyRef);
+          console.log("docHistory: ", docHistory.data());
+          const historyData = docHistory.data()?.history || [];
+          setDocumentHistory(historyData as historyRecord[]);
+        }
+        setDocument(document);
+      }
+      setLoading(false);
+    };
+    fetchDocument();
   }, [docs, docId]);
 
   const handleModifyDoc = () => {
@@ -90,7 +111,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
       drawerTriggerRef.current.click();
       setNewDocVersion(document as DocRequest);
     }
-    console.log("Modify document:", doc);
+    console.log("Modify document:", document);
   };
 
   const handleDeleteDoc = async (document: DocRequest) => {
@@ -166,7 +187,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                       {document?.createdAt
                         ? (document.createdAt as any)
                             .toDate()
-                            .toLocaleDateString("en-GB")
+                            .toLocaleDateString("en-GB", { year: 'numeric', month: 'short', day: 'numeric'})
                         : "Date not available"}
                     </Button>
                   </TooltipTrigger>
@@ -212,7 +233,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   Modify
                 </span>
               </Button>
-              <Button className="group flex items-center">
+              <Button onClick={handleViewHistory} className="group flex items-center">
                 <HistoryIcon className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   History
@@ -317,6 +338,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               handleDeleteDoc={handleDeleteDoc}
               loadingAction={loadingAction}
             />
+            {showHistory && <DocumentHistory docHistory={documentHistory} closeHistory={closeHistory} />}
           </div>
         </motion.div>
       </AnimatePresence>

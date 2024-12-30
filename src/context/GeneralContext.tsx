@@ -39,6 +39,8 @@ interface GeneralContextProps {
   ) => Promise<void>;
   deleteDocument: (fileName: string) => Promise<void>;
   docsByOrg: DocsByOrg[];
+  docViewType: "table" | "grid";
+  changeDocViewType: (type: "table" | "grid") => void;
 }
 
 export type DocsByOrg = {
@@ -58,6 +60,11 @@ export const GeneralProvider = ({
   const [numberOfRequests, setNumberOfRequests] = useState(0);
   const [docs, setDocs] = useState<DocRequest[]>([]);
   const [docsByOrg, setDocsByOrg] = useState<DocsByOrg[]>([]);
+  const [docViewType, setDocViewType] = useState<"table" | "grid">("table");
+
+  const changeDocViewType = (type: "table" | "grid") => {
+    setDocViewType(type);
+  }
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -184,7 +191,9 @@ export const GeneralProvider = ({
         createDoc,
         updateDocument,
         deleteDocument,
-        docsByOrg
+        docsByOrg,
+        docViewType,
+        changeDocViewType,
       }}
     >
       {children}

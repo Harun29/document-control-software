@@ -71,12 +71,13 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
   const {deleteDocument} = useGeneral();
   const {user} = useAuth();
   const { docsByOrg } = useGeneral();
+  const {docViewType} = useGeneral();
+  const {changeDocViewType} = useGeneral();
   const [data, setData] = useState<DocRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [viewType, setViewType] = useState<"table" | "grid">("grid");
   const [selectedDoc, setSelectedDoc] = useState<DocRequest | null>(null);
   const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
   const [loadingAction, setLoadingAction] = useState(false);
@@ -137,10 +138,6 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
     console.log("Modify document:", doc);
   };
 
-  useEffect(() => {
-    console.log(viewType);
-  }, [viewType]);
-
   const table = useReactTable({
     data,
     columns: columns(handleDeleteDoc, handleModifyDoc, loadingAction),
@@ -188,10 +185,12 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
         <ToggleGroup
           variant="outline"
           type="single"
-          value={viewType}
-          onValueChange={(value) =>
-            setViewType(value as unknown as "table" | "grid")
-          }
+          value={docViewType}
+          onValueChange={(value) => {
+            if (value) {
+              changeDocViewType(value as "table" | "grid");
+            }
+          }}
         >
           <ToggleGroupItem value="table">
             <TableIcon className="w-5 h-5" />
@@ -228,7 +227,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {viewType === "table" && (
+      {docViewType === "table" && (
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -277,7 +276,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           </Table>
         </div>
       )}
-      {viewType === "table" && (
+      {docViewType === "table" && (
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 text-sm text-muted-foreground">
             {table.getFilteredRowModel().rows.length} row(s) found.
@@ -302,7 +301,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           </div>
         </div>
       )}
-      {viewType === "grid" && (
+      {docViewType === "grid" && (
         <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 py-4">
           {data.map((doc) => (
             <div className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group">
