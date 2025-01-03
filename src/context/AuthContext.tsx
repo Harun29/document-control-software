@@ -11,7 +11,6 @@ import {
 import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, or, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "sonner";
-import Link from "next/link";
 
 export interface Notifs {
   title: string;

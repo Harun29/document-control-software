@@ -67,6 +67,12 @@ export const GeneralProvider = ({
   }
 
   useEffect(() => {
+    if (!usersOrg) {
+      setDocRequests([]);
+      setNumberOfRequests(0);
+      return;
+    }
+  
     const unsubscribe = onSnapshot(
       collection(db, "org", usersOrg, "docRequests"),
       (snapshot) => {
@@ -80,9 +86,9 @@ export const GeneralProvider = ({
         console.error("Error fetching doc requests: ", error);
       }
     );
-    console.log("is editor: ", isEditor);
+  
     return () => unsubscribe();
-  }, [isEditor, usersOrg]);
+  }, [usersOrg]);
 
   useEffect(() => {
     docRequests && console.log(docRequests);

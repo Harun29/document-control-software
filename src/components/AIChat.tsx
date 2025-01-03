@@ -20,9 +20,11 @@ import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ChatSupport() {
   const [isGenerating, setIsGenerating] = useState(false);
+  const {user} = useAuth();
   const {
     messages,
     setMessages,
@@ -62,11 +64,11 @@ export default function ChatSupport() {
     }
   };
 
-  return (
+  return user && (
     <ExpandableChat size="md" position="bottom-right">
       <ExpandableChatHeader className="bg-muted/60 flex-col text-center justify-center">
-        <h1 className="text-xl font-semibold">Chat with our AI ✨</h1>
-        <p>Ask any question for our AI to answer</p>
+        <h1 className="text-xl font-semibold">AI Document Assistance ✨</h1>
+        <p>Ask any questions regarding the documents</p>
         <div className="flex gap-2 items-center pt-2">
           <Button variant="secondary" onClick={() => setMessages([])}>
             New Chat
@@ -79,7 +81,7 @@ export default function ChatSupport() {
           <ChatBubble variant="received">
             <ChatBubbleAvatar src="" fallback="🤖" />
             <ChatBubbleMessage>
-              Hello! I'm the AI assistant. How can I help you today?
+              Hi there! I'm your AI assistant. How can I help you with your documents today? 😊
             </ChatBubbleMessage>
           </ChatBubble>
 
