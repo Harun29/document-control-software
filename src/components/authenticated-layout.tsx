@@ -1,28 +1,20 @@
 "use client";
-
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import LoginPage from "@/app/_login/page";
 
 const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
-  const router = useRouter();
   const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      if (window.location.pathname === "/login") {
-        router.push("/");
-      }
-    } else {
-      router.push("/login");
-    }
-  }, [user, router]);
-
+  
   if (!user) {
-    return <>{children}</>;
+    if(window.location.pathname !== "/") {
+      const router = useRouter();
+      router.push("/");
+    }
+    return <LoginPage />;
   }
 
   return (
