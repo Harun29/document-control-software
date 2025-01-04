@@ -119,6 +119,21 @@ const AddDocument = () => {
         }
       );
 
+      const orgRef = doc(db, "org", usersOrg);
+      const orgSnap = await getDoc(orgRef);
+      const editors = orgSnap.data()?.editors;
+      editors.forEach(async (editor: string) => {
+        const notifRef = collection(db, "users", editor, "notifications");
+        await addDoc(notifRef, {
+          createdAt: new Date().toISOString(),
+          read: false,
+          documentURL: `/requests`,
+          documentName: title,
+          title: "Document Request",
+          message: `${user?.userInfo?.email} requested a document`,
+        });
+      })
+
       const docHistoryRef = doc(db, "docHistory", extendedFileName);
       const docSnap = await getDoc(docHistoryRef);
 

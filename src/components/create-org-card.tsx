@@ -49,7 +49,8 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
         name: orgName,
         description: orgDescription,
         users: [],
-        docs: []
+        docs: [],
+        editors: [],
       });
 
       try {

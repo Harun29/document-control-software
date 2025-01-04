@@ -36,6 +36,7 @@ import { useEffect } from "react";
 import { getDocs, collection } from "firebase/firestore";
 import { Orgs } from "@/app/orgs/columns";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
   const [email, setEmail] = useState("");
@@ -85,13 +86,13 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
 
   const handleAddUser = async () => {
     if (!email || !password || !firstName || !lastName || !role || !org) {
-      alert("Please fill out all fields before proceeding.");
+      toast.error("All fields are required!");
       return;
     }
 
     try {
       await createUser(email, password, firstName, lastName, role, org, orgName);
-      alert('User created successfully');
+      toast.success("User added successfully!");
       console.log("User registered and added to Firestore");
     } catch (error) {
       console.error("Error registering user: ", error);

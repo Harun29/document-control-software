@@ -35,7 +35,6 @@ import {
   where,
   doc,
   getDocs,
-  updateDoc,
   deleteDoc,
   addDoc,
   serverTimestamp,
@@ -75,7 +74,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   useEffect(() => {
     const unwrapParams = async () => {
       const resolvedParams = await params;
-      setDocId(resolvedParams.docId);
+      setDocId(resolvedParams.docId.replace(/%20/g, " "));
     };
     unwrapParams();
   }, [params]);

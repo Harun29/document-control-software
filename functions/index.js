@@ -42,6 +42,11 @@ module.exports.createUser = functions.https.onCall(async (data) => {
     await orgRef.update({
       users: admin.firestore.FieldValue.arrayUnion(userRecord.uid),
     });
+    if(role === "Editor"){
+      await orgRef.update({
+        editors: admin.firestore.FieldValue.arrayUnion(userRecord.uid),
+      })
+    }
     console.log("Organization document updated successfully for org:", org);
 
     return { message: "User created successfully", uid: userRecord.uid };
