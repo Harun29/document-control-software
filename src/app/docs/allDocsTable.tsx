@@ -140,7 +140,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
 
   const table = useReactTable({
     data,
-    columns: columns(handleDeleteDoc, handleModifyDoc, loadingAction),
+    columns: columns(handleDeleteDoc, handleModifyDoc, loadingAction, user?.userInfo?.orgName as string),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -305,7 +305,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
         <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 py-4">
           {data.map((doc) => (
             <div className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group">
-              <div
+              {user?.userInfo?.orgName === doc.org && <div
                 className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -317,7 +317,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
                   size={20}
                   className="hover:scale-110 transition-all"
                 />
-              </div>
+              </div>}
               <Link
                 href={`/docs/${doc.fileName}`}
                 key={doc.fileName}

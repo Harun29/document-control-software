@@ -25,7 +25,8 @@ import {
 export const columns = (
   handleDeleteDoc: (doc: DocRequest) => void,
   handleModifyDoc: (doc: DocRequest) => void,
-  loadingAction: boolean
+  loadingAction: boolean,
+  usersOrg: string
 ): ColumnDef<DocRequest>[] => [
   {
     accessorKey: "fileType",
@@ -83,9 +84,10 @@ export const columns = (
   {
     id: "actions",
     cell: ({ row }) => {
+      console.log(row.original.orgID, usersOrg);
       return (
         <div className="flex space-x-4 justify-self-end">
-          <TooltipProvider>
+          {usersOrg === row.original.org && <TooltipProvider>
             <Tooltip>
               <TooltipTrigger
                 className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
@@ -97,7 +99,7 @@ export const columns = (
                 <p>Modify</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider>}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger
@@ -113,7 +115,7 @@ export const columns = (
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <TooltipProvider>
+          {usersOrg === row.original.org && <TooltipProvider>
             <Tooltip>
               <TooltipTrigger
                 className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
@@ -152,7 +154,7 @@ export const columns = (
                 <p>Delete</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider>}
         </div>
       );
     },

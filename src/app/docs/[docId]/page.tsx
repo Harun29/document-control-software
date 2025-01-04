@@ -79,6 +79,11 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     unwrapParams();
   }, [params]);
 
+  useEffect(() => {
+    document && console.log("document: ",document);
+    user && console.log("user: ",user.userInfo?.orgName);
+  }, [document])
+
   const closeHistory = () => {
     setShowHistory(false);
   };
@@ -173,6 +178,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             <Skeleton className="h-[200px]" />
           </div>
           <div className="flex space-x-4">
+            {document?.org === user?.userInfo?.orgName && 
             <Button
               onClick={handleModifyDoc}
               className="group flex items-center"
@@ -181,7 +187,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               <span className="hidden group-hover:inline transition-opacity duration-1000 ease-in-out">
                 Modify
               </span>
-            </Button>
+            </Button>}
             <Button
               onClick={handleViewHistory}
               className="group flex items-center"
@@ -301,7 +307,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               <p>{document?.summary}</p>
             </div>
             <div className="flex space-x-4">
-              <Button
+              {document?.org === user?.userInfo?.orgName && <Button
                 onClick={handleModifyDoc}
                 className="group flex items-center"
               >
@@ -309,7 +315,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                 <span className="hidden group-hover:inline transition-opacity duration-1000 ease-in-out">
                   Modify
                 </span>
-              </Button>
+              </Button>}
               <Button
                 onClick={handleViewHistory}
                 className="group flex items-center"
@@ -341,19 +347,19 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   </span>
                 </Button>
               </a>
-              <Button className="group flex items-center">
+              {document?.org === user?.userInfo?.orgName && <Button className="group flex items-center">
                 <FileSymlink className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   Send to other Department
                 </span>
-              </Button>
-              <Button className="group flex items-center">
+              </Button>}
+              {document?.org === user?.userInfo?.orgName && <Button className="group flex items-center">
                 <UserRoundPlus className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   Assign to user
                 </span>
-              </Button>
-              <AlertDialog>
+              </Button>}
+              {document?.org === user?.userInfo?.orgName && <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="destructive"
@@ -385,7 +391,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
-              </AlertDialog>
+              </AlertDialog>}
             </div>
           </div>
           <div className="lg:w-1/3 bg-background shadow-md p-4 flex flex-col flex-grow">
