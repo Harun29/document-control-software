@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Copy, LoaderCircle, Pencil, Trash } from "lucide-react";
+import { ArrowUpDown, Copy, LoaderCircle, Pencil, Trash } from "lucide-react";
 import { DocRequest } from "./types";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
 import Link from "next/link";
@@ -43,7 +43,17 @@ export const columns = (
   },
   {
     accessorKey: "createdAt",
-    header: "Created At",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Created At
+          <ArrowUpDown />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
       const createdAt = row.getValue("createdAt") as string | number | Date;
       const date = (createdAt as any).toDate();
@@ -64,11 +74,33 @@ export const columns = (
   },
   {
     accessorKey: "reqBy",
-    header: "Requested By",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Submited By
+          <ArrowUpDown />
+        </Button>
+      )
+    },
+    enableSorting: true
   },
   {
     accessorKey: "label",
-    header: "Label",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Label
+          <ArrowUpDown />
+        </Button>
+      )
+    },
+    enableSorting: true
   },
   {
     accessorKey: "title",
