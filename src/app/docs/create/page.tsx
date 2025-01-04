@@ -226,7 +226,7 @@ const AddDocument = () => {
           Add Document
         </h1>
         <p className="text-muted-foreground">
-          Add a document to your organization
+          Add a document to your department's repository
         </p>
         {/* Title Input */}
         <div className="space-y-2">

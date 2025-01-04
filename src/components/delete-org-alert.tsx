@@ -28,7 +28,7 @@ const DeleteOrgDialog: React.FC<DeleteOrgDialogProps> = ({ orgToDelete, onClose 
         try {
           await addDoc(collection(db, "history"), {
             author: currentUserEmail || "Unknown",
-            action: "deleted organization",
+            action: "deleted department",
             result: docName,
             timestamp: serverTimestamp(),
           });
@@ -38,10 +38,10 @@ const DeleteOrgDialog: React.FC<DeleteOrgDialogProps> = ({ orgToDelete, onClose 
         }
         onClose();
       } else {
-        alert("There are users in this organization. Please remove them before deleting the organization.");
+        alert("There are users in this department. Please remove them before deleting the department.");
       }
     } catch (error) {
-      console.error("Error deleting organization: ", error);
+      console.error("Error deleting department: ", error);
     }
   };
 
@@ -49,8 +49,8 @@ const DeleteOrgDialog: React.FC<DeleteOrgDialogProps> = ({ orgToDelete, onClose 
     <div className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10" onClick={onClose}>
       <Card className="w-96">
         <CardHeader>
-          <CardTitle className="leading-8">Are you sure you want to delete this organization?</CardTitle>
-          <CardDescription>This organization will be deleted from our servers with all its data!</CardDescription>
+          <CardTitle className="leading-8">Are you sure you want to delete this department?</CardTitle>
+          <CardDescription>This department will be deleted from our servers with all its data!</CardDescription>
         </CardHeader>
         <CardContent className="flex content-end justify-end">
           <Button variant="outline" onClick={onClose} className="me-4">Cancel</Button>

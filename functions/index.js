@@ -37,7 +37,7 @@ module.exports.createUser = functions.https.onCall(async (data) => {
     });
     console.log("User data saved to Firestore for UID:", userRecord.uid);
 
-    console.log("Updating organization document for org:", org);
+    console.log("Updating department document for org:", org);
     const orgRef = admin.firestore().collection("org").doc(org);
     await orgRef.update({
       users: admin.firestore.FieldValue.arrayUnion(userRecord.uid),
@@ -47,7 +47,7 @@ module.exports.createUser = functions.https.onCall(async (data) => {
         editors: admin.firestore.FieldValue.arrayUnion(userRecord.uid),
       })
     }
-    console.log("Organization document updated successfully for org:", org);
+    console.log("Department document updated successfully for org:", org);
 
     return { message: "User created successfully", uid: userRecord.uid };
   } catch (error) {

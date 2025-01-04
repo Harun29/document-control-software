@@ -27,7 +27,7 @@ const DeleteUserDialog: React.FC<DeleteUserDialogProps> = ({ userToDelete, onClo
       <Card className="w-100">
         <CardHeader>
           <CardTitle className="leading-8">Are you sure you want to delete this user?</CardTitle>
-          <CardDescription>This user will be deleted from our servers and removed from organization!</CardDescription>
+          <CardDescription>This user will be deleted from our servers and removed from department!</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-end content-end">
           <Button variant="outline" onClick={onClose} className="me-4">Cancel</Button>

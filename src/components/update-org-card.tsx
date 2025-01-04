@@ -50,7 +50,7 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
       try {
         await addDoc(collection(db, "history"), {
           author: currentUserEmail || "Unknown",
-          action: "updated organization",
+          action: "updated department",
           result: name,
           timestamp: serverTimestamp(),
         });
@@ -59,10 +59,10 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
         console.error("Error adding history record: ", historyError);
       }
 
-      console.log("Organization information updated in Firestore");
+      console.log("Department information updated in Firestore");
       onClose();
     } catch (error) {
-      console.error("Error updating organization information: ", error);
+      console.error("Error updating department information: ", error);
     }
   };
 
@@ -72,19 +72,19 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
         <CardHeader>
           <CardTitle className="flex">
             <PencilIcon className="h-6 w-6 mr-2" />
-            Update Organization Information</CardTitle>
-          <CardDescription>Update the information of an existing organization</CardDescription>
+            Update department Information</CardTitle>
+          <CardDescription>Update the information of an existing department</CardDescription>
         </CardHeader>
         <CardContent>
           <Input
             type="text"
-            placeholder="Organization Name"
+            placeholder="Department Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <Input
             type="text"
-            placeholder="Organization Description"
+            placeholder="Department Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -92,10 +92,10 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
             <Terminal className="h-4 w-4" />
             <AlertTitle>Heads up!</AlertTitle>
             <AlertDescription>
-              All fields are required in order to update organization information!
+              All fields are required in order to update department information!
             </AlertDescription>
           </Alert>
-          <Button onClick={handleUpdateOrg} className="mt-4">Update Organization</Button>
+          <Button onClick={handleUpdateOrg} className="mt-4">Update Department</Button>
         </CardContent>
       </Card>
     </div>

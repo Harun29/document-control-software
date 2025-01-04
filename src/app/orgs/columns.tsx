@@ -189,12 +189,12 @@ export const orgsColumns = (
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleSelectOrgToDelete(org)}>
               <Trash />
-              Delete Organization
+              Delete Department
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleModifyOrg(org)}>
               <Pencil />
-              Modify organization
+              Modify Department
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

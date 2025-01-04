@@ -76,7 +76,7 @@ const ViewHistory = () => {
       await deleteDoc(doc(db, "history", history.id));
       setData((prevData) => prevData.filter((data) => data.id !== history.id));
     } catch (error) {
-      console.error("Error deleting organization: ", error);
+      console.error("Error deleting department: ", error);
     }
   };
 

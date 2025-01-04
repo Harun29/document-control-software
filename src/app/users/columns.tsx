@@ -47,7 +47,7 @@ export const columns = (
   },
   {
     accessorKey: "orgName",
-    header: "Organization",
+    header: "Department",
   },
   {
     id: "actions",

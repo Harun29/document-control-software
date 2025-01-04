@@ -18,7 +18,7 @@ const ManageDocs = () => {
         const orgs = querySnapshot.docs.map((doc) => doc.data().name);
         setOrgs(orgs as string[]);
       } catch (err) {
-        console.error("Error fetching organizations: ", err);
+        console.error("Error fetching departments: ", err);
       }
     };
     fetchOrgs();

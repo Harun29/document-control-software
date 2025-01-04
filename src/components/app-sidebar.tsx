@@ -42,16 +42,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Home,
       },
       ...(isAdmin ? [{ 
-        title: "Organizations",
+        title: "Departmentss",
         icon: Users2,
         isActive: true,
         items: [
           {
-            title: "Create organization",
+            title: "Create departments",
             action: "createOrg",
           },
           {
-            title: "Manage organizations",
+            title: "Manage departments",
             url: "/orgs",
           },
         ],
@@ -175,7 +175,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ...subItem,
       action: subItem.title.toLowerCase().includes("user")
         ? "createUser"
-        : subItem.title.toLowerCase().includes("organization")
+        : subItem.title.toLowerCase().includes("department")
         ? "createOrg"
         : undefined,
     })),

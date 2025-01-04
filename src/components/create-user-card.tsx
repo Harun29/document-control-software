@@ -163,7 +163,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
                 className="w-[180px]"
                 onMouseDown={handlePropagation}
               >
-                <SelectValue placeholder="Organization" />
+                <SelectValue placeholder="Department" />
               </SelectTrigger>
               <SelectContent onMouseDown={handlePropagation}>
                 {loading && !data ? (
@@ -197,7 +197,7 @@ const CreateUserCard = forwardRef<HTMLDivElement>((_, ref) => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Proceed adding this user?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  New user will be added. Email: {email}, Full name: {firstName} {lastName}, Organization: {org}, Role: {role}
+                  New user will be added. Email: {email}, Full name: {firstName} {lastName}, Department: {org}, Role: {role}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter onMouseDown={handlePropagation}>

@@ -56,7 +56,7 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
       try {
         await addDoc(collection(db, "history"), {
           author: user?.userInfo?.email || "Unknown",
-          action: "created organization",
+          action: "created department",
           result: orgName,
           timestamp: serverTimestamp(),
         });
@@ -64,9 +64,9 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
       } catch (historyError) {
         console.error("Error adding history record: ", historyError);
       }
-      console.log("Organization added to Firestore");
+      console.log("Department added to Firestore");
     } catch (error) {
-      console.error("Error creating organization: ", error);
+      console.error("Error creating department: ", error);
     }
   };
 
@@ -76,20 +76,20 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
         <CardHeader>
           <CardTitle className="flex">
             <PlusCircle className="h-6 w-6 mr-2" />
-            Create New Organization
+            Create New Department
           </CardTitle>
-          <CardDescription>Create a new organization in the company</CardDescription>
+          <CardDescription>Create a new department in the company</CardDescription>
         </CardHeader>
         <CardContent>
           <Input
             type="text"
-            placeholder="Organization name"
+            placeholder="Department name"
             value={orgName}
             onChange={(e) => setOrgName(e.target.value)}
           />
           <Textarea
             className="mb-3"
-            placeholder="Organization description"
+            placeholder="Department description"
             value={orgDescription}
             onChange={(e) => setOrgDescription(e.target.value)}
           />
@@ -97,7 +97,7 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
             <Terminal className="h-4 w-4" />
             <AlertTitle>Heads up!</AlertTitle>
             <AlertDescription>
-              All fields are required to create a new organization!
+              All fields are required to create a new department!
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -105,14 +105,14 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
           <AlertDialog>
             <AlertDialogTrigger>
               <Button disabled={!orgName || !orgDescription}>
-                Create Organization
+                Create Department
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Proceed creating this organization?</AlertDialogTitle>
+                <AlertDialogTitle>Proceed creating this department?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  The organization will be created with the name: {orgName}
+                  The department will be created with the name: {orgName}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -124,7 +124,7 @@ const CreateOrgCard = forwardRef<HTMLDivElement>((_, ref) => {
                     onMouseDown={handlePropagation}
                     onClick={handleCreateOrganization}
                   >
-                    Create Organization
+                    Create Department
                   </Button>
                 </AlertDialogAction>
               </AlertDialogFooter>

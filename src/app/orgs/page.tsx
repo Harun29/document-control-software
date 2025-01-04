@@ -59,7 +59,7 @@ const ManageOrgs = () => {
         })) as Orgs[];
         setData(orgsList);
       } catch (error) {
-        console.error("Error fetching organizations: ", error);
+        console.error("Error fetching departments: ", error);
       } finally {
         setLoading(false);
       }
@@ -134,9 +134,9 @@ const ManageOrgs = () => {
     <div className="w-full p-10">
       <h1 className="text-3xl mb-1 flex">
         <UsersRound className="w-8 h-8 mr-2" />
-        Manage Organizations
+        Manage Departments
       </h1>
-      <p className="text-[#505050]">View, modify and delete organizations.</p>
+      <p className="text-[#505050]">View, modify and delete departments.</p>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter names..."

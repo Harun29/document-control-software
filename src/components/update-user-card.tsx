@@ -70,7 +70,7 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(
           }));
           setData(orgsList);
         } catch (error) {
-          console.error("Error fetching organizations: ", error);
+          console.error("Error fetching departments: ", error);
         } finally {
           setLoading(false);
         }
@@ -203,7 +203,7 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(
                   className="w-[180px]"
                   onMouseDown={handlePropagation}
                 >
-                  <SelectValue placeholder="Organization" />
+                  <SelectValue placeholder="Department" />
                 </SelectTrigger>
                 <SelectContent onMouseDown={handlePropagation}>
                   {loading ? (
