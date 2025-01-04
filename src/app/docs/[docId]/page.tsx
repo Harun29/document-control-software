@@ -182,7 +182,7 @@ useEffect(() => {
       querySnapshot.forEach(async (doc) => {
         await deleteDoc(doc.ref);
       });
-      await deleteDocument(document.fileName);
+      await deleteDocument(document.fileName, document.org);
 
       const historyRef = collection(db, "history");
       await addDoc(historyRef, {
@@ -204,6 +204,7 @@ useEffect(() => {
     e.preventDefault();
     setLoading(true);
     const documentFileName = document?.fileName;
+    const documentOrg = document?.org;
 
     if (documentFileName) {
       try {
@@ -266,7 +267,7 @@ useEffect(() => {
         }
 
         if (deleteUponSending) {
-          await deleteDocument(documentFileName);
+          await deleteDocument(documentFileName, documentOrg as string);
         }
 
         console.log("Document request submitted with ID:", docRef.id);

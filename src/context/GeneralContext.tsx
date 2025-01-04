@@ -35,9 +35,10 @@ interface GeneralContextProps {
   createDoc: (doc: DocRequest) => Promise<void>;
   updateDocument: (
     fileName: string,
+    orgName: string,
     updatedDoc: Partial<DocRequest>
   ) => Promise<void>;
-  deleteDocument: (fileName: string) => Promise<void>;
+  deleteDocument: (fileName: string, orgName: string) => Promise<void>;
   docsByOrg: DocsByOrg[];
   docViewType: "table" | "grid";
   changeDocViewType: (type: "table" | "grid") => void;
@@ -46,7 +47,7 @@ interface GeneralContextProps {
 export type DocsByOrg = {
   org: string;
   docs: DocRequest[];
-}
+};
 
 const GeneralContext = createContext<GeneralContextProps | null>(null);
 
@@ -64,7 +65,7 @@ export const GeneralProvider = ({
 
   const changeDocViewType = (type: "table" | "grid") => {
     setDocViewType(type);
-  }
+  };
 
   useEffect(() => {
     if (!usersOrg) {
@@ -72,7 +73,7 @@ export const GeneralProvider = ({
       setNumberOfRequests(0);
       return;
     }
-  
+
     const unsubscribe = onSnapshot(
       collection(db, "org", usersOrg, "docRequests"),
       (snapshot) => {
@@ -86,7 +87,7 @@ export const GeneralProvider = ({
         console.error("Error fetching doc requests: ", error);
       }
     );
-  
+
     return () => unsubscribe();
   }, [usersOrg]);
 
@@ -96,44 +97,52 @@ export const GeneralProvider = ({
 
   useEffect(() => {
     const docRef = doc(db, "docs", "alldocs");
-    const unsubscribe = onSnapshot(docRef, async (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        
-        // Sorting documents based on createdAt field (latest to oldest)
-        const sortedDocs = (data.docs || []).sort((a: DocRequest, b: DocRequest) => {
-          const dateA = (a.createdAt as any).toDate();
-          const dateB = (b.createdAt as any).toDate();
-          return dateB.getTime() - dateA.getTime();
-        });
-  
-        setDocs(sortedDocs);
-        console.log("Sorted docs: ", sortedDocs);
-  
-        const orgs = await getDocs(collection(db, "org"));
-        const docsByOrgPromises = orgs.docs.map(async (org) => {
-          const q = query(collection(db, "org", org.id, "docs"), orderBy("createdAt", "desc"));
-          const docsByOrg = await getDocs(q);
-          const docs = docsByOrg.docs.map((doc) => doc.data() as DocRequest);
-          return { org: org.data().name, docs };
-        });
-  
-        const docsByOrgArray = await Promise.all(docsByOrgPromises);
-        setDocsByOrg(docsByOrgArray);
-  
-        docsByOrgArray.forEach((docFromOrg) => {
-          console.log("Docs by org: ", docFromOrg.org, docFromOrg.docs);
-        });
-      } else {
-        console.error("No such document!");
+    const unsubscribe = onSnapshot(
+      docRef,
+      async (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+
+          // Sorting documents based on createdAt field (latest to oldest)
+          const sortedDocs = (data.docs || []).sort(
+            (a: DocRequest, b: DocRequest) => {
+              const dateA = (a.createdAt as any).toDate();
+              const dateB = (b.createdAt as any).toDate();
+              return dateB.getTime() - dateA.getTime();
+            }
+          );
+
+          setDocs(sortedDocs);
+          console.log("Sorted docs: ", sortedDocs);
+
+          const orgs = await getDocs(collection(db, "org"));
+          const docsByOrgPromises = orgs.docs.map(async (org) => {
+            const q = query(
+              collection(db, "org", org.id, "docs"),
+              orderBy("createdAt", "desc")
+            );
+            const docsByOrg = await getDocs(q);
+            const docs = docsByOrg.docs.map((doc) => doc.data() as DocRequest);
+            return { org: org.data().name, docs };
+          });
+
+          const docsByOrgArray = await Promise.all(docsByOrgPromises);
+          setDocsByOrg(docsByOrgArray);
+
+          docsByOrgArray.forEach((docFromOrg) => {
+            console.log("Docs by org: ", docFromOrg.org, docFromOrg.docs);
+          });
+        } else {
+          console.error("No such document!");
+        }
+      },
+      (error) => {
+        console.error("Error fetching docs: ", error);
       }
-    }, (error) => {
-      console.error("Error fetching docs: ", error);
-    });
-  
+    );
+
     return () => unsubscribe();
   }, []);
-  
 
   const createDoc = async (newDoc: DocRequest) => {
     try {
@@ -153,6 +162,7 @@ export const GeneralProvider = ({
 
   const updateDocument = async (
     fileName: string,
+    orgName: string,
     updatedDoc: Partial<DocRequest>
   ) => {
     try {
@@ -161,7 +171,9 @@ export const GeneralProvider = ({
       if (docSnap.exists()) {
         const data = docSnap.data();
         const updatedDocs = data.docs.map((doc: DocRequest) =>
-          doc.fileName === fileName ? { ...doc, ...updatedDoc } : doc
+          doc.fileName === fileName && doc.org === orgName
+            ? { ...doc, ...updatedDoc }
+            : doc
         );
         await updateDoc(docRef, { docs: updatedDocs });
         setDocs(updatedDocs);
@@ -171,14 +183,14 @@ export const GeneralProvider = ({
     }
   };
 
-  const deleteDocument = async (fileName: string) => {
+  const deleteDocument = async (fileName: string, orgName: string) => {
     try {
       const docRef = doc(db, "docs", "alldocs");
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
         const updatedDocs = data.docs.filter(
-          (doc: DocRequest) => doc.fileName !== fileName
+          (doc: DocRequest) => doc.fileName !== fileName && doc.org !== orgName
         );
         await updateDoc(docRef, { docs: updatedDocs });
         setDocs(updatedDocs);

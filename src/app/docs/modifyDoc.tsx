@@ -127,7 +127,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
       });
 
       await updateDoc(docRef, newDoc);
-      await updateDocument(document.fileName, newDoc);
+      await updateDocument(document.fileName, document.org, newDoc);
       toast.success("Document updated successfully");
     } catch (err) {
       console.error("Error modifying document: ", err);

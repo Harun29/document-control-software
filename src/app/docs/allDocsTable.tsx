@@ -111,7 +111,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       querySnapshot.forEach(async (doc) => {
         await deleteDoc(doc.ref);
       });
-      await deleteDocument(document.fileName);
+      await deleteDocument(document.fileName, document.org);
 
       const historyRef = collection(db, "history");
       await addDoc(historyRef, {
