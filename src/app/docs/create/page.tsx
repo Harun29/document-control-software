@@ -134,7 +134,7 @@ const AddDocument = () => {
         });
       })
 
-      const docHistoryRef = doc(db, "docHistory", extendedFileName);
+      const docHistoryRef = doc(db, "docHistory", extendedFileName + user?.userInfo?.orgName );
       const docSnap = await getDoc(docHistoryRef);
 
       if (docSnap.exists()) {

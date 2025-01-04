@@ -192,7 +192,7 @@ const DocRequests = () => {
         await deleteDoc(docRequestRef);
         toast.success("Document accepted successfully");
         
-        const docHistoryRef = doc(db, "docHistory", selectedDoc.fileName);
+        const docHistoryRef = doc(db, "docHistory", selectedDoc.fileName + selectedDoc.org);
         await updateDoc(docHistoryRef, {
           history: arrayUnion({
             action: "Document accepted",

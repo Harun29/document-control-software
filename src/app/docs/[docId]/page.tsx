@@ -152,7 +152,7 @@ useEffect(() => {
       if (docs && docId && docsOrg) {
         const document = docs.find((doc) => (doc.fileName === docId && doc.org === docsOrg));
         if (document?.fileName) {
-          const historyRef = doc(db, "docHistory", document.fileName);
+          const historyRef = doc(db, "docHistory", document.fileName + document.org);
           const docHistory = await getDoc(historyRef);
           console.log("docHistory: ", docHistory.data());
           const historyData = docHistory.data()?.history || [];
@@ -241,7 +241,17 @@ useEffect(() => {
           });
         });
 
-        const docHistoryRef = doc(db, "docHistory", documentFileName);
+        const historyRef = doc(db, "docHistory", documentFileName + documentOrg);
+        await updateDoc(historyRef, {
+          history: arrayUnion({
+            action: `User submitted document to ${sendToOrg.name}`,
+            user: user?.userInfo?.email,
+            org: user?.userInfo?.orgName,
+            timeStamp: new Date(),
+          }),
+        });
+
+        const docHistoryRef = doc(db, "docHistory", documentFileName + sendToOrg.name);
         const docSnap = await getDoc(docHistoryRef);
 
         if (docSnap.exists()) {
