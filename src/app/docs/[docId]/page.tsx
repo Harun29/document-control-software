@@ -56,6 +56,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import DocumentHistory, { historyRecord } from "@/components/docHistory";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { docs } = useGeneral();
@@ -142,7 +143,80 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <AnimatePresence>
+      <motion.div
+      initial={{ x: "100%", opacity: 0 }}
+      animate={{ x: "0", opacity: 1 }}
+      exit={{ x: "-100%", opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="lg:flex lg:space-x-6 h-full min-h-[100vh-4rem]">
+        <div className="lg:w-2/3 flex flex-col space-y-6 p-6 bg-background shadow-md flex-grow">
+          <h1 className="text-3xl mb-0 flex">
+            <ChevronLeft
+              onClick={() => window.history.back()}
+              className="cursor-pointer w-8 h-8 mr-2 hover:scale-125 transition-all"
+            />
+            <FaFilePdf className="w-8 h-8 mr-2 text-red-500" />
+            Document - Loading
+          </h1>
+          <p className="text-muted-foreground">
+            View and manage document details
+          </p>
+          <div className="flex space-x-4 items-center">
+            <Button variant="outline">Loading</Button>
+            <Button variant="outline">Loading</Button>
+            <Button variant="outline">Loading</Button>
+            <Button variant="outline">Loading</Button>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="content">Summary</Label>
+            <Skeleton className="h-[200px]" />
+          </div>
+          <div className="flex space-x-4">
+            <Button
+              onClick={handleModifyDoc}
+              className="group flex items-center"
+            >
+              <Pencil className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+              <span className="hidden group-hover:inline transition-opacity duration-1000 ease-in-out">
+                Modify
+              </span>
+            </Button>
+            <Button
+              onClick={handleViewHistory}
+              className="group flex items-center"
+            >
+              <HistoryIcon className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+              <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
+                History
+              </span>
+            </Button>
+            <Button
+              onClick={() => {
+                if (document?.fileURL) {
+                  navigator.clipboard.writeText(document.fileURL);
+                  toast.success("URL copied to clipboard");
+                }
+              }}
+              className="group flex items-center"
+            >
+              <Copy className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+              <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
+                Copy URL
+              </span>
+            </Button>
+          </div>
+        </div>
+        <div className="lg:w-1/3 bg-background shadow-md p-4 flex flex-col flex-grow">
+          <h2 className="text-lg font-medium text-primary">Document Preview</h2>
+          <div className="flex-grow h-[400px] overflow-auto border mt-4 rounded-md pt-4 pb-4">
+            <Skeleton className="h-full" />
+          </div>
+        </div>
+      </motion.div>
+      </AnimatePresence>
+    );
   } else {
     return (
       <AnimatePresence>
@@ -187,7 +261,11 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                       {document?.createdAt
                         ? (document.createdAt as any)
                             .toDate()
-                            .toLocaleDateString("en-GB", { year: 'numeric', month: 'short', day: 'numeric'})
+                            .toLocaleDateString("en-GB", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })
                         : "Date not available"}
                     </Button>
                   </TooltipTrigger>
@@ -233,17 +311,22 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   Modify
                 </span>
               </Button>
-              <Button onClick={handleViewHistory} className="group flex items-center">
+              <Button
+                onClick={handleViewHistory}
+                className="group flex items-center"
+              >
                 <HistoryIcon className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   History
                 </span>
               </Button>
               <Button
-                onClick={() =>
-                  document?.fileURL &&
-                  navigator.clipboard.writeText(document.fileURL)
-                }
+                onClick={() => {
+                  if (document?.fileURL) {
+                    navigator.clipboard.writeText(document.fileURL);
+                    toast.success("URL copied to clipboard");
+                  }
+                }}
                 className="group flex items-center"
               >
                 <Copy className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
@@ -338,7 +421,12 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               handleDeleteDoc={handleDeleteDoc}
               loadingAction={loadingAction}
             />
-            {showHistory && <DocumentHistory docHistory={documentHistory} closeHistory={closeHistory} />}
+            {showHistory && (
+              <DocumentHistory
+                docHistory={documentHistory}
+                closeHistory={closeHistory}
+              />
+            )}
           </div>
         </motion.div>
       </AnimatePresence>
