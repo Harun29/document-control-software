@@ -76,12 +76,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useSearchParams } from "next/navigation";
 
 const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { docs } = useGeneral();
   const { deleteDocument } = useGeneral();
   const { user } = useAuth();
   const [docId, setDocId] = useState<string | null>(null);
+  const [docsOrg, setDocsOrg] = useState("");
   const [document, setDocument] = useState<DocRequest>();
   const [loading, setLoading] = useState(false);
   const [newDocVersion, setNewDocVersion] = useState<DocRequest | null>(null);
@@ -95,6 +97,22 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const [deleteUponSending, setDeleteUponSending] = useState(false);
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
   const closeDrawerRef = useRef<HTMLButtonElement>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const unwrapParams = async () => {
+      const resolvedParams = await params;
+      const orgName = searchParams.get("orgName");
+      console.log("resolvedParams: ", resolvedParams);
+      setDocId(resolvedParams.docId.replace(/%20/g, " "));
+      console.log("doc id: ", resolvedParams.docId);
+      if (orgName) {
+        setDocsOrg(orgName);
+        console.log("org name: ", orgName);
+      }
+    };
+    unwrapParams();
+  }, [params, searchParams]);
 
   useEffect(() => {
     try {
@@ -116,13 +134,9 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     }
   }, []);
 
-  useEffect(() => {
-    const unwrapParams = async () => {
-      const resolvedParams = await params;
-      setDocId(resolvedParams.docId.replace(/%20/g, " "));
-    };
-    unwrapParams();
-  }, [params]);
+useEffect(() => {
+  console.log("docId: ", docId, "docsOrg: ", docsOrg);
+}, [docId, docsOrg])  
 
   const closeHistory = () => {
     setShowHistory(false);
@@ -135,8 +149,8 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   useEffect(() => {
     const fetchDocument = async () => {
       setLoading(true);
-      if (docs && docId) {
-        const document = docs.find((doc) => doc.fileName === docId);
+      if (docs && docId && docsOrg) {
+        const document = docs.find((doc) => (doc.fileName === docId && doc.org === docsOrg));
         if (document?.fileName) {
           const historyRef = doc(db, "docHistory", document.fileName);
           const docHistory = await getDoc(historyRef);

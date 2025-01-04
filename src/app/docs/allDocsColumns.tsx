@@ -82,7 +82,7 @@ export const columns = (
       const fileName = row.getValue("fileName") as string;
       return (
         <Button variant="ghost" className="text-blue-500">
-          <Link href={`/docs/${fileName}`}>View Doc</Link>
+          <Link href={`/docs/${fileName}?orgName=${encodeURIComponent(row.original.org)}`}>View Doc</Link>
         </Button>
       );
     },

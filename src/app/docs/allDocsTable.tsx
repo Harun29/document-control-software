@@ -319,7 +319,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
                 />
               </div>}
               <Link
-                href={`/docs/${doc.fileName}`}
+                href={`/docs/${doc.fileName}?orgName=${encodeURIComponent(doc.org)}`}
                 key={doc.fileName}
                 className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
               >
