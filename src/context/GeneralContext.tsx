@@ -121,26 +121,20 @@ export const GeneralProvider = ({
               collection(db, "org", org.id, "docs"),
               orderBy("createdAt", "desc")
             );
-            const docsByOrg = await getDocs(q);
-            const docs = docsByOrg.docs.map((doc) => doc.data() as DocRequest);
-            return { org: org.data().name, docs };
+
+            onSnapshot(q, (docsByOrgSnap) => {
+              const docs = docsByOrgSnap.docs.map((doc) => doc.data() as DocRequest);
+              setDocsByOrg((prevDocsByOrg) => {
+                const updatedDocsByOrg = prevDocsByOrg.filter(d => d.org !== org.data().name);
+                return [...updatedDocsByOrg, { org: org.data().name, docs }];
+              });
+            });
           });
 
-          const docsByOrgArray = await Promise.all(docsByOrgPromises);
-          setDocsByOrg(docsByOrgArray);
-
-          docsByOrgArray.forEach((docFromOrg) => {
-            console.log("Docs by org: ", docFromOrg.org, docFromOrg.docs);
-          });
-        } else {
-          console.error("No such document!");
+          await Promise.all(docsByOrgPromises);
         }
-      },
-      (error) => {
-        console.error("Error fetching docs: ", error);
       }
     );
-
     return () => unsubscribe();
   }, []);
 
