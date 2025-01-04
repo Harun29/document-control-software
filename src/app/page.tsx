@@ -46,8 +46,8 @@ export default function Home() {
   const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
   const { usersNotifs } = useAuth();
-  const {usersUnreadNotifs} = useAuth();
-  const {viewNotifications} = useAuth();
+  const { usersUnreadNotifs } = useAuth();
+  const { viewNotifications } = useAuth();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [history, setHistory] = useState<History[]>([]);
   const [notifications, setNotifications] = useState<Notifs[]>([]);
@@ -182,14 +182,20 @@ export default function Home() {
       </div>
 
       {/* Content Section */}
-      <div className="grid space-x-10 border-2 rounded-xl p-10" style={{ gridTemplateColumns: "2fr 3fr 2fr" }}>
+      <div
+        className="grid space-x-10 border-2 rounded-xl p-10"
+        style={{ gridTemplateColumns: "2fr 3fr 2fr" }}
+      >
         {/* Recent Documents */}
         <div className="flex flex-col">
           <span className="text-xl font-bold mb-6">Recent</span>
           <div className="border-l-2 p-5 grid grid-cols-2 gap-x-20 gap-y-5">
             {docs.map((doc) => (
-              <Link href={`/docs/${doc.fileName}`} key={doc.id}
-                className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition-all">
+              <Link
+                href={`/docs/${doc.fileName}`}
+                key={doc.id}
+                className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition-all"
+              >
                 {doc.fileType === "application/pdf" && (
                   <FaFilePdf className="text-red-500 w-10 h-10 me-2" />
                 )}
@@ -232,32 +238,41 @@ export default function Home() {
         <div className="flex flex-col">
           <span className="text-xl font-bold mb-6">Notifications</span>
           <div className="border-l-2 p-5 space-y-3 flex flex-col items-center">
-            {notifications.map((notif, index) => (
-              !notif.read && (
-              <div
-                key={index}
-                className="text-muted-foreground hover:text-secondary-foreground flex items-center space-x-2 cursor-pointer hover:scale-105 transform transition-all"
-              >
-                <div className="bg-blue-500 text-white w-8 h-8 flex items-center justify-center rounded-full">
-                  <span className="font-bold">!</span>
-                </div>
-                <div className="flex flex-col m-2">
-                  <span>
-                    {notif.title}
-                    {": "}
-                    {notif.documentName}...
-                  </span>
-                </div>
-              </div>
-            )))}
+            {notifications.map(
+              (notif, index) =>
+                !notif.read && (
+                  <div
+                    key={index}
+                    className="text-muted-foreground hover:text-secondary-foreground flex items-center space-x-2 cursor-pointer hover:scale-105 transform transition-all"
+                  >
+                    <div className="bg-blue-500 text-white w-8 h-8 flex items-center justify-center rounded-full">
+                      <span className="font-bold">!</span>
+                    </div>
+                    <div className="flex flex-col m-2">
+                      <span>
+                        {notif.title}
+                        {": "}
+                        {notif.documentName}...
+                      </span>
+                    </div>
+                  </div>
+                )
+            )}
             {usersUnreadNotifs === 0 && (
-              <span className="text-muted-foreground">You don't have any new notifications!</span>
+              <span className="text-muted-foreground">
+                You don't have any new notifications!
+              </span>
             )}
             <Button onClick={() => setShowNotifs(true)} variant="secondary">
               {usersUnreadNotifs > 0 ? "View All" : "View"}
             </Button>
           </div>
-          {(showNotifs || viewNotifications) && <Notifications ref={notificationsRef} closeNotifs={() => setShowNotifs(false)}/>}
+          {(showNotifs || viewNotifications) && (
+            <Notifications
+              ref={notificationsRef}
+              closeNotifs={() => setShowNotifs(false)}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -97,44 +97,45 @@ export const GeneralProvider = ({
 
   useEffect(() => {
     const docRef = doc(db, "docs", "alldocs");
-    const unsubscribe = onSnapshot(
-      docRef,
-      async (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
+    const unsubscribe = onSnapshot(docRef, async (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
 
-          // Sorting documents based on createdAt field (latest to oldest)
-          const sortedDocs = (data.docs || []).sort(
-            (a: DocRequest, b: DocRequest) => {
-              const dateA = (a.createdAt as any).toDate();
-              const dateB = (b.createdAt as any).toDate();
-              return dateB.getTime() - dateA.getTime();
-            }
+        // Sorting documents based on createdAt field (latest to oldest)
+        const sortedDocs = (data.docs || []).sort(
+          (a: DocRequest, b: DocRequest) => {
+            const dateA = (a.createdAt as any).toDate();
+            const dateB = (b.createdAt as any).toDate();
+            return dateB.getTime() - dateA.getTime();
+          }
+        );
+
+        setDocs(sortedDocs);
+        console.log("Sorted docs: ", sortedDocs);
+
+        const orgs = await getDocs(collection(db, "org"));
+        const docsByOrgPromises = orgs.docs.map(async (org) => {
+          const q = query(
+            collection(db, "org", org.id, "docs"),
+            orderBy("createdAt", "desc")
           );
 
-          setDocs(sortedDocs);
-          console.log("Sorted docs: ", sortedDocs);
-
-          const orgs = await getDocs(collection(db, "org"));
-          const docsByOrgPromises = orgs.docs.map(async (org) => {
-            const q = query(
-              collection(db, "org", org.id, "docs"),
-              orderBy("createdAt", "desc")
+          onSnapshot(q, (docsByOrgSnap) => {
+            const docs = docsByOrgSnap.docs.map(
+              (doc) => doc.data() as DocRequest
             );
-
-            onSnapshot(q, (docsByOrgSnap) => {
-              const docs = docsByOrgSnap.docs.map((doc) => doc.data() as DocRequest);
-              setDocsByOrg((prevDocsByOrg) => {
-                const updatedDocsByOrg = prevDocsByOrg.filter(d => d.org !== org.data().name);
-                return [...updatedDocsByOrg, { org: org.data().name, docs }];
-              });
+            setDocsByOrg((prevDocsByOrg) => {
+              const updatedDocsByOrg = prevDocsByOrg.filter(
+                (d) => d.org !== org.data().name
+              );
+              return [...updatedDocsByOrg, { org: org.data().name, docs }];
             });
           });
+        });
 
-          await Promise.all(docsByOrgPromises);
-        }
+        await Promise.all(docsByOrgPromises);
       }
-    );
+    });
     return () => unsubscribe();
   }, []);
 

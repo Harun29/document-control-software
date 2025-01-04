@@ -10,30 +10,36 @@ import {
 import { DocRequest } from "../types";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
 
-
 export const columns = (
   handleReviewDoc: (doc: DocRequest) => void,
-  handleAcceptDoc: (selectedDoc: DocRequest, newDoc: DocRequest | null) => Promise<void>,
+  handleAcceptDoc: (
+    selectedDoc: DocRequest,
+    newDoc: DocRequest | null
+  ) => Promise<void>,
   handleReturnDoc: (doc: DocRequest) => void
 ): ColumnDef<DocRequest>[] => [
   {
-      accessorKey: "fileType",
-      header: "File Type",
-      cell: ({ row }) => {
-        const fileType = row.getValue("fileType");
-  
-        if (fileType === "application/pdf") {
-          return <FaFilePdf className="w-6 h-6 text-red-500" />;
-        }
-  
-        return <FaFileWord className="w-6 h-6" />;
+    accessorKey: "fileType",
+    header: "File Type",
+    cell: ({ row }) => {
+      const fileType = row.getValue("fileType");
+
+      if (fileType === "application/pdf") {
+        return <FaFilePdf className="w-6 h-6 text-red-500" />;
       }
+
+      return <FaFileWord className="w-6 h-6" />;
     },
+  },
   {
     accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => (
-      <div>{(row.getValue("createdAt") as any).toDate().toLocaleDateString('en-GB')}</div>
+      <div>
+        {(row.getValue("createdAt") as any)
+          .toDate()
+          .toLocaleDateString("en-GB")}
+      </div>
     ),
   },
   {

@@ -1,9 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import {
-  MoreHorizontal,
-  Trash,
-} from "lucide-react";
+import { MoreHorizontal, Trash } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,7 +50,9 @@ export const historyColumns = (
     header: "Timestamp",
     cell: ({ row }) => {
       const timestamp = row.getValue<{ seconds: number }>("timestamp");
-      return timestamp ? new Date(timestamp.seconds * 1000).toLocaleString('en-GB') : "N/A";
+      return timestamp
+        ? new Date(timestamp.seconds * 1000).toLocaleString("en-GB")
+        : "N/A";
     },
   },
   {

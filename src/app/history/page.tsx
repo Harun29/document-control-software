@@ -200,9 +200,7 @@ const ViewHistory = () => {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className={`${getRowBackgroundColor(
-                    row.original.action
-                  )}`}
+                  className={`${getRowBackgroundColor(row.original.action)}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell className="px-4 py-2" key={cell.id}>

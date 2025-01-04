@@ -108,7 +108,11 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
       const docId = docSnapshot.docs[0].id;
       const docs = collection(db, "org", usersOrg, "docs");
       const docRef = doc(docs, docId);
-      const docHistoryRef = doc(db, "docHistory", document.fileName + document.org);
+      const docHistoryRef = doc(
+        db,
+        "docHistory",
+        document.fileName + document.org
+      );
       await updateDoc(docHistoryRef, {
         history: arrayUnion({
           action: "Document Modified",

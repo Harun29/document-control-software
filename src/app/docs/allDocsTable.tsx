@@ -68,11 +68,11 @@ import DocumentReviewDrawer from "./modifyDoc";
 
 const AllDocumentsTable = ({ org }: { org: string }) => {
   const { docs } = useGeneral();
-  const {deleteDocument} = useGeneral();
-  const {user} = useAuth();
+  const { deleteDocument } = useGeneral();
+  const { user } = useAuth();
   const { docsByOrg } = useGeneral();
-  const {docViewType} = useGeneral();
-  const {changeDocViewType} = useGeneral();
+  const { docViewType } = useGeneral();
+  const { changeDocViewType } = useGeneral();
   const [data, setData] = useState<DocRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -103,7 +103,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
   }, [docs, org]);
 
   const handleDeleteDoc = async (document: DocRequest) => {
-    try{
+    try {
       setLoadingAction(true);
       const docsRef = collection(db, "org", document.orgID, "docs");
       const q = query(docsRef, where("fileName", "==", document.fileName));
@@ -123,7 +123,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
 
       toast.success("Document deleted successfully");
       setLoadingAction(false);
-    }catch(error){
+    } catch (error) {
       setLoadingAction(false);
       console.error("Error deleting document: ", error);
     }
@@ -140,7 +140,12 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
 
   const table = useReactTable({
     data,
-    columns: columns(handleDeleteDoc, handleModifyDoc, loadingAction, user?.userInfo?.orgName as string),
+    columns: columns(
+      handleDeleteDoc,
+      handleModifyDoc,
+      loadingAction,
+      user?.userInfo?.orgName as string
+    ),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -305,21 +310,25 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
         <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 py-4">
           {data.map((doc) => (
             <div className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group">
-              {user?.userInfo?.orgName === doc.org && <div
-                className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleModifyDoc(doc);
-                }}
-              >
-                <Pencil
-                  strokeWidth={1}
-                  size={20}
-                  className="hover:scale-110 transition-all"
-                />
-              </div>}
+              {user?.userInfo?.orgName === doc.org && (
+                <div
+                  className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleModifyDoc(doc);
+                  }}
+                >
+                  <Pencil
+                    strokeWidth={1}
+                    size={20}
+                    className="hover:scale-110 transition-all"
+                  />
+                </div>
+              )}
               <Link
-                href={`/docs/${doc.fileName}?orgName=${encodeURIComponent(doc.org)}`}
+                href={`/docs/${doc.fileName}?orgName=${encodeURIComponent(
+                  doc.org
+                )}`}
                 key={doc.fileName}
                 className="flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
               >

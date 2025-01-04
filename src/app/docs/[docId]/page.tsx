@@ -90,8 +90,11 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const [loadingAction, setLoadingAction] = useState(false);
   const [documentHistory, setDocumentHistory] = useState<historyRecord[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [sendToOrg, setSendToOrg] = useState<{name: string, id: string}>({name: "", id: ""});
-  const [allOrgs, setAllOrgs] = useState<{ orgName: string; orgID: string}[]>(
+  const [sendToOrg, setSendToOrg] = useState<{ name: string; id: string }>({
+    name: "",
+    id: "",
+  });
+  const [allOrgs, setAllOrgs] = useState<{ orgName: string; orgID: string }[]>(
     []
   );
   const [deleteUponSending, setDeleteUponSending] = useState(false);
@@ -120,12 +123,14 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
         const orgsRef = collection(db, "org");
         const orgsSnap = await getDocs(orgsRef);
         const orgs = orgsSnap.docs.map((doc) => {
-            return {
-              orgName: doc.data().name,
-              orgID: doc.id,
-            };        
+          return {
+            orgName: doc.data().name,
+            orgID: doc.id,
+          };
         });
-        const filteredOrgs = orgs.filter((org) => org.orgID !== user?.userInfo?.org);
+        const filteredOrgs = orgs.filter(
+          (org) => org.orgID !== user?.userInfo?.org
+        );
         setAllOrgs(filteredOrgs);
       };
       fetchAllDepartments();
@@ -134,9 +139,9 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     }
   }, []);
 
-useEffect(() => {
-  console.log("docId: ", docId, "docsOrg: ", docsOrg);
-}, [docId, docsOrg])  
+  useEffect(() => {
+    console.log("docId: ", docId, "docsOrg: ", docsOrg);
+  }, [docId, docsOrg]);
 
   const closeHistory = () => {
     setShowHistory(false);
@@ -150,9 +155,15 @@ useEffect(() => {
     const fetchDocument = async () => {
       setLoading(true);
       if (docs && docId && docsOrg) {
-        const document = docs.find((doc) => (doc.fileName === docId && doc.org === docsOrg));
+        const document = docs.find(
+          (doc) => doc.fileName === docId && doc.org === docsOrg
+        );
         if (document?.fileName) {
-          const historyRef = doc(db, "docHistory", document.fileName + document.org);
+          const historyRef = doc(
+            db,
+            "docHistory",
+            document.fileName + document.org
+          );
           const docHistory = await getDoc(historyRef);
           console.log("docHistory: ", docHistory.data());
           const historyData = docHistory.data()?.history || [];
@@ -241,7 +252,11 @@ useEffect(() => {
           });
         });
 
-        const historyRef = doc(db, "docHistory", documentFileName + documentOrg);
+        const historyRef = doc(
+          db,
+          "docHistory",
+          documentFileName + documentOrg
+        );
         await updateDoc(historyRef, {
           history: arrayUnion({
             action: `User submitted document to ${sendToOrg.name}`,
@@ -251,7 +266,11 @@ useEffect(() => {
           }),
         });
 
-        const docHistoryRef = doc(db, "docHistory", documentFileName + sendToOrg.name);
+        const docHistoryRef = doc(
+          db,
+          "docHistory",
+          documentFileName + sendToOrg.name
+        );
         const docSnap = await getDoc(docHistoryRef);
 
         if (docSnap.exists()) {
@@ -515,33 +534,55 @@ useEffect(() => {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-rows-2 items-center gap-2">
-                        <Select onValueChange={(value) => setSendToOrg({name: allOrgs.find(org => org.orgID === value)?.orgName || "", id: value})}>
+                        <Select
+                          onValueChange={(value) =>
+                            setSendToOrg({
+                              name:
+                                allOrgs.find((org) => org.orgID === value)
+                                  ?.orgName || "",
+                              id: value,
+                            })
+                          }
+                        >
                           <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Department" />
                           </SelectTrigger>
                           <SelectContent>
                             {allOrgs.map((org) => (
-                              <SelectItem
-                                key={org.orgID}
-                                value={org.orgID}
-                              >
+                              <SelectItem key={org.orgID} value={org.orgID}>
                                 {org.orgName}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                         <div className="flex items-center space-x-2">
-                        <Switch checked={deleteUponSending} onCheckedChange={(checked) => setDeleteUponSending(checked)} id="delete-upon-sending" />
-                          <Label htmlFor="airplane-mode">Delete document from this department</Label>
+                          <Switch
+                            checked={deleteUponSending}
+                            onCheckedChange={(checked) =>
+                              setDeleteUponSending(checked)
+                            }
+                            id="delete-upon-sending"
+                          />
+                          <Label htmlFor="airplane-mode">
+                            Delete document from this department
+                          </Label>
                         </div>
-                        <p className={`${deleteUponSending ? "block" : "hidden"} text-sm text-red-500`}>
+                        <p
+                          className={`${
+                            deleteUponSending ? "block" : "hidden"
+                          } text-sm text-red-500`}
+                        >
                           This action is irreversible
                         </p>
                       </div>
                     </div>
                     <DialogFooter>
-
-                      <Button disabled={sendToOrg.id === "" && sendToOrg.name === ""} onClick={(e) => handleSendDoc(e)}>Send</Button>
+                      <Button
+                        disabled={sendToOrg.id === "" && sendToOrg.name === ""}
+                        onClick={(e) => handleSendDoc(e)}
+                      >
+                        Send
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>

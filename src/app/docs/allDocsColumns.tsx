@@ -52,7 +52,7 @@ export const columns = (
           Created At
           <ArrowUpDown />
         </Button>
-      )
+      );
     },
     cell: ({ row }) => {
       const createdAt = row.getValue("createdAt") as string | number | Date;
@@ -83,9 +83,9 @@ export const columns = (
           Submited By
           <ArrowUpDown />
         </Button>
-      )
+      );
     },
-    enableSorting: true
+    enableSorting: true,
   },
   {
     accessorKey: "label",
@@ -98,9 +98,9 @@ export const columns = (
           Label
           <ArrowUpDown />
         </Button>
-      )
+      );
     },
-    enableSorting: true
+    enableSorting: true,
   },
   {
     accessorKey: "title",
@@ -114,7 +114,13 @@ export const columns = (
       const fileName = row.getValue("fileName") as string;
       return (
         <Button variant="ghost" className="text-blue-500">
-          <Link href={`/docs/${fileName}?orgName=${encodeURIComponent(row.original.org)}`}>View Doc</Link>
+          <Link
+            href={`/docs/${fileName}?orgName=${encodeURIComponent(
+              row.original.org
+            )}`}
+          >
+            View Doc
+          </Link>
         </Button>
       );
     },

@@ -5,9 +5,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import { AiProvider } from "@/context/AiContext";
 import { GeneralProvider } from "@/context/GeneralContext";
 import AuthenticatedLayout from "@/components/authenticated-layout";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 import ChatSupport from "@/components/AIChat";
-
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,7 +32,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en">
       <body

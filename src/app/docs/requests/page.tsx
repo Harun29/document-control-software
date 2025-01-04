@@ -170,7 +170,7 @@ const DocRequests = () => {
           "docRequests",
           docRequestId
         );
-        
+
         await addDoc(newDocRef, newDoc || selectedDoc);
         await addDoc(userRequestedNotifRef, {
           title: "Document Accepted",
@@ -191,15 +191,19 @@ const DocRequests = () => {
         });
         await deleteDoc(docRequestRef);
         toast.success("Document accepted successfully");
-        
-        const docHistoryRef = doc(db, "docHistory", selectedDoc.fileName + selectedDoc.org);
+
+        const docHistoryRef = doc(
+          db,
+          "docHistory",
+          selectedDoc.fileName + selectedDoc.org
+        );
         await updateDoc(docHistoryRef, {
           history: arrayUnion({
             action: "Document accepted",
             user: user?.userInfo?.email,
             org: user?.userInfo?.orgName,
             timeStamp: new Date(),
-          })
+          }),
         });
 
         closeDrawerRef.current?.click();
@@ -212,9 +216,7 @@ const DocRequests = () => {
     }
   };
 
-  const handleReturnDoc = async (
-    selectedDoc: DocRequest
-  ) => {
+  const handleReturnDoc = async (selectedDoc: DocRequest) => {
     try {
       const userOrg = usersOrg;
       const docRequestsRef = collection(db, "org", userOrg, "docRequests");
@@ -565,7 +567,9 @@ const DocRequests = () => {
                       Return the document to the requester {selectedDoc?.reqBy}{" "}
                       with a note:
                     </DialogDescription>
-                    <Textarea onChange={(e) => setDocumentRejectionNote(e.target.value)}></Textarea>
+                    <Textarea
+                      onChange={(e) => setDocumentRejectionNote(e.target.value)}
+                    ></Textarea>
                   </DialogHeader>
                   <DialogFooter className="sm:justify-start">
                     <Button onClick={() => handleReturnDoc(selectedDoc!)}>

@@ -1,6 +1,6 @@
-import Image from "next/image"
+import Image from "next/image";
 
-import { LoginForm } from "@/components/login-form"
+import { LoginForm } from "@/components/login-form";
 
 export default function LoginPage() {
   return (
@@ -18,7 +18,7 @@ export default function LoginPage() {
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
             <div className="flex h-6 w-6 items-center justify-center rounded-md text-primary-foreground">
-              <Image src="/dcs-logo.png" alt="Logo" width={24} height={24}/>
+              <Image src="/dcs-logo.png" alt="Logo" width={24} height={24} />
             </div>
             FSK DCS
           </a>
@@ -29,7 +29,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      
     </div>
-  )
+  );
 }

@@ -89,14 +89,14 @@ const AddDocument = () => {
       alert("Please upload a file.");
       return;
     }
-    
+
     setLoading(true);
     const randomWords = uuidv4();
     const extendedFileName = `${
       file.name.split(".")[0]
     }-${randomWords}.${file.name.split(".").pop()}`;
     const storageRef = ref(storage, `documents/${extendedFileName}`);
-    
+
     try {
       await uploadBytes(storageRef, file);
       const fileURL = await getDownloadURL(storageRef);
@@ -132,9 +132,13 @@ const AddDocument = () => {
           title: "Document Request",
           message: `${user?.userInfo?.email} requested a document`,
         });
-      })
+      });
 
-      const docHistoryRef = doc(db, "docHistory", extendedFileName + user?.userInfo?.orgName );
+      const docHistoryRef = doc(
+        db,
+        "docHistory",
+        extendedFileName + user?.userInfo?.orgName
+      );
       const docSnap = await getDoc(docHistoryRef);
 
       if (docSnap.exists()) {
@@ -327,9 +331,13 @@ const AddDocument = () => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel ref={alertDialogCancelRef}>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel ref={alertDialogCancelRef}>
+                    Cancel
+                  </AlertDialogCancel>
                   <AlertDialogAction onClick={handleSubmit} disabled={loading}>
-                    {loading && <LoaderCircle className="animate-spin w-4 h-4" />}
+                    {loading && (
+                      <LoaderCircle className="animate-spin w-4 h-4" />
+                    )}
                     Continue
                   </AlertDialogAction>
                 </AlertDialogFooter>

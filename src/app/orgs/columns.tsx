@@ -154,12 +154,16 @@ export const orgsColumns = (
   {
     accessorKey: "users",
     header: "Users",
-    cell: ({ row }) => <UsersCell orgUsers={row.getValue("users") as string[]} />,
+    cell: ({ row }) => (
+      <UsersCell orgUsers={row.getValue("users") as string[]} />
+    ),
   },
   {
     accessorKey: "docs",
     header: "Documents",
-    cell: ({ row }) => <DocumentsCell orgDocs={row.getValue("docs") as string[]} />,
+    cell: ({ row }) => (
+      <DocumentsCell orgDocs={row.getValue("docs") as string[]} />
+    ),
   },
   {
     id: "actions",
