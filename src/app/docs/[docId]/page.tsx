@@ -587,7 +587,8 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   </DialogContent>
                 </Dialog>
               )}
-              {document?.org === user?.userInfo?.orgName && (
+              {/* implement later */}
+              {document?.org === user?.userInfo?.orgName && false && (
                 <Button className="group flex items-center">
                   <UserRoundPlus className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                   <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">

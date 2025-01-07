@@ -252,7 +252,7 @@ export default function Home() {
                       <span>
                         {notif.title}
                         {": "}
-                        {notif.documentName}...
+                        {notif.documentName?.substring(0, 15)}...
                       </span>
                     </div>
                   </div>

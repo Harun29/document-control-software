@@ -73,7 +73,7 @@ export const AiProvider = ({ children }: { children: React.ReactNode }) => {
       reqBy: doc.reqBy,
       org: doc.org,
     }));
-  
+
     try {
       const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -82,25 +82,42 @@ export const AiProvider = ({ children }: { children: React.ReactNode }) => {
           {
             role: "system",
             content: `
-            You are a helpful assistant that searches through a JSON array of documents. 
-            Your tasks are:
-            1. Search for the most relevant document based on the user's query.
-            2. Provide a brief summary of the matching document (maximum 10 words).
-            3. Always include the FileName field from the JSON document in this format: FileName: <fileName> (Do not add fullstop at the end). The FileName comes specifically from the "fileName" field of the document. Do not use the "title" field for this.
-            4. If the query does not match any document, Do not include the FileName at the end.
-            5. Documents are sorted from newest to oldest (most recent first).
-            Documents are structured as follows:
-            - fileName: string
-            - label: string
-            - summary: string
-            - title: string
-            - reqBy: string
-            - org: string
-            `
+              You are a helpful assistant designed to search through a JSON array of documents and assist with the following:  
+
+              1. **Search for Relevant Documents**  
+                - When a user asks a question, find the document that best matches their query.  
+                - Focus on matching the query with fields like "label," "summary," or "title," in that order of priority.  
+
+              2. **Provide a Short Summary**  
+                - After finding the most relevant document, give the user a quick summary of what it's about.  
+                - Mention the department (org) and keep the description concise (up to 10 words).  
+
+              3. **Share the File Reference**  
+                - Always include the FileName field for the most relevant document in the following format:  
+                  "FileName: <fileName>?orgName=<org>"
+                - Use the 'fileName' and 'org' fields exactly as they appear, without adding a period at the end.  
+
+              4. **Handle Cases with No Matches**  
+                - If you can't find a document that matches the query, let the user know and skip the FileName reference.  
+
+              ### A Few Things to Keep in Mind:
+              - Documents are listed from newest to oldest, so always prioritize the most recent ones.  
+              - Each document is structured with the following fields:  
+                - fileName: The name of the file.  
+                - label: A tag or category for the document.  
+                - summary: A brief description of the document.  
+                - title: The title of the document.  
+                - reqBy: The requester of the document.  
+                - org: The department or organization responsible for the document.  
+
+              Make your responses clear, friendly, and easy to understand!
+            `,
           },
           {
             role: "system",
-            content: `Here is the JSON array of documents:\n${JSON.stringify(filteredDocs)}`,
+            content: `Here is the JSON array of documents:\n${JSON.stringify(
+              filteredDocs
+            )}`,
           },
           {
             role: "user",
@@ -108,14 +125,14 @@ export const AiProvider = ({ children }: { children: React.ReactNode }) => {
           },
         ],
       });
-  
+
       if (!response.choices || response.choices.length === 0) {
         throw new Error("Failed to get AI message");
       }
-  
+
       const aiMessage = response.choices[0].message.content;
-      console.log(aiMessage);
-  
+      console.log("AI Message: ", aiMessage);
+
       return aiMessage || undefined;
     } catch (err) {
       console.error("Error fetching AI response:", err);
