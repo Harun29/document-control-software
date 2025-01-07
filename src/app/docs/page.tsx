@@ -52,7 +52,7 @@ const ManageDocs = () => {
               <AllDocumentsTable org="" />
             </TabsContent>
             {orgs.map((org) => (
-              <TabsContent value={org}>
+              <TabsContent key={org} value={org}>
                 <AllDocumentsTable org={org} />
               </TabsContent>
             ))}

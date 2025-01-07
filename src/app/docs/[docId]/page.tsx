@@ -137,7 +137,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     } catch (err) {
       console.error("Error fetching all departments: ", err);
     }
-  }, []);
+  }, [user?.userInfo?.org]);
 
   useEffect(() => {
     console.log("docId: ", docId, "docsOrg: ", docsOrg);
@@ -174,7 +174,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
       setLoading(false);
     };
     fetchDocument();
-  }, [docs, docId]);
+  }, [docs, docId, docsOrg]);
 
   const handleModifyDoc = () => {
     if (drawerTriggerRef.current) {
@@ -694,6 +694,3 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
 };
 
 export default ManageDocs;
-function uuidv4() {
-  throw new Error("Function not implemented.");
-}

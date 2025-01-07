@@ -29,7 +29,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/AuthContext"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import Notifications from "./notifications"
 
 export function NavUser({

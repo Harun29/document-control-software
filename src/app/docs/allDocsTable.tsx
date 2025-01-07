@@ -19,9 +19,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -34,12 +31,9 @@ import {
 } from "@/components/ui/table";
 import {
   ChevronDown,
-  Copy,
-  EllipsisVertical,
   Grid,
   Pencil,
   TableIcon,
-  Trash,
 } from "lucide-react";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
@@ -53,8 +47,6 @@ import {
   getDocs,
   query,
   where,
-  doc,
-  updateDoc,
   deleteDoc,
   addDoc,
   serverTimestamp,
@@ -100,7 +92,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
     };
 
     fetchDocs();
-  }, [docs, org]);
+  }, [docs, org, docsByOrg]);
 
   const handleDeleteDoc = async (document: DocRequest) => {
     try {
@@ -316,7 +308,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       {docViewType === "grid" && (
         <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 py-4">
           {data.map((doc) => (
-            <div className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group">
+            <div key={doc.fileName} className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group">
               {user?.userInfo?.orgName === doc.org && (
                 <div
                   className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"

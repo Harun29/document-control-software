@@ -56,7 +56,7 @@ export const GeneralProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { isEditor, usersOrg } = useAuth();
+  const { usersOrg } = useAuth();
   const [docRequests, setDocRequests] = useState<DocRequest[]>([]);
   const [numberOfRequests, setNumberOfRequests] = useState(0);
   const [docs, setDocs] = useState<DocRequest[]>([]);
@@ -90,10 +90,6 @@ export const GeneralProvider = ({
 
     return () => unsubscribe();
   }, [usersOrg]);
-
-  useEffect(() => {
-    docRequests && console.log(docRequests);
-  }, [docRequests]);
 
   useEffect(() => {
     const docRef = doc(db, "docs", "alldocs");

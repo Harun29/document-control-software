@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { useAuth } from "@/context/AuthContext";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Notifs } from "@/context/AuthContext";
 import "../app/globals.css";
 import Link from "next/link";
@@ -22,7 +22,7 @@ interface NotificationsProps {
   closeNotifs: () => void;
 }
 
-const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNotifs }, ref) => {
+const Notifications: React.FC<NotificationsProps> = (({ closeNotifs }) => {
   const { usersNotifs } = useAuth();
   const { usersUnreadNotifs } = useAuth();
   const { user } = useAuth();
@@ -36,27 +36,21 @@ const Notifications = forwardRef<HTMLDivElement, NotificationsProps>(({ closeNot
   }, [usersNotifs]);
 
   useEffect(() => {
-    data && console.log(data);
-  }, [data]);
-
-  const handleClickOutside = (event: MouseEvent) => {
-    const clickedOutsideNotifications =
-      (notifRef && 'current' in notifRef && notifRef.current) &&
-      !notifRef.current.contains(event.target as Node);
-
-    if (clickedOutsideNotifications) {
-      closeNotifs();
-      handleViewNotifications(false);
-    };
-  };
-
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
+    const handleClickOutside = ((event: MouseEvent) => {
+      const clickedOutsideNotifications =
+        (notifRef && 'current' in notifRef && notifRef.current) &&
+        !notifRef.current.contains(event.target as Node);
   
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, []);
+      if (clickedOutsideNotifications) {
+        closeNotifs();
+        handleViewNotifications(false);
+      }
+    });
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [closeNotifs, handleViewNotifications]);
 
   const handleViewNotif = async (notif: Notifs) => {
     try {

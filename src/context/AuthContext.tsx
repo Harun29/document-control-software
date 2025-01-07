@@ -8,7 +8,7 @@ import {
   signOut,
   User,
 } from "firebase/auth";
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, or, orderBy, query, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { toast } from "sonner";
 
@@ -262,7 +262,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUsersNotifsNumber(0);
       setUsersUnreadNotifs(0);
     }
-  }, [user, db]);
+  }, [user, usersNotifs.length]);
 
   useEffect(() => {
     console.log("Users notifications: ", usersNotifs);

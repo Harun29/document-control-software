@@ -7,7 +7,6 @@ import {
   collection,
   getDocs,
   limit,
-  or,
   orderBy,
   query,
 } from "firebase/firestore";
@@ -53,7 +52,6 @@ export default function Home() {
   const [history, setHistory] = useState<History[]>([]);
   const [notifications, setNotifications] = useState<Notifs[]>([]);
   const [showNotifs, setShowNotifs] = useState(false);
-  const notificationsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     try {
@@ -96,7 +94,7 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
-  }, []);
+  }, [user, usersNotifs]);
 
   const handleClickOutside = (event: MouseEvent) => {
     const clickedOutsideUser =
@@ -261,7 +259,7 @@ export default function Home() {
             )}
             {usersUnreadNotifs === 0 && (
               <span className="text-muted-foreground">
-                You don't have any new notifications!
+                You don&apos;t have any new notifications!
               </span>
             )}
             <Button onClick={() => setShowNotifs(true)} variant="secondary">
@@ -270,7 +268,6 @@ export default function Home() {
           </div>
           {(showNotifs || viewNotifications) && (
             <Notifications
-              ref={notificationsRef}
               closeNotifs={() => setShowNotifs(false)}
             />
           )}

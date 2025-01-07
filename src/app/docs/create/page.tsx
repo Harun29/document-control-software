@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
@@ -10,7 +10,6 @@ import { storage } from "@/config/firebaseConfig";
 import {
   collection,
   addDoc,
-  or,
   doc,
   setDoc,
   arrayUnion,
@@ -230,7 +229,7 @@ const AddDocument = () => {
           Add Document
         </h1>
         <p className="text-muted-foreground">
-          Add a document to your department's repository
+          Add a document to your department&apos;s repository
         </p>
         {/* Title Input */}
         <div className="space-y-2">

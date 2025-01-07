@@ -13,13 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   CheckCircle2,
-  Copy,
-  CopyIcon,
-  FileTextIcon,
   LoaderCircle,
   SquareArrowOutUpRight,
   Trash,
-  TrashIcon,
 } from "lucide-react";
 
 import {

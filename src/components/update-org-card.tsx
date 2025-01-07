@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Pen, PencilIcon, PenIcon, Terminal } from "lucide-react";
+import { PencilIcon, Terminal } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface Org {

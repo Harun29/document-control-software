@@ -6,10 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../app/globals.css";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpSquareIcon } from "lucide-react";
+import React from "react";
 
 export type historyRecord = {
   action: string;
@@ -23,30 +23,29 @@ type DocHistoryProps = {
   closeHistory: () => void;
 };
 
-const DocumentHistory = forwardRef<HTMLDivElement, DocHistoryProps>(
-  ({ docHistory, closeHistory }, ref) => {
+const DocumentHistory: React.FC<DocHistoryProps> = (
+  ({ docHistory, closeHistory }) => {
     const [data, setData] = useState<historyRecord[]>([]);
-    const notifRef = useRef<HTMLDivElement>(null);
+    const histRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
       setData([...docHistory].reverse());
     }, [docHistory]);
 
-    const handleClickOutside = (event: MouseEvent) => {
-      const clickedOutsideNotifications =
-        notifRef.current && !notifRef.current.contains(event.target as Node);
-
-      if (clickedOutsideNotifications) {
-        closeHistory();
-      }
-    };
-
     useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        const clickedOutsideNotifications =
+          histRef.current && !histRef.current.contains(event.target as Node);
+  
+        if (clickedOutsideNotifications) {
+          closeHistory();
+        }
+      };
       document.addEventListener("mousedown", handleClickOutside);
       return () => {
         document.removeEventListener("mousedown", handleClickOutside);
       };
-    }, []);
+    }, [closeHistory]);
 
     return (
       <AnimatePresence>
@@ -57,7 +56,7 @@ const DocumentHistory = forwardRef<HTMLDivElement, DocHistoryProps>(
           transition={{ duration: 0.1 }}
           className="grid grid-rows-1 grid-cols-1 place-items-center fixed top-0 left-0 right-0 bottom-0 bg-[#00000050] z-10"
         >
-          <Card className="w-[600px] shadow-lg rounded-lg" ref={notifRef}>
+          <Card className="w-[600px] shadow-lg rounded-lg" ref={histRef}>
             <CardHeader className="p-4">
               <CardTitle className="leading-8 text-xl font-semibold">
                 Document History
@@ -69,6 +68,7 @@ const DocumentHistory = forwardRef<HTMLDivElement, DocHistoryProps>(
             <CardContent className="px-6 max-h-80 overflow-y-auto custom-scrollbar">
               {data.map((record, index) => (
                 <div
+                  key={index}
                   className="grid"
                   style={{ gridTemplateColumns: "2fr 1fr" }}
                 >
