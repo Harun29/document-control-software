@@ -3,18 +3,21 @@ import { useRef, useState, useEffect } from "react";
 import { Notifs, useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  collection,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-} from "firebase/firestore";
+import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { FaFilePdf } from "react-icons/fa";
-import { Dot, FileInput, FilePlus2, FileText } from "lucide-react";
+import {
+  Dot,
+  FileInput,
+  FilePlus2,
+  FileText,
+  IdCard,
+  Mail,
+  Users2,
+} from "lucide-react";
 import Notifications from "@/components/notifications";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export type Doc = {
   id: string;
@@ -124,32 +127,31 @@ export default function Home() {
     <div className="p-16 pb-0 h-full">
       <div className="flex items-center justify-between mb-12 ">
         <div className="flex items-center border-2 rounded-xl p-7">
-          <div>
-            <Image
-              src="/default-user.png"
-              alt="profile"
-              width={200}
-              height={200}
-              className="me-10"
-            />
+          <div className="mr-10">
+            <Avatar className="w-24 h-24">
+              <AvatarImage src="https://github.com/shadcn.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
           </div>
           <div className="flex flex-col text-xl space-y-1">
             <span className="font-bold">
-              <Dot className="inline-block" />
-              {user?.userInfo?.email}
-            </span>
-            <span>
-              <Dot className="inline-block" />
+              {/* <Dot className="inline-block" /> */}
               {user?.userInfo?.firstName} {user?.userInfo?.lastName}
             </span>
             <span>
-              <Dot className="inline-block" />
+              <Mail className="inline-block mr-3" />
+              {user?.userInfo?.email}
+            </span>
+            <span>
+              <IdCard className="inline-block mr-3" />
               {user?.userInfo?.role}
             </span>
-            <Link className="font-bold" href={`/orgs/${user?.userInfo?.org}`}>
-              <Dot className="inline-block" />
-              <span>{user?.userInfo?.orgName}</span>
-            </Link>
+            {user?.userInfo?.org && (
+              <span>
+                <Users2 className="inline-block mr-3" />
+                {user?.userInfo?.orgName}
+              </span>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-3 gap-10 m-auto">
@@ -267,9 +269,7 @@ export default function Home() {
             </Button>
           </div>
           {(showNotifs || viewNotifications) && (
-            <Notifications
-              closeNotifs={() => setShowNotifs(false)}
-            />
+            <Notifications closeNotifs={() => setShowNotifs(false)} />
           )}
         </div>
       </div>
