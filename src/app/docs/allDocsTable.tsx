@@ -116,9 +116,16 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       const historyRef = collection(db, "history");
       await addDoc(historyRef, {
         author: user?.userInfo?.email || "Unknown",
-        action: "Modified a document",
+        action: "Deleted a document",
         result: document?.title || document.title,
         timestamp: serverTimestamp(),
+      });
+
+      const docUserRef = collection(db, "users", document.reqByID, "notifications");
+      const qe = query(docUserRef, where("documentURL", "==", document.fileName));
+      const querySnapshotNotifs = await getDocs(qe);
+      querySnapshotNotifs.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
       });
 
       toast.success("Document deleted successfully");

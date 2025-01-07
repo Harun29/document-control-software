@@ -203,6 +203,21 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
         timestamp: serverTimestamp(),
       });
 
+      const docUserRef = collection(
+        db,
+        "users",
+        document.reqByID,
+        "notifications"
+      );
+      const qe = query(
+        docUserRef,
+        where("documentURL", "==", document.fileName)
+      );
+      const querySnapshotNotifs = await getDocs(qe);
+      querySnapshotNotifs.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+
       window.history.back();
       toast.success("Document deleted successfully");
       setLoadingAction(false);
