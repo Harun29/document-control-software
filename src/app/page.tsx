@@ -29,6 +29,7 @@ export type Doc = {
   title: string;
   reqBy: string;
   reqByID: string;
+  org: string;
 };
 
 export type History = {
@@ -192,7 +193,7 @@ export default function Home() {
           <div className="border-l-2 p-5 grid grid-cols-2 gap-x-20 gap-y-5">
             {docs.map((doc) => (
               <Link
-                href={`/docs/${doc.fileName}`}
+                href={`/docs/${doc.fileName}?orgName=${doc.org}`}
                 key={doc.id}
                 className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition-all"
               >
