@@ -62,6 +62,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
   const { docs } = useGeneral();
   const { deleteDocument } = useGeneral();
   const { user } = useAuth();
+  const { isAdmin } = useAuth();
   const { docsByOrg } = useGeneral();
   const { docViewType } = useGeneral();
   const { changeDocViewType } = useGeneral();
@@ -143,7 +144,8 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       handleDeleteDoc,
       handleModifyDoc,
       loadingAction,
-      user?.userInfo?.orgName as string
+      user?.userInfo?.orgName as string,
+      isAdmin
     ),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

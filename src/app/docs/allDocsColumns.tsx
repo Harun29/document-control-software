@@ -26,7 +26,8 @@ export const columns = (
   handleDeleteDoc: (doc: DocRequest) => void,
   handleModifyDoc: (doc: DocRequest) => void,
   loadingAction: boolean,
-  usersOrg: string
+  usersOrg: string,
+  isAdmin: boolean
 ): ColumnDef<DocRequest>[] => [
   {
     accessorKey: "fileType",
@@ -131,7 +132,7 @@ export const columns = (
       console.log(row.original.orgID, usersOrg);
       return (
         <div className="flex space-x-4 justify-self-end">
-          {usersOrg === row.original.org && (
+          {(usersOrg === row.original.org || isAdmin) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger
@@ -161,7 +162,7 @@ export const columns = (
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {usersOrg === row.original.org && (
+          {(usersOrg === row.original.org || isAdmin) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger
