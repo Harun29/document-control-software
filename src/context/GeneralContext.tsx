@@ -162,7 +162,7 @@ export const GeneralProvider = ({
       if (docSnap.exists()) {
         const data = docSnap.data();
         const updatedDocs = data.docs.map((doc: DocRequest) =>
-          doc.fileName === fileName && doc.org === orgName
+          (doc.fileName === fileName && doc.org === orgName)
             ? { ...doc, ...updatedDoc }
             : doc
         );
@@ -181,7 +181,7 @@ export const GeneralProvider = ({
       if (docSnap.exists()) {
         const data = docSnap.data();
         const updatedDocs = data.docs.filter(
-          (doc: DocRequest) => doc.fileName !== fileName && doc.org !== orgName
+          (doc: DocRequest) => !(doc.fileName === fileName && doc.org === orgName)
         );
         await updateDoc(docRef, { docs: updatedDocs });
         setDocs(updatedDocs);
