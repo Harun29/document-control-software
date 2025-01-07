@@ -145,7 +145,7 @@ const ManageOrgs = () => {
         Manage Departments
       </h1>
       <p className="text-[#505050]">View, modify and delete departments.</p>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 mb-4">
         <Input
           placeholder="Filter names..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}

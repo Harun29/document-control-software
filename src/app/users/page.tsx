@@ -32,9 +32,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, User2 } from "lucide-react";
+import { ChevronDown, User2, UserPlus2Icon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DeleteUserDialog from "@/components/delete-user-alers";
+import CreateUserCard from "@/components/create-user-card";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const ManageUsers = () => {
   const [data, setData] = useState<Users[]>([]);
@@ -122,15 +125,27 @@ const ManageUsers = () => {
         Manage Users
       </h1>
       <p className="text-[#505050]">View, modify and delete users.</p>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 mb-4">
         <Input
           placeholder="Filter emails..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm mb-0"
         />
+        <Dialog>
+          <DialogTrigger className="ml-4 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-blue-600 text-white hover:bg-blue-800 h-10 px-4 py-2">
+            <UserPlus2Icon />
+            Create new user
+          </DialogTrigger>
+          <DialogContent className="w-auto h-auto">
+            <VisuallyHidden>
+              <DialogTitle></DialogTitle>
+            </VisuallyHidden>
+            <CreateUserCard />
+          </DialogContent>
+        </Dialog>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

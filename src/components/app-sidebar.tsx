@@ -18,10 +18,10 @@ import { useRef, useState, useEffect } from "react";
 import CreateUserCard from "@/components/create-user-card";
 import CreateOrgCard from "@/components/create-org-card";
 import { useAuth } from "@/context/AuthContext";
+import { url } from "inspector";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [createUser, setCreateUser] = useState(false);
-  const [createOrg, setCreateOrg] = useState(false);
   const createOrgRef = useRef<HTMLDivElement | null>(null);
   const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
@@ -50,16 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ...(isAdmin ? [{
         title: "Users",
         icon: User2,
-        items: [
-          {
-            title: "Create user",
-            action: "createUser",
-          },
-          {
-            title: "Manage users",
-            url: "/users",
-          },
-        ],
+        url: "/users",
       }] : []),
       ...((isEditor || isAdmin) ? [
         {
@@ -85,7 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: FileTextIcon,
         items:[
           {
-            title: "Add documents",
+            title: "Add document",
             url: "/docs/create",
           },
           {
@@ -126,40 +117,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
-    const clickedOutsideUser =
-      createUserRef.current &&
-      !createUserRef.current.contains(event.target as Node);
-    const clickedOutsideOrg =
-      createOrgRef.current &&
-      !createOrgRef.current.contains(event.target as Node);
-
-    if (clickedOutsideUser) setCreateUser(false);
-    if (clickedOutsideOrg) setCreateOrg(false);
-  };
-
-  useEffect(() => {
-    if (createUser || createOrg) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [createUser, createOrg]);
-
-  const handleNavAction = (action: string) => {
-    if (action === "createUser") {
-      setCreateUser(true);
-    } else if (action === "createOrg") {
-      setCreateOrg(true);
-    } else {
-      console.log("Action not implemented");
-    }
-  };
-
   const navItems = data.navMain.map((item) => ({
     ...item,
     items: item.items?.map((subItem) => ({
@@ -178,7 +135,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} onAction={handleNavAction} />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={{
@@ -192,7 +149,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
       {createUser && <CreateUserCard ref={createUserRef} />}
-      {createOrg && <CreateOrgCard ref={createOrgRef} />}
     </Sidebar>
   );
 }
