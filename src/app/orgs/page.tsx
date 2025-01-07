@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "@/config/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import { Orgs, orgsColumns } from "./columns";
@@ -32,9 +32,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, UsersRound } from "lucide-react";
+import { ChevronDown, PlusCircle, UsersRound } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DeleteOrgDialog from "@/components/delete-org-alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import CreateOrgCard from "@/components/create-org-card";
 
 const ManageOrgs = () => {
   const [data, setData] = useState<Orgs[]>([]);
@@ -144,8 +152,20 @@ const ManageOrgs = () => {
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm mb-0"
         />
+        <Dialog>
+          <DialogTrigger className="ml-4 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-blue-600 text-white hover:bg-blue-800 h-10 px-4 py-2">
+            <PlusCircle />
+            Create new department
+          </DialogTrigger>
+          <DialogContent className="w-auto h-auto">
+            <VisuallyHidden>
+              <DialogTitle></DialogTitle>
+            </VisuallyHidden>
+            <CreateOrgCard />
+          </DialogContent>
+        </Dialog>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

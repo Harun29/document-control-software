@@ -42,19 +42,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Home,
       },
       ...(isAdmin ? [{ 
-        title: "Departmentss",
+        title: "Departments",
+        url: "/orgs",
         icon: Users2,
-        isActive: true,
-        items: [
-          {
-            title: "Create departments",
-            action: "createOrg",
-          },
-          {
-            title: "Manage departments",
-            url: "/orgs",
-          },
-        ],
+        isActive: true
       }] : []),
       ...(isAdmin ? [{
         title: "Users",
