@@ -236,7 +236,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             ...(doc.data() as Notifs),
             id: doc.id,
           }));
-          if(notifications.length !== usersNotifs.length){
+          if(notifications.length !== usersNotifs.length && notifications.length > usersNotifs.length) {
             toast("You received new notification!", {
               action: {
                 label: "View",

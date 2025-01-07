@@ -166,7 +166,7 @@ export const columns = (
               <Tooltip>
                 <TooltipTrigger
                   className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
-                  onClick={() => handleDeleteDoc(row.original)}
+                  
                 >
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
