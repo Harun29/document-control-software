@@ -585,8 +585,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               <p>{document?.summary}</p>
             </div>
             <div className="flex space-x-4">
-              {document?.org === user?.userInfo?.orgName ||
-                (isAdmin && (
+              {(document?.org === user?.userInfo?.orgName || isAdmin) && (
                   <Button
                     onClick={handleModifyDoc}
                     className="group flex items-center"
@@ -596,7 +595,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                       Modify
                     </span>
                   </Button>
-                ))}
+                )}
               <Button
                 onClick={handleViewHistory}
                 className="group flex items-center"
@@ -725,8 +724,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   </span>
                 </Button>
               )}
-              {document?.org === user?.userInfo?.orgName ||
-                (isAdmin && (
+              {(document?.org === user?.userInfo?.orgName || isAdmin) && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -760,7 +758,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
-                ))}
+                )}
             </div>
           </div>
           <div className="lg:w-1/3 bg-background shadow-md p-4 flex flex-col flex-grow">
