@@ -29,12 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ChevronDown,
-  Grid,
-  Pencil,
-  TableIcon,
-} from "lucide-react";
+import { ChevronDown, Grid, Pencil, TableIcon } from "lucide-react";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -114,8 +109,16 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
         timestamp: serverTimestamp(),
       });
 
-      const docUserRef = collection(db, "users", document.reqByID, "notifications");
-      const qe = query(docUserRef, where("documentURL", "==", document.fileName));
+      const docUserRef = collection(
+        db,
+        "users",
+        document.reqByID,
+        "notifications"
+      );
+      const qe = query(
+        docUserRef,
+        where("documentURL", "==", document.fileName)
+      );
       const querySnapshotNotifs = await getDocs(qe);
       querySnapshotNotifs.forEach(async (doc) => {
         await deleteDoc(doc.ref);
@@ -257,7 +260,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow key={row.id} className="row">
                     {row.getVisibleCells().map((cell) => (
                       <TableCell className="px-4 py-2" key={cell.id}>
                         {flexRender(
@@ -310,8 +313,11 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       {docViewType === "grid" && (
         <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 py-4">
           {data.map((doc) => (
-            <div key={doc.fileName} className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group">
-              {user?.userInfo?.orgName === doc.org && (
+            <div
+              key={doc.fileName}
+              className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
+            >
+              {user?.userInfo?.orgName === doc.org || isAdmin && (
                 <div
                   className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
                   onClick={(e) => {

@@ -104,3 +104,11 @@
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
+.hidden-on-row {
+  opacity: 0;
+}
+
+.row:hover .hidden-on-row {
+  opacity: 1;
+}

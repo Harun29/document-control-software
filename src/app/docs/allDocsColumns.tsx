@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Copy, LoaderCircle, Pencil, Trash } from "lucide-react";
+import { ArrowUpDown, Copy, FileIcon, LoaderCircle, Pencil, SquareArrowOutUpRightIcon, Star, Trash } from "lucide-react";
 import { DocRequest } from "./types";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
 import Link from "next/link";
@@ -114,12 +114,14 @@ export const columns = (
     cell: ({ row }) => {
       const fileName = row.getValue("fileName") as string;
       return (
-        <Button variant="ghost" className="text-blue-500">
+        <Button variant="ghost" className="text-blue-500 hidden-on-row">
           <Link
+          className="flex items-center space-x-2"
             href={`/docs/${fileName}?orgName=${encodeURIComponent(
               row.original.org
             )}`}
           >
+            <FileIcon className="mr-1"/>
             View Doc
           </Link>
         </Button>
@@ -131,7 +133,7 @@ export const columns = (
     cell: ({ row }) => {
       console.log(row.original.orgID, usersOrg);
       return (
-        <div className="flex space-x-4 justify-self-end">
+        <div className="flex space-x-4 justify-self-end hidden-on-row">
           {(usersOrg === row.original.org || isAdmin) && (
             <TooltipProvider>
               <Tooltip>
@@ -141,9 +143,6 @@ export const columns = (
                 >
                   <Pencil strokeWidth={1} />
                 </TooltipTrigger>
-                <TooltipContent>
-                  <p>Modify</p>
-                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -159,6 +158,32 @@ export const columns = (
               </TooltipTrigger>
               <TooltipContent>
                 <p>Copy</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
+              >
+                  <a target="_blank" href={row.original.fileURL}>
+                    <SquareArrowOutUpRightIcon strokeWidth={1} />
+                  </a>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Open in new tab</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
+              >
+                <Star strokeWidth={1} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Favorites</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
