@@ -1,12 +1,13 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Files, FileText, Star } from "lucide-react";
+import { Files, FileText, Star, Terminal } from "lucide-react";
 import AllDocumentsTable from "./allDocsTable";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { AnimatePresence, motion } from "framer-motion";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const ManageDocs = () => {
   const [orgs, setOrgs] = useState<string[]>([]);
@@ -60,6 +61,13 @@ const ManageDocs = () => {
             </TabsContent>
             <TabsContent value="favorites">
               <AllDocumentsTable org="favorites" />
+              <Alert>
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Heads up!</AlertTitle>
+                <AlertDescription>
+                  You will recieve a notification when from favorites is modified, deletet or sent to another department.
+                </AlertDescription>
+              </Alert>
             </TabsContent>
             {orgs.map((org) => (
               <TabsContent key={org} value={org}>
