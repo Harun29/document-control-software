@@ -25,9 +25,11 @@ import {
 export const columns = (
   handleDeleteDoc: (doc: DocRequest) => void,
   handleModifyDoc: (doc: DocRequest) => void,
+  handleAddToFavourites: (doc: DocRequest, isFavourite: boolean) => void,
   loadingAction: boolean,
   usersOrg: string,
-  isAdmin: boolean
+  isAdmin: boolean,
+  userId: string
 ): ColumnDef<DocRequest>[] => [
   {
     accessorKey: "fileType",
@@ -131,7 +133,9 @@ export const columns = (
   {
     id: "actions",
     cell: ({ row }) => {
-      console.log(row.original.orgID, usersOrg);
+
+      const isFavourite = row.original.favoritedBy?.includes(userId);
+
       return (
         <div className="flex space-x-4 justify-self-end hidden-on-row">
           {(usersOrg === row.original.org || isAdmin) && (
@@ -179,11 +183,12 @@ export const columns = (
             <Tooltip>
               <TooltipTrigger
                 className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
+                onClick={() => handleAddToFavourites(row.original, isFavourite)}
               >
-                <Star strokeWidth={1} />
+                <Star fill={isFavourite ? "gold" : "none"} strokeWidth={1} />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Favorites</p>
+                {!isFavourite ? <p>Add to favorites</p>: <p>Remove from favorites</p>}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

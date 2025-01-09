@@ -362,7 +362,11 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             doc.fileName === document?.fileName && doc.org === document?.org
         );
         if (newDoc) {
-          newDoc.favoritedBy.push(user?.uid as string);
+          if (newDoc.favoritedBy) {
+            newDoc.favoritedBy.push(user?.uid as string);
+          } else {
+            newDoc.favoritedBy = [user?.uid as string];
+          }
         }
         await updateDocument(
           document?.fileName as string,
@@ -372,7 +376,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
         setIsFavourite(true);
         setFavouriteDisabled(false);
         toast.success("Document added to favourites");
-      }else{
+      } else {
         if (document?.orgID) {
           setFavouriteDisabled(true);
           const q = query(
@@ -396,7 +400,9 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             doc.fileName === document?.fileName && doc.org === document?.org
         );
         if (newDoc) {
-          newDoc.favoritedBy = newDoc.favoritedBy.filter((id) => id !== user?.uid);
+          newDoc.favoritedBy = newDoc.favoritedBy.filter(
+            (id) => id !== user?.uid
+          );
         }
         await updateDocument(
           document?.fileName as string,
@@ -504,7 +510,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
           className="lg:flex lg:space-x-6 h-full min-h-[100vh-4rem]"
         >
           <div className="lg:w-2/3 flex flex-col space-y-6 p-6 bg-background shadow-md flex-grow">
-            <h1 className="text-3xl mb-0 flex">
+            <h1 className="text-3xl mb-0 flex items-center">
               <ChevronLeft
                 onClick={() => window.history.back()}
                 className="cursor-pointer w-8 h-8 mr-2 hover:scale-125 transition-all"
@@ -514,6 +520,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               ) : (
                 <FaFileWord className="w-8 h-8 mr-2" />
               )}
+              {isFavourite && <Star className="w-6 h-6 mr-2" fill="gold" />}
               Document - {document?.title}
             </h1>
             <p className="text-muted-foreground">
@@ -599,10 +606,20 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   History
                 </span>
               </Button>
-              <Button disabled={favouriteDisabled} onClick={handleAddToFavourites} className="group flex items-center">
-                <Star className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+              <Button
+                onClick={handleAddToFavourites}
+                className="group flex items-center"
+              >
+                {!favouriteDisabled ? (
+                  <Star
+                    className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2"
+                    fill={isFavourite ? "gold" : "none"}
+                  />
+                ) : (
+                  <LoaderCircle className="w-4 h-4 animate-spin" />
+                )}
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
-                  Favourite
+                  {isFavourite ? "Remove from Favourites" : "Add to Favourites"}
                 </span>
               </Button>
               <Button

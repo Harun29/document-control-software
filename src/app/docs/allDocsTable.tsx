@@ -45,6 +45,10 @@ import {
   deleteDoc,
   addDoc,
   serverTimestamp,
+  updateDoc,
+  doc,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import Link from "next/link";
@@ -56,6 +60,7 @@ import DocumentReviewDrawer from "./modifyDoc";
 const AllDocumentsTable = ({ org }: { org: string }) => {
   const { docs } = useGeneral();
   const { deleteDocument } = useGeneral();
+  const { updateDocument } = useGeneral();
   const { user } = useAuth();
   const { isAdmin } = useAuth();
   const { docsByOrg } = useGeneral();
@@ -89,6 +94,76 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
 
     fetchDocs();
   }, [docs, org, docsByOrg]);
+
+  const handleAddToFavourites = async (document: DocRequest, isFavourite: boolean) => {
+      try {
+        if (!isFavourite) {
+          if (document?.orgID) {
+            const q = query(
+              collection(db, "org", document.orgID, "docs"),
+              where("fileName", "==", document.fileName)
+            );
+            const querySnapshot = await getDocs(q);
+            const docRef = doc(
+              db,
+              "org",
+              document.orgID,
+              "docs",
+              querySnapshot.docs[0].id
+            );
+            await updateDoc(docRef, {
+              favoritedBy: arrayUnion(user?.uid),
+            });
+          }
+          const newDoc = docs.find(
+            (doc) =>
+              doc.fileName === document?.fileName && doc.org === document?.org
+          );
+          if (newDoc) {
+            newDoc.favoritedBy.push(user?.uid as string);
+          }
+          await updateDocument(
+            document?.fileName as string,
+            document?.org as string,
+            newDoc as DocRequest
+          );
+          toast.success("Document added to favourites");
+        }else{
+          if (document?.orgID) {
+            const q = query(
+              collection(db, "org", document.orgID, "docs"),
+              where("fileName", "==", document.fileName)
+            );
+            const querySnapshot = await getDocs(q);
+            const docRef = doc(
+              db,
+              "org",
+              document.orgID,
+              "docs",
+              querySnapshot.docs[0].id
+            );
+            await updateDoc(docRef, {
+              favoritedBy: arrayRemove(user?.uid),
+            });
+          }
+          const newDoc = docs.find(
+            (doc) =>
+              doc.fileName === document?.fileName && doc.org === document?.org
+          );
+          if (newDoc) {
+            newDoc.favoritedBy = newDoc.favoritedBy.filter((id) => id !== user?.uid);
+          }
+          await updateDocument(
+            document?.fileName as string,
+            document?.org as string,
+            newDoc as DocRequest
+          );
+          toast.success("Document removed from favourites");
+        }
+      } catch (error) {
+        console.error("Error adding document to favourites: ", error);
+      }
+    };
 
   const handleDeleteDoc = async (document: DocRequest) => {
     try {
@@ -146,9 +221,11 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
     columns: columns(
       handleDeleteDoc,
       handleModifyDoc,
+      handleAddToFavourites,
       loadingAction,
       user?.userInfo?.orgName as string,
-      isAdmin
+      isAdmin,
+      user?.uid as string
     ),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
