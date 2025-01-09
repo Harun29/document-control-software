@@ -10,6 +10,7 @@ import {
   LoaderCircle,
   Pencil,
   SquareArrowOutUpRight,
+  Star,
   Trash,
   UserRoundPlus,
 } from "lucide-react";
@@ -42,6 +43,7 @@ import {
   updateDoc,
   arrayUnion,
   setDoc,
+  arrayRemove,
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { toast } from "sonner";
@@ -81,7 +83,9 @@ import { useSearchParams } from "next/navigation";
 const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { docs } = useGeneral();
   const { deleteDocument } = useGeneral();
+  const { updateDocument } = useGeneral();
   const { user } = useAuth();
+  const { isAdmin } = useAuth();
   const [docId, setDocId] = useState<string | null>(null);
   const [docsOrg, setDocsOrg] = useState("");
   const [document, setDocument] = useState<DocRequest>();
@@ -98,6 +102,8 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     []
   );
   const [deleteUponSending, setDeleteUponSending] = useState(false);
+  const [isFavourite, setIsFavourite] = useState<boolean>(false);
+  const [favouriteDisabled, setFavouriteDisabled] = useState<boolean>(false);
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
   const closeDrawerRef = useRef<HTMLButtonElement>(null);
   const searchParams = useSearchParams();
@@ -249,6 +255,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             reqByID: user?.uid,
             org: sendToOrg.name,
             orgID: sendToOrg.id,
+            favoritedBy: [],
           }
         );
 
@@ -320,6 +327,89 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
       } catch (error) {
         console.error("Error adding document request:", error);
       }
+    }
+  };
+
+  useEffect(() => {
+    if (document?.favoritedBy) {
+      setIsFavourite(document.favoritedBy.includes(user?.uid as string));
+    }
+  }, [document]);
+
+  const handleAddToFavourites = async () => {
+    try {
+      if (!isFavourite) {
+        if (document?.orgID) {
+          setFavouriteDisabled(true);
+          const q = query(
+            collection(db, "org", document.orgID, "docs"),
+            where("fileName", "==", document.fileName)
+          );
+          const querySnapshot = await getDocs(q);
+          const docRef = doc(
+            db,
+            "org",
+            document.orgID,
+            "docs",
+            querySnapshot.docs[0].id
+          );
+          await updateDoc(docRef, {
+            favoritedBy: arrayUnion(user?.uid),
+          });
+        }
+        const newDoc = docs.find(
+          (doc) =>
+            doc.fileName === document?.fileName && doc.org === document?.org
+        );
+        if (newDoc) {
+          newDoc.favoritedBy.push(user?.uid as string);
+        }
+        await updateDocument(
+          document?.fileName as string,
+          document?.org as string,
+          newDoc as DocRequest
+        );
+        setIsFavourite(true);
+        setFavouriteDisabled(false);
+        toast.success("Document added to favourites");
+      }else{
+        if (document?.orgID) {
+          setFavouriteDisabled(true);
+          const q = query(
+            collection(db, "org", document.orgID, "docs"),
+            where("fileName", "==", document.fileName)
+          );
+          const querySnapshot = await getDocs(q);
+          const docRef = doc(
+            db,
+            "org",
+            document.orgID,
+            "docs",
+            querySnapshot.docs[0].id
+          );
+          await updateDoc(docRef, {
+            favoritedBy: arrayRemove(user?.uid),
+          });
+        }
+        const newDoc = docs.find(
+          (doc) =>
+            doc.fileName === document?.fileName && doc.org === document?.org
+        );
+        if (newDoc) {
+          newDoc.favoritedBy = newDoc.favoritedBy.filter((id) => id !== user?.uid);
+        }
+        await updateDocument(
+          document?.fileName as string,
+          document?.org as string,
+          newDoc as DocRequest
+        );
+        setIsFavourite(false);
+        setFavouriteDisabled(false);
+        toast.success("Document removed from favourites");
+      }
+    } catch (error) {
+      setFavouriteDisabled(false);
+      console.error("Error adding document to favourites: ", error);
     }
   };
 
@@ -488,17 +578,18 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               <p>{document?.summary}</p>
             </div>
             <div className="flex space-x-4">
-              {document?.org === user?.userInfo?.orgName && (
-                <Button
-                  onClick={handleModifyDoc}
-                  className="group flex items-center"
-                >
-                  <Pencil className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
-                  <span className="hidden group-hover:inline transition-opacity duration-1000 ease-in-out">
-                    Modify
-                  </span>
-                </Button>
-              )}
+              {document?.org === user?.userInfo?.orgName ||
+                (isAdmin && (
+                  <Button
+                    onClick={handleModifyDoc}
+                    className="group flex items-center"
+                  >
+                    <Pencil className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+                    <span className="hidden group-hover:inline transition-opacity duration-1000 ease-in-out">
+                      Modify
+                    </span>
+                  </Button>
+                ))}
               <Button
                 onClick={handleViewHistory}
                 className="group flex items-center"
@@ -506,6 +597,12 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                 <HistoryIcon className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                 <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                   History
+                </span>
+              </Button>
+              <Button disabled={favouriteDisabled} onClick={handleAddToFavourites} className="group flex items-center">
+                <Star className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+                <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
+                  Favourite
                 </span>
               </Button>
               <Button
@@ -611,41 +708,42 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   </span>
                 </Button>
               )}
-              {document?.org === user?.userInfo?.orgName && (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      className="group flex items-center"
-                    >
-                      <Trash className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
-                      <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
-                        Delete
-                      </span>
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription className="flex flex-col gap-2">
-                        Do you want to delete this document? {document?.title}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        disabled={loadingAction}
-                        onClick={() => handleDeleteDoc(document!)}
+              {document?.org === user?.userInfo?.orgName ||
+                (isAdmin && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        className="group flex items-center"
                       >
-                        {loadingAction && (
-                          <LoaderCircle className="w-4 h-4 animate-spin" />
-                        )}
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
+                        <Trash className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+                        <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
+                          Delete
+                        </span>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription className="flex flex-col gap-2">
+                          Do you want to delete this document? {document?.title}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          disabled={loadingAction}
+                          onClick={() => handleDeleteDoc(document!)}
+                        >
+                          {loadingAction && (
+                            <LoaderCircle className="w-4 h-4 animate-spin" />
+                          )}
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                ))}
             </div>
           </div>
           <div className="lg:w-1/3 bg-background shadow-md p-4 flex flex-col flex-grow">

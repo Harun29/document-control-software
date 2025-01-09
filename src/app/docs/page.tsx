@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText } from "lucide-react";
+import { Files, FileText, Star } from "lucide-react";
 import AllDocumentsTable from "./allDocsTable";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
@@ -40,8 +40,15 @@ const ManageDocs = () => {
         <p className="text-[#505050]">View and manage all documents</p>
         <div className="flex items-center py-4">
           <Tabs defaultValue="alldocuments" className="w-full">
-            <TabsList className="flex justify-evenly">
-              <TabsTrigger value="alldocuments">All Documents</TabsTrigger>
+            <TabsList className="flex justify-start space-x-4">
+              <TabsTrigger value="alldocuments">
+                <Files className="w-4 h-4 mr-2" />
+                All Documents
+              </TabsTrigger>
+              <TabsTrigger value="favorites">
+                <Star className="w-4 h-4 mr-2" />
+                Favorites
+              </TabsTrigger>
               {orgs.map((org) => (
                 <TabsTrigger key={org} value={org}>
                   {org}

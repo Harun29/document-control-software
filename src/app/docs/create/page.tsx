@@ -115,6 +115,7 @@ const AddDocument = () => {
           reqByID: user?.uid,
           org: user?.userInfo?.orgName,
           orgID: usersOrg,
+          favoritedBy: [],
         }
       );
 
