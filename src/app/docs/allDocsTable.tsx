@@ -82,7 +82,10 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       try {
         if (org === "") {
           setData(docs);
-        } else {
+        }else if(org === "favorites"){
+          setData(docs.filter((doc) => doc.favoritedBy?.includes(user?.uid as string)));
+        } 
+        else {
           setData(docsByOrg.find((doc) => doc.org === org)?.docs ?? []);
         }
       } catch (error) {
@@ -120,7 +123,11 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
               doc.fileName === document?.fileName && doc.org === document?.org
           );
           if (newDoc) {
-            newDoc.favoritedBy.push(user?.uid as string);
+            if(newDoc.favoritedBy){
+              newDoc.favoritedBy.push(user?.uid as string);
+            }else{
+              newDoc.favoritedBy = [user?.uid as string];
+            }
           }
           await updateDocument(
             document?.fileName as string,
@@ -151,7 +158,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
               doc.fileName === document?.fileName && doc.org === document?.org
           );
           if (newDoc) {
-            newDoc.favoritedBy = newDoc.favoritedBy.filter((id) => id !== user?.uid);
+              newDoc.favoritedBy = newDoc.favoritedBy.filter((id) => id !== user?.uid);
           }
           await updateDocument(
             document?.fileName as string,
