@@ -15,6 +15,8 @@ import {
   IdCard,
   PlusCircle,
   UserPlus2Icon,
+  Search,
+  Star,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,6 +39,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import CreateUserCard from "@/components/create-user-card";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { Input } from "@/components/ui/input";
 
 export type Orgs = {
   id: string;
@@ -57,6 +60,7 @@ const UsersCell = ({ orgUsers }: { orgUsers: string[] }) => {
       org: string;
     }[]
   >([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -79,6 +83,12 @@ const UsersCell = ({ orgUsers }: { orgUsers: string[] }) => {
     fetchUsers();
   }, [orgUsers]);
 
+  const filteredUsers = users.filter((user) =>
+    `${user.firstName} ${user.lastName} ${user.email}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <Dialog>
@@ -87,13 +97,23 @@ const UsersCell = ({ orgUsers }: { orgUsers: string[] }) => {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="mb-8">
+            <DialogTitle className="mb-4">
               All users in this department
             </DialogTitle>
+            <div className="flex items-center mb-3">
+              <Input
+                placeholder="Search users..."
+                className="m-2"
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
             <div className="max-h-96 overflow-y-auto custom-scrollbar">
-              {users.length > 0 ? (
-                users.map((user) => (
-                  <div className="hover:bg-secondary px-2 py-3 rounded-md">
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <div
+                    key={user.email}
+                    className="hover:bg-secondary px-2 py-3 rounded-md"
+                  >
                     <div className="flex mb-3 items-center">
                       <Avatar className="mr-2">
                         <AvatarFallback>

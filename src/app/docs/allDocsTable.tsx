@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, Grid, Pencil, TableIcon } from "lucide-react";
+import { ChevronDown, LayoutGrid, Pencil, TableProperties } from "lucide-react";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -266,7 +266,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
 
   return (
     <div>
-      <div className="flex justify-between py-4">
+      <div className="grid grid-cols-[1fr_auto_auto] items-center space-x-4 py-4">
         <Input
           placeholder="Search files..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
@@ -286,10 +286,10 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           }}
         >
           <ToggleGroupItem value="table">
-            <TableIcon className="w-5 h-5" />
+            <TableProperties className="w-5 h-5" />
           </ToggleGroupItem>
           <ToggleGroupItem value="grid">
-            <Grid className="w-5 h-5" />
+            <LayoutGrid className="w-5 h-5" />
           </ToggleGroupItem>
         </ToggleGroup>
         <DropdownMenu>
@@ -401,7 +401,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
               key={doc.fileName}
               className="relative flex flex-col items-center justify-center cursor-pointer hover:scale-105 transform transition-transform group"
             >
-              {user?.userInfo?.orgName === doc.org || isAdmin && (
+              {(user?.userInfo?.orgName === doc.org || isAdmin) && (
                 <div
                   className="w-6 h-6 absolute right-0 -top-3 opacity-0 group-hover:opacity-100 transition-all rounded-full"
                   onClick={(e) => {
