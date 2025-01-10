@@ -1,13 +1,15 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Files, FileText, Star, Terminal, User2 } from "lucide-react";
+import { FilePlus2, Files, FileText, Star, Terminal, User2 } from "lucide-react";
 import AllDocumentsTable from "./allDocsTable";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { AnimatePresence, motion } from "framer-motion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const ManageDocs = () => {
   const [orgs, setOrgs] = useState<string[]>([]);
@@ -41,7 +43,8 @@ const ManageDocs = () => {
         <p className="text-[#505050]">View and manage all documents</p>
         <div className="flex items-center py-4">
           <Tabs defaultValue="alldocuments" className="w-full">
-            <TabsList className="flex justify-start space-x-4">
+            <TabsList className="flex justify-between h-auto">
+              <div className="grid grid-cols-8 justify-start space-x-2">
               <TabsTrigger value="alldocuments">
                 <Files className="w-4 h-4 mr-2" />
                 All Documents
@@ -59,6 +62,13 @@ const ManageDocs = () => {
                   {org}
                 </TabsTrigger>
               ))}
+              </div>
+              <Link href="/docs/create">
+                <Button variant="default" className="ml-4">
+                  <FilePlus2 className="w-4 h-4 mr-2" />
+                  Create Document
+                </Button>
+              </Link>
             </TabsList>
             <TabsContent value="alldocuments">
               <AllDocumentsTable org="" />
@@ -75,6 +85,7 @@ const ManageDocs = () => {
                   You will recieve a notification when a document from favorites is modified, deleted or sent to another department.
                 </AlertDescription>
               </Alert>
+          
             </TabsContent>
             {orgs.map((org) => (
               <TabsContent key={org} value={org}>
