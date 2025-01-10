@@ -7,11 +7,17 @@ import {
   Copy,
   FileSymlink,
   HistoryIcon,
+  IdCard,
   LoaderCircle,
+  Mail,
   Pencil,
   SquareArrowOutUpRight,
   Star,
   Trash,
+  User2,
+  UserPen,
+  UserPlus,
+  UserPlus2,
   UserRoundPlus,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -79,6 +85,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useSearchParams } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { docs } = useGeneral();
@@ -86,6 +94,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { updateDocument } = useGeneral();
   const { user } = useAuth();
   const { isAdmin } = useAuth();
+  const {usersOrg} = useAuth();
   const [docId, setDocId] = useState<string | null>(null);
   const [docsOrg, setDocsOrg] = useState("");
   const [document, setDocument] = useState<DocRequest>();
@@ -107,6 +116,17 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const drawerTriggerRef = useRef<HTMLButtonElement>(null);
   const closeDrawerRef = useRef<HTMLButtonElement>(null);
   const searchParams = useSearchParams();
+  const [users, setUsers] = useState<
+    {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      role: string;
+      org: string;
+    }[]
+  >([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const unwrapParams = async () => {
@@ -139,6 +159,35 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
         );
         setAllOrgs(filteredOrgs);
       };
+      const fetchAllUsers = async () => {
+        const usersRef = doc(db, "org", usersOrg);
+        const usersSnap = await getDoc(usersRef);
+        const users = usersSnap.data()?.users;
+      
+        if (!users) {
+          setUsers([]);
+          return;
+        }
+      
+        const fetchedUsers = await Promise.all(
+          users.map(async (userId: string) => {
+            const userRef = doc(db, "users", userId);
+            const userSnap = await getDoc(userRef);
+            const user = userSnap.data();
+            return {
+              id: userSnap.id,
+              firstName: user?.firstName,
+              lastName: user?.lastName,
+              email: user?.email,
+              role: user?.role,
+              org: user?.org,
+            };
+          })
+        );
+      
+        setUsers(fetchedUsers);
+      };
+      fetchAllUsers();
       fetchAllDepartments();
     } catch (err) {
       console.error("Error fetching all departments: ", err);
@@ -455,6 +504,17 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     }
   };
 
+
+  const filteredUsers = users.filter((user) =>
+    `${user.firstName} ${user.lastName} ${user.email}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  const assignDocumentToUser = () => {
+    console.log("Document assignes");
+  }
+
   if (loading) {
     return (
       <AnimatePresence>
@@ -752,13 +812,69 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                 </Dialog>
               )}
               {/* implement later */}
-              {document?.org === user?.userInfo?.orgName && false && (
+              {document?.org === user?.userInfo?.orgName && (
+                
+                <Dialog>
+                <DialogTrigger>
                 <Button className="group flex items-center">
-                  <UserRoundPlus className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+                  <UserPen className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
                   <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
                     Assign to user
                   </span>
                 </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="mb-4">
+                      All users in this department
+                    </DialogTitle>
+                    <div className="flex items-center mb-3">
+                      <Input
+                        placeholder="Search users..."
+                        className="m-2"
+                        onChange={(e) => setSearch(e.target.value)}
+                      />
+                    </div>
+                    <div className="max-h-96 overflow-y-auto custom-scrollbar">
+                      {filteredUsers.length > 0 ? (
+                        filteredUsers.map((user) => (
+                          <div
+                            key={user.email}
+                            className="hover-container hover:bg-secondary px-2 py-3 rounded-md cursor-pointer"
+                          >
+                            <div className="flex mb-3 items-center">
+                              <Avatar className="mr-2">
+                                <AvatarFallback>
+                                  <User2 />
+                                </AvatarFallback>
+                              </Avatar>
+                              <strong>
+                                {user.firstName} {user.lastName}
+                              </strong>
+                              <strong className="hidden-on-hover text-blue-600 ml-4 flex gap-x-2">
+                                <UserPen />
+                                Assign to</strong>
+                            </div>
+                            <div className="ml-2">
+                              <div className="flex mb-2">
+                                <Mail />
+                                <span className="ml-2">{user.email}</span>
+                              </div>
+                              <div className="flex">
+                                <IdCard />
+                                <span className="ml-2">{user.role}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div>No users</div>
+                      )}
+                    </div>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+                
               )}
               {(document?.org === user?.userInfo?.orgName || isAdmin) && (
                   <AlertDialog>

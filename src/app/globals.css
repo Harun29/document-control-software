@@ -112,3 +112,12 @@
 .row:hover .hidden-on-row {
   opacity: 1;
 }
+
+.hidden-on-hover {
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.hover-container:hover .hidden-on-hover {
+  opacity: 1;
+}
