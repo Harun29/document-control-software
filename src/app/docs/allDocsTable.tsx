@@ -84,7 +84,9 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           setData(docs);
         }else if(org === "favorites"){
           setData(docs.filter((doc) => doc.favoritedBy?.includes(user?.uid as string)));
-        } 
+        }else if(org === "mydocuments"){
+          setData(docs.filter((doc) => doc.reqByID === user?.uid));
+        }
         else {
           setData(docsByOrg.find((doc) => doc.org === org)?.docs ?? []);
         }
