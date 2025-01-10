@@ -208,6 +208,24 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
         await deleteDoc(doc.ref);
       });
 
+      document.favoritedBy?.forEach(async (userId) => {
+        const userDocRef = collection(
+          db,
+          "users",
+          userId,
+          "notifications",
+        );
+        await addDoc(userDocRef, {
+            message: `Document ${document.title} has been deleted by ${user?.userInfo?.email}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+            documentName: document.title,
+            documentURL: "/docs",
+            title : "Document Deleted",
+          },
+        );
+      });
+
       toast.success("Document deleted successfully");
       setLoadingAction(false);
     } catch (error) {
@@ -277,24 +295,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
           }
           className="max-w-sm"
         />
-        <ToggleGroup
-          variant="outline"
-          type="single"
-          value={docViewType}
-          onValueChange={(value) => {
-            if (value) {
-              changeDocViewType(value as "table" | "grid");
-            }
-          }}
-        >
-          <ToggleGroupItem value="table">
-            <TableProperties className="w-5 h-5" />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="grid">
-            <LayoutGrid className="w-5 h-5" />
-          </ToggleGroupItem>
-        </ToggleGroup>
-        <DropdownMenu>
+        {docViewType === "table" && <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
               Columns <ChevronDown />
@@ -320,7 +321,25 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
                 );
               })}
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu>}
+        <ToggleGroup
+          variant="outline"
+          type="single"
+          value={docViewType}
+          onValueChange={(value) => {
+            if (value) {
+              changeDocViewType(value as "table" | "grid");
+            }
+          }}
+        >
+          <ToggleGroupItem value="table">
+            <TableProperties className="w-5 h-5" />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="grid">
+            <LayoutGrid className="w-5 h-5" />
+          </ToggleGroupItem>
+        </ToggleGroup>
+        
       </div>
       {docViewType === "table" && (
         <div className="rounded-md border">

@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FilePlus2, Files, FileText, Star, Terminal, User2 } from "lucide-react";
+import { FilePlus2, Files, FileText, Folder, Star, Terminal, User2 } from "lucide-react";
 import AllDocumentsTable from "./allDocsTable";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
@@ -59,6 +59,7 @@ const ManageDocs = () => {
               </TabsTrigger>
               {orgs.map((org) => (
                 <TabsTrigger key={org} value={org}>
+                  <Folder className="w-4 h-4 mr-2" />
                   {org}
                 </TabsTrigger>
               ))}

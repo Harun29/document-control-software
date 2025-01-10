@@ -224,6 +224,24 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
         await deleteDoc(doc.ref);
       });
 
+      document.favoritedBy?.forEach(async (userId) => {
+        const userDocRef = collection(
+          db,
+          "users",
+          userId,
+          "notifications",
+        );
+        await addDoc(userDocRef, {
+            message: `Document ${document.title} has been deleted by ${user?.userInfo?.email}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+            documentName: document.title,
+            documentURL: "/docs",
+            title : "Document Deleted",
+          },
+        );
+      });
+
       window.history.back();
       toast.success("Document deleted successfully");
       setLoadingAction(false);
@@ -268,7 +286,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             createdAt: new Date().toISOString(),
             read: false,
             documentURL: `/requests`,
-            documentName: document?.fileName,
+            documentName: document?.title,
             title: "Document Request",
             message: `${user?.userInfo?.email} requested a document`,
           });
@@ -320,6 +338,24 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
         if (deleteUponSending) {
           await deleteDocument(documentFileName, documentOrg as string);
         }
+
+        document.favoritedBy?.forEach(async (userId) => {
+          const userDocRef = collection(
+            db,
+            "users",
+            userId,
+            "notifications",
+          );
+          await addDoc(userDocRef, {
+              message: `Document ${document.title} has been sent to department ${sendToOrg.name} by ${user?.userInfo?.email}`,
+              createdAt: new Date().toISOString(),
+              read: false,
+              documentName: document.title,
+              documentURL: document.fileName + "?orgName=" + document.org,
+              title : "Document Sent to Another Department",
+            },
+          );
+        });
 
         console.log("Document request submitted with ID:", docRef.id);
         setLoading(false);

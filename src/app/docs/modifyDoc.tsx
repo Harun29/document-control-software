@@ -57,6 +57,7 @@ import { useGeneral } from "@/context/GeneralContext";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { db } from "@/config/firebaseConfig";
+import { title } from "process";
 
 interface DocumentReviewDrawerProps {
   drawerTriggerRef: React.RefObject<HTMLButtonElement>;
@@ -128,6 +129,23 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
 
       await updateDoc(docRef, newDoc);
       await updateDocument(document.fileName, document.org, newDoc);
+      document.favoritedBy?.forEach(async (userId) => {
+        const userDocRef = collection(
+          db,
+          "users",
+          userId,
+          "notifications",
+        );
+        await addDoc(userDocRef, {
+            message: `Document ${document.title} has been modified by ${user?.userInfo?.email}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+            documentName: document.title,
+            documentURL: document.fileName + "?orgName=" + document.org,
+            title : "Document Modified",
+          },
+        );
+      });
       toast.success("Document updated successfully");
     } catch (err) {
       console.error("Error modifying document: ", err);
