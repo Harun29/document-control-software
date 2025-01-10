@@ -49,10 +49,12 @@ import {
   FilePlus2,
   FileTextIcon,
   LoaderCircle,
+  Terminal,
   XCircleIcon,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const AddDocument = () => {
   const [title, setTitle] = useState("");
@@ -232,6 +234,7 @@ const AddDocument = () => {
         <p className="text-muted-foreground">
           Add a document to your department&apos;s repository
         </p>
+        
         {/* Title Input */}
         <div className="space-y-2">
           <Label htmlFor="title">Title</Label>
@@ -362,6 +365,13 @@ const AddDocument = () => {
             Clear Document Selection
           </Button>
         </div>
+        <Alert>
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            All documents need to be approved by an editor before they are added to the repository.
+          </AlertDescription>
+        </Alert>
       </div>
 
       {/* Preview Section */}
@@ -403,6 +413,7 @@ const AddDocument = () => {
           <p className="mt-2 text-sm text-gray-600">No document selected</p>
         )}
       </div>
+      
     </div>
   );
 };
