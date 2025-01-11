@@ -13,6 +13,7 @@ import {
   Pencil,
   SquareArrowOutUpRight,
   Star,
+  Terminal,
   Trash,
   User2,
   UserPen,
@@ -87,6 +88,8 @@ import { Switch } from "@/components/ui/switch";
 import { useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { docs } = useGeneral();
@@ -94,7 +97,8 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { updateDocument } = useGeneral();
   const { user } = useAuth();
   const { isAdmin } = useAuth();
-  const {usersOrg} = useAuth();
+  const { usersOrg } = useAuth();
+  const {assignedDocs} = useAuth();
   const [docId, setDocId] = useState<string | null>(null);
   const [docsOrg, setDocsOrg] = useState("");
   const [document, setDocument] = useState<DocRequest>();
@@ -127,6 +131,29 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     }[]
   >([]);
   const [search, setSearch] = useState("");
+  const [message, setMessage] = useState("");
+  const [issAssignedToMe, setIsAssignedToMe] = useState(false);
+  const [assignedMessage, setAssignedMessage] = useState("");
+
+  useEffect(() => {
+    const checkAssignedDocs = async () => {
+      if (assignedDocs) {
+  
+        const assignedDoc = assignedDocs.find(
+          (doc) => doc.docUrl === (document?.fileName + "?orgName=" + document?.org)
+        );
+  
+        if (assignedDoc) {
+          setIsAssignedToMe(true);
+          setAssignedMessage(assignedDoc.message);
+        } else {
+          setIsAssignedToMe(false);
+          setAssignedMessage("");
+        }
+      }
+    };
+    checkAssignedDocs();
+  }, [assignedDocs, document?.fileURL]);
 
   useEffect(() => {
     const unwrapParams = async () => {
@@ -163,12 +190,12 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
         const usersRef = doc(db, "org", usersOrg);
         const usersSnap = await getDoc(usersRef);
         const users = usersSnap.data()?.users;
-      
+
         if (!users) {
           setUsers([]);
           return;
         }
-      
+
         const fetchedUsers = await Promise.all(
           users.map(async (userId: string) => {
             const userRef = doc(db, "users", userId);
@@ -184,7 +211,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             };
           })
         );
-      
+
         setUsers(fetchedUsers);
       };
       fetchAllUsers();
@@ -274,21 +301,15 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
       });
 
       document.favoritedBy?.forEach(async (userId) => {
-        const userDocRef = collection(
-          db,
-          "users",
-          userId,
-          "notifications",
-        );
+        const userDocRef = collection(db, "users", userId, "notifications");
         await addDoc(userDocRef, {
-            message: `Document ${document.title} has been deleted by ${user?.userInfo?.email}`,
-            createdAt: new Date().toISOString(),
-            read: false,
-            documentName: document.title,
-            documentURL: "/docs",
-            title : "Document Deleted",
-          },
-        );
+          message: `Document ${document.title} has been deleted by ${user?.userInfo?.email}`,
+          createdAt: new Date().toISOString(),
+          read: false,
+          documentName: document.title,
+          documentURL: "/docs",
+          title: "Document Deleted",
+        });
       });
 
       window.history.back();
@@ -389,21 +410,15 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
         }
 
         document.favoritedBy?.forEach(async (userId) => {
-          const userDocRef = collection(
-            db,
-            "users",
-            userId,
-            "notifications",
-          );
+          const userDocRef = collection(db, "users", userId, "notifications");
           await addDoc(userDocRef, {
-              message: `Document ${document.title} has been sent to department ${sendToOrg.name} by ${user?.userInfo?.email}`,
-              createdAt: new Date().toISOString(),
-              read: false,
-              documentName: document.title,
-              documentURL: document.fileName + "?orgName=" + document.org,
-              title : "Document Sent to Another Department",
-            },
-          );
+            message: `Document ${document.title} has been sent to department ${sendToOrg.name} by ${user?.userInfo?.email}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+            documentName: document.title,
+            documentURL: document.fileName + "?orgName=" + document.org,
+            title: "Document Sent to Another Department",
+          });
         });
 
         console.log("Document request submitted with ID:", docRef.id);
@@ -504,16 +519,42 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     }
   };
 
-
   const filteredUsers = users.filter((user) =>
     `${user.firstName} ${user.lastName} ${user.email}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
-  const assignDocumentToUser = () => {
-    console.log("Document assignes");
-  }
+  const assignDocumentToUser = async (userId: string, message: string) => {
+    try {
+      const usersRef = doc(db, "users", userId);
+      const userSnap = await getDoc(usersRef);
+      const userData = userSnap.data();
+      if (userData && userData.assignedDocs) {
+        updateDoc(usersRef, {
+          assignedDocs: arrayUnion({ docUrl: document?.fileName+"?orgName="+document?.org, message }),
+        });
+      } else {
+        setDoc(usersRef, {
+          assignedDocs: [{ docUrl: document?.fileName+"?orgName="+document?.org, message }],
+        }, { merge: true });
+      }
+      const usersNotifRef = collection(usersRef, "notifications");
+      await addDoc(usersNotifRef, {
+        message: `Document ${document?.title} has been assigned to you by ${user?.userInfo?.email}`,
+        createdAt: new Date().toISOString(),
+        read: false,
+        documentName: document?.title,
+        documentURL: document?.fileName + "?orgName=" + document?.org,
+        title: "Document Assigned",
+      });
+      setMessage("");
+      toast.success("Document assigned to user");
+    } catch (err) {
+      toast.error("Error assigning document to user");
+      console.error("Error assigning document to user: ", err);
+    }
+  };
 
   if (loading) {
     return (
@@ -622,6 +663,15 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             <p className="text-muted-foreground">
               View and manage document details
             </p>
+            {issAssignedToMe && <Alert>
+              <Terminal className="h-4 w-4" />
+              <AlertTitle>
+                This document has been assigned to you
+              </AlertTitle>
+              <AlertDescription>
+                Message: {assignedMessage}
+              </AlertDescription>
+            </Alert>}
             <div className="flex space-x-4 items-center">
               <TooltipProvider>
                 <Tooltip>
@@ -682,16 +732,16 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             </div>
             <div className="flex space-x-4">
               {(document?.org === user?.userInfo?.orgName || isAdmin) && (
-                  <Button
-                    onClick={handleModifyDoc}
-                    className="group flex items-center"
-                  >
-                    <Pencil className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
-                    <span className="hidden group-hover:inline transition-opacity duration-1000 ease-in-out">
-                      Modify
-                    </span>
-                  </Button>
-                )}
+                <Button
+                  onClick={handleModifyDoc}
+                  className="group flex items-center"
+                >
+                  <Pencil className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+                  <span className="hidden group-hover:inline transition-opacity duration-1000 ease-in-out">
+                    Modify
+                  </span>
+                </Button>
+              )}
               <Button
                 onClick={handleViewHistory}
                 className="group flex items-center"
@@ -813,104 +863,131 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               )}
               {/* implement later */}
               {document?.org === user?.userInfo?.orgName && (
-                
                 <Dialog>
-                <DialogTrigger>
-                <Button className="group flex items-center">
-                  <UserPen className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
-                  <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
-                    Assign to user
-                  </span>
-                </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="mb-4">
-                      All users in this department
-                    </DialogTitle>
-                    <div className="flex items-center mb-3">
-                      <Input
-                        placeholder="Search users..."
-                        className="m-2"
-                        onChange={(e) => setSearch(e.target.value)}
-                      />
-                    </div>
-                    <div className="max-h-96 overflow-y-auto custom-scrollbar">
-                      {filteredUsers.length > 0 ? (
-                        filteredUsers.map((user) => (
-                          <div
-                            key={user.email}
-                            className="hover-container hover:bg-secondary px-2 py-3 rounded-md cursor-pointer"
-                          >
-                            <div className="flex mb-3 items-center">
-                              <Avatar className="mr-2">
-                                <AvatarFallback>
-                                  <User2 />
-                                </AvatarFallback>
-                              </Avatar>
-                              <strong>
-                                {user.firstName} {user.lastName}
-                              </strong>
-                              <strong className="hidden-on-hover text-blue-600 ml-4 flex gap-x-2">
-                                <UserPen />
-                                Assign to</strong>
-                            </div>
-                            <div className="ml-2">
-                              <div className="flex mb-2">
-                                <Mail />
-                                <span className="ml-2">{user.email}</span>
-                              </div>
-                              <div className="flex">
-                                <IdCard />
-                                <span className="ml-2">{user.role}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div>No users</div>
-                      )}
-                    </div>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-                
+                  <DialogTrigger>
+                    <Button className="group flex items-center">
+                      <UserPen className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+                      <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
+                        Assign to user
+                      </span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle className="mb-4">
+                        All users in this department
+                      </DialogTitle>
+                      <div className="flex items-center mb-3">
+                        <Input
+                          placeholder="Search users..."
+                          className="m-2"
+                          onChange={(e) => setSearch(e.target.value)}
+                        />
+                      </div>
+                      <div className="max-h-96 overflow-y-auto custom-scrollbar">
+                        {filteredUsers.length > 0 ? (
+                          filteredUsers.map((user) => (
+                            <Dialog key={user.id}>
+                              <DialogTrigger className="hover-container hover:bg-secondary px-2 py-3 rounded-md cursor-pointer w-full">
+                                  <div className="flex mb-3 items-center">
+                                    <Avatar className="mr-2">
+                                      <AvatarFallback>
+                                        <User2 />
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <strong>
+                                      {user.firstName} {user.lastName}
+                                    </strong>
+                                    <strong className="hidden-on-hover text-blue-600 ml-4 flex gap-x-2">
+                                      <UserPen />
+                                      Assign to
+                                    </strong>
+                                  </div>
+                                  <div className="ml-2">
+                                    <div className="flex mb-2">
+                                      <Mail />
+                                      <span className="ml-2">{user.email}</span>
+                                    </div>
+                                    <div className="flex">
+                                      <IdCard />
+                                      <span className="ml-2">{user.role}</span>
+                                    </div>
+                                  </div>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle className="mb-4">
+                                    Assign document to {user.firstName}{" "}
+                                    {user.lastName}
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    <Label htmlFor="message">
+                                      Message to user
+                                    </Label>
+                                    <Textarea
+                                      value={message}
+                                      onChange={(e) => setMessage(e.target.value)}
+                                      id="message"
+                                      className="w-full mt-2"
+                                      placeholder="Enter a message to the user"
+                                    />
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                  <Button
+                                    onClick={() =>
+                                      assignDocumentToUser(user.id, message)
+                                    }
+                                  >
+                                    Assign
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          ))
+                        ) : (
+                          <div>No users</div>
+                        )}
+                      </div>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
               )}
               {(document?.org === user?.userInfo?.orgName || isAdmin) && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        className="group flex items-center"
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      className="group flex items-center"
+                    >
+                      <Trash className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
+                      <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
+                        Delete
+                      </span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription className="flex flex-col gap-2">
+                        Do you want to delete this document? {document?.title}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={loadingAction}
+                        onClick={() => handleDeleteDoc(document!)}
                       >
-                        <Trash className="w-4 h-4 transition-all duration-200 ease-in-out group-hover:mr-2" />
-                        <span className="hidden group-hover:inline transition-opacity duration-200 ease-in-out">
-                          Delete
-                        </span>
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription className="flex flex-col gap-2">
-                          Do you want to delete this document? {document?.title}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          disabled={loadingAction}
-                          onClick={() => handleDeleteDoc(document!)}
-                        >
-                          {loadingAction && (
-                            <LoaderCircle className="w-4 h-4 animate-spin" />
-                          )}
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
+                        {loadingAction && (
+                          <LoaderCircle className="w-4 h-4 animate-spin" />
+                        )}
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
           </div>
           <div className="lg:w-1/3 bg-background shadow-md p-4 flex flex-col flex-grow">

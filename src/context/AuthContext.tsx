@@ -29,6 +29,7 @@ interface UserInfo {
   orgName: string;
   firstName?: string;
   lastName?: string;
+  assignedDocs?: {docUrl: string, message: string}[];
 }
 
 interface AuthContextProps {
@@ -54,6 +55,7 @@ interface AuthContextProps {
   usersUnreadNotifs: number;
   viewNotifications: boolean;
   handleViewNotifications: (bool: boolean) => void;
+  assignedDocs: {docUrl: string, message: string}[];
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -68,6 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [usersNotifsNumber, setUsersNotifsNumber] = useState(0);
   const [usersUnreadNotifs, setUsersUnreadNotifs] = useState(0);
   const [viewNotifications, setViewNotifications] = useState(false);
+  const [assignedDocs, setAssignedDocs] = useState<{docUrl: string, message: string}[]>([]);
 
   const functions = getFunctions();
 
@@ -199,6 +202,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setIsAdmin(!!idTokenResult.claims.admin);
           setIsEditor(!!userInfo?.role && userInfo.role === "Editor");
           setUsersOrg(userInfo?.org);
+          setAssignedDocs(userInfo?.assignedDocs || []);
           console.log("isAdmin in context: ", !!idTokenResult.claims.admin);
           setUser({ ...currentUser, userInfo: userInfo as UserInfo || undefined });
         } catch (error) {
@@ -294,6 +298,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         usersUnreadNotifs,
         viewNotifications,
         handleViewNotifications,
+        assignedDocs,
       }}
     >
       {!loading && children}
