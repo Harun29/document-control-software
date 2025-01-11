@@ -12,6 +12,7 @@ import {
   FilePlus2,
   FileText,
   IdCard,
+  Info,
   Mail,
   Users2,
 } from "lucide-react";
@@ -246,9 +247,7 @@ export default function Home() {
                     key={index}
                     className="text-muted-foreground place-self-start hover:text-secondary-foreground grid grid-cols-[auto_1fr] items-center space-x-2 cursor-pointer hover:scale-105 transform transition-all"
                   >
-                    <div className="bg-blue-500 text-white w-8 h-8 flex items-center justify-center rounded-full">
-                      <span className="font-bold">!</span>
-                    </div>
+                    <Info className="w-6 h-6 text-blue-500" />
                     <div className="flex flex-col m-2">
                       <span>
                         {notif.title}
