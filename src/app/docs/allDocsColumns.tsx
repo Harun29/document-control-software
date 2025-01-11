@@ -119,25 +119,23 @@ export const columns = (
   {
     accessorKey: "title",
     header: "Title",
-  },
-  {
-    id: "fileName",
-    accessorKey: "fileName",
-    header: "",
     cell: ({ row }) => {
       const fileName = row.getValue("fileName") as string;
-      const issAssignedToMe = assignedDocs.some(
+      const isAssignedToMe = assignedDocs.some(
         (doc) =>
           doc.docUrl ===
           fileName + "?orgName=" + encodeURIComponent(row.original.org)
       );
       return (
         <div className="flex items-center space-x-2">
-          {issAssignedToMe && (
+          <span>
+            {row.original.title}
+          </span>
+          {isAssignedToMe && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Info className="w-6 h-6 text-blue-500 hidden-on-row" />
+                  <Info className="w-6 h-6 text-blue-500" />
                 </TooltipTrigger>
                 <TooltipContent>
                   This document is assigned to you.
@@ -145,6 +143,18 @@ export const columns = (
               </Tooltip>
             </TooltipProvider>
           )}
+        </div>
+      );
+    },
+  },
+  {
+    id: "fileName",
+    accessorKey: "fileName",
+    header: "",
+    cell: ({ row }) => {
+      const fileName = row.getValue("fileName") as string;
+      return (
+        <div className="flex items-center space-x-2">
           <Button variant="ghost" className="text-blue-500 hidden-on-row">
             <Link
               className="flex items-center space-x-2"
