@@ -17,9 +17,6 @@ import {
   Trash,
   User2,
   UserPen,
-  UserPlus,
-  UserPlus2,
-  UserRoundPlus,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { DocRequest } from "../types";
@@ -98,7 +95,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { user } = useAuth();
   const { isAdmin } = useAuth();
   const { usersOrg } = useAuth();
-  const {assignedDocs} = useAuth();
+  const { assignedDocs } = useAuth();
   const [docId, setDocId] = useState<string | null>(null);
   const [docsOrg, setDocsOrg] = useState("");
   const [document, setDocument] = useState<DocRequest>();
@@ -138,11 +135,11 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   useEffect(() => {
     const checkAssignedDocs = async () => {
       if (assignedDocs) {
-  
         const assignedDoc = assignedDocs.find(
-          (doc) => doc.docUrl === (document?.fileName + "?orgName=" + document?.org)
+          (doc) =>
+            doc.docUrl === document?.fileName + "?orgName=" + document?.org
         );
-  
+
         if (assignedDoc) {
           setIsAssignedToMe(true);
           setAssignedMessage(assignedDoc.message);
@@ -532,12 +529,24 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
       const userData = userSnap.data();
       if (userData && userData.assignedDocs) {
         updateDoc(usersRef, {
-          assignedDocs: arrayUnion({ docUrl: document?.fileName+"?orgName="+document?.org, message }),
+          assignedDocs: arrayUnion({
+            docUrl: document?.fileName + "?orgName=" + document?.org,
+            message,
+          }),
         });
       } else {
-        setDoc(usersRef, {
-          assignedDocs: [{ docUrl: document?.fileName+"?orgName="+document?.org, message }],
-        }, { merge: true });
+        setDoc(
+          usersRef,
+          {
+            assignedDocs: [
+              {
+                docUrl: document?.fileName + "?orgName=" + document?.org,
+                message,
+              },
+            ],
+          },
+          { merge: true }
+        );
       }
       const usersNotifRef = collection(usersRef, "notifications");
       await addDoc(usersNotifRef, {
@@ -663,15 +672,13 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
             <p className="text-muted-foreground">
               View and manage document details
             </p>
-            {issAssignedToMe && <Alert>
-              <Terminal className="h-4 w-4" />
-              <AlertTitle>
-                This document has been assigned to you
-              </AlertTitle>
-              <AlertDescription>
-                Message: {assignedMessage}
-              </AlertDescription>
-            </Alert>}
+            {issAssignedToMe && (
+              <Alert>
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>This document has been assigned to you</AlertTitle>
+                <AlertDescription>Message: {assignedMessage}</AlertDescription>
+              </Alert>
+            )}
             <div className="flex space-x-4 items-center">
               <TooltipProvider>
                 <Tooltip>
@@ -889,30 +896,30 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                           filteredUsers.map((user) => (
                             <Dialog key={user.id}>
                               <DialogTrigger className="hover-container hover:bg-secondary px-2 py-3 rounded-md cursor-pointer w-full">
-                                  <div className="flex mb-3 items-center">
-                                    <Avatar className="mr-2">
-                                      <AvatarFallback>
-                                        <User2 />
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <strong>
-                                      {user.firstName} {user.lastName}
-                                    </strong>
-                                    <strong className="hidden-on-hover text-blue-600 ml-4 flex gap-x-2">
-                                      <UserPen />
-                                      Assign to
-                                    </strong>
+                                <div className="flex mb-3 items-center">
+                                  <Avatar className="mr-2">
+                                    <AvatarFallback>
+                                      <User2 />
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <strong>
+                                    {user.firstName} {user.lastName}
+                                  </strong>
+                                  <strong className="hidden-on-hover text-blue-600 ml-4 flex gap-x-2">
+                                    <UserPen />
+                                    Assign to
+                                  </strong>
+                                </div>
+                                <div className="ml-2">
+                                  <div className="flex mb-2">
+                                    <Mail />
+                                    <span className="ml-2">{user.email}</span>
                                   </div>
-                                  <div className="ml-2">
-                                    <div className="flex mb-2">
-                                      <Mail />
-                                      <span className="ml-2">{user.email}</span>
-                                    </div>
-                                    <div className="flex">
-                                      <IdCard />
-                                      <span className="ml-2">{user.role}</span>
-                                    </div>
+                                  <div className="flex">
+                                    <IdCard />
+                                    <span className="ml-2">{user.role}</span>
                                   </div>
+                                </div>
                               </DialogTrigger>
                               <DialogContent>
                                 <DialogHeader>
@@ -926,7 +933,9 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                                     </Label>
                                     <Textarea
                                       value={message}
-                                      onChange={(e) => setMessage(e.target.value)}
+                                      onChange={(e) =>
+                                        setMessage(e.target.value)
+                                      }
                                       id="message"
                                       className="w-full mt-2"
                                       placeholder="Enter a message to the user"

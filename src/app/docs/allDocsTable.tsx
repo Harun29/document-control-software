@@ -63,6 +63,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
   const { updateDocument } = useGeneral();
   const { user } = useAuth();
   const { isAdmin } = useAuth();
+  const { assignedDocs } = useAuth();
   const { docsByOrg } = useGeneral();
   const { docViewType } = useGeneral();
   const { changeDocViewType } = useGeneral();
@@ -252,7 +253,8 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
       loadingAction,
       user?.userInfo?.orgName as string,
       isAdmin,
-      user?.uid as string
+      user?.uid as string,
+      assignedDocs
     ),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

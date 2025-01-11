@@ -1,6 +1,16 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Copy, FileIcon, LoaderCircle, Pencil, SquareArrowOutUpRightIcon, Star, Trash } from "lucide-react";
+import {
+  ArrowUpDown,
+  Copy,
+  FileIcon,
+  Info,
+  LoaderCircle,
+  Pencil,
+  SquareArrowOutUpRightIcon,
+  Star,
+  Trash,
+} from "lucide-react";
 import { DocRequest } from "./types";
 import { FaFilePdf, FaFileWord } from "react-icons/fa";
 import Link from "next/link";
@@ -29,7 +39,8 @@ export const columns = (
   loadingAction: boolean,
   usersOrg: string,
   isAdmin: boolean,
-  userId: string
+  userId: string,
+  assignedDocs: { docUrl: string; message: string }[]
 ): ColumnDef<DocRequest>[] => [
   {
     accessorKey: "fileType",
@@ -115,25 +126,43 @@ export const columns = (
     header: "",
     cell: ({ row }) => {
       const fileName = row.getValue("fileName") as string;
+      const issAssignedToMe = assignedDocs.some(
+        (doc) =>
+          doc.docUrl ===
+          fileName + "?orgName=" + encodeURIComponent(row.original.org)
+      );
       return (
-        <Button variant="ghost" className="text-blue-500 hidden-on-row">
-          <Link
-          className="flex items-center space-x-2"
-            href={`/docs/${fileName}?orgName=${encodeURIComponent(
-              row.original.org
-            )}`}
-          >
-            <FileIcon className="mr-1"/>
-            View Doc
-          </Link>
-        </Button>
+        <div className="flex items-center space-x-2">
+          {issAssignedToMe && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="w-6 h-6 text-blue-500 hidden-on-row" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  This document is assigned to you.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          <Button variant="ghost" className="text-blue-500 hidden-on-row">
+            <Link
+              className="flex items-center space-x-2"
+              href={`/docs/${fileName}?orgName=${encodeURIComponent(
+                row.original.org
+              )}`}
+            >
+              <FileIcon className="mr-1" />
+              View Doc
+            </Link>
+          </Button>
+        </div>
       );
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-
       const isFavourite = row.original.favoritedBy?.includes(userId);
 
       return (
@@ -167,12 +196,10 @@ export const columns = (
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger
-                className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
-              >
-                  <a target="_blank" href={row.original.fileURL}>
-                    <SquareArrowOutUpRightIcon strokeWidth={1} />
-                  </a>
+              <TooltipTrigger className="transition-transform transform hover:scale-125 duration-300 ease-in-out">
+                <a target="_blank" href={row.original.fileURL}>
+                  <SquareArrowOutUpRightIcon strokeWidth={1} />
+                </a>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Open in new tab</p>
@@ -188,17 +215,18 @@ export const columns = (
                 <Star fill={isFavourite ? "gold" : "none"} strokeWidth={1} />
               </TooltipTrigger>
               <TooltipContent>
-                {!isFavourite ? <p>Add to favorites</p>: <p>Remove from favorites</p>}
+                {!isFavourite ? (
+                  <p>Add to favorites</p>
+                ) : (
+                  <p>Remove from favorites</p>
+                )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
           {(usersOrg === row.original.org || isAdmin) && (
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger
-                  className="transition-transform transform hover:scale-125 duration-300 ease-in-out"
-                  
-                >
+                <TooltipTrigger className="transition-transform transform hover:scale-125 duration-300 ease-in-out">
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive">
