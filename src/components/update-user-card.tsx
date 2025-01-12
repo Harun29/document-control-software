@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PencilIcon, Terminal } from "lucide-react";
+import { LoaderCircle, PencilIcon, Terminal } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 
@@ -56,6 +56,7 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(
     const [role, setRole] = useState<string | null>(user.role);
     const [org, setOrg] = useState<string | null>(user.org);
     const [loading, setLoading] = useState(true);
+    const [updateing, setUpdating] = useState(false);
     const [data, setData] = useState<{ id: string; name: string }[]>([]);
     const { user: authUser } = useAuth();
     const currentUserEmail = authUser?.userInfo?.email;
@@ -92,6 +93,7 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(
       }
 
       try {
+        setUpdating(true);
         const userRef = doc(db, "users", user.id);
 
         await updateDoc(userRef, {
@@ -137,6 +139,7 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(
 
         console.log("User information updated in Firestore");
         toast.success("User information updated successfully!");
+        setUpdating(false);
         onClose();
       } catch (error) {
         console.error("Error updating user information: ", error);
@@ -225,7 +228,8 @@ const UpdateUserCard = forwardRef<HTMLDivElement, UpdateUserCardProps>(
                 All fields are required in order to update user information!
               </AlertDescription>
             </Alert>
-            <Button onClick={handleUpdateUser} className="mt-4">
+            <Button disabled={updateing} onClick={handleUpdateUser} className="mt-4">
+              {updateing && <LoaderCircle className="h-4 w-4 animate-spin"/>}
               Update User
             </Button>
           </CardContent>

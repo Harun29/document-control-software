@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Copy, MoreHorizontal, Pencil, Trash } from "lucide-react";
+import { Copy, MoreHorizontal, Pencil, Trash, User2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export type Users = {
   id: string;
@@ -25,8 +26,16 @@ export const columns = (
   handleSelectUserToDelete: (user: Users) => void
 ): ColumnDef<Users>[] => [
   {
-    accessorKey: "id",
-    header: "User ID",
+    id: "id",
+    cell: ({ row }) => (
+      <div>
+        <Avatar>
+          <AvatarFallback>
+            <User2 />
+          </AvatarFallback>
+        </Avatar>
+      </div>
+    ),
   },
   {
     accessorKey: "email",
@@ -66,10 +75,10 @@ export const columns = (
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.id)}
+              onClick={() => navigator.clipboard.writeText(user.email)}
             >
               <Copy />
-              Copy user ID
+              Copy user Email
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleSelectUserToDelete(user)}>
               <Trash />

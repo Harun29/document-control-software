@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/config/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { Orgs, orgsColumns } from "./columns";
 import UpdateOrgCard from "../../components/update-org-card";
 import {
@@ -58,23 +58,21 @@ const ManageOrgs = () => {
   };
 
   useEffect(() => {
-    const fetchOrgs = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "org"));
-        const orgsList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Orgs[];
-        setData(orgsList);
-      } catch (error) {
-        console.error("Error fetching departments: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrgs();
+    const unsubscribe = onSnapshot(collection(db, "org"), (querySnapshot) => {
+      const orgsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Orgs[];
+      setData(orgsList);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching departments: ", error);
+      setLoading(false);
+    });
+  
+    return () => unsubscribe();
   }, []);
+  
 
   const handleModifyOrg = (org: Orgs) => {
     setSelectedOrg(org);

@@ -7,8 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PencilIcon, Terminal } from "lucide-react";
+import { LoaderCircle, PencilIcon, Terminal } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { Textarea } from "./ui/textarea";
 
 interface Org {
   id: string;
@@ -26,6 +27,7 @@ interface UpdateOrgCardProps {
 const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onClose }, ref) => {
   const [name, setName] = useState(org.name);
   const [description, setDescription] = useState(org.description);
+  const [loading, setLoading] = useState(false);
   const {user}= useAuth();
   const currentUserEmail = user?.userInfo?.email;
 
@@ -40,6 +42,7 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
     }
 
     try {
+      setLoading(true);
       const orgRef = doc(db, "org", org.id);
 
       await updateDoc(orgRef, {
@@ -60,6 +63,7 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
       }
 
       console.log("Department information updated in Firestore");
+      setLoading(false);
       onClose();
     } catch (error) {
       console.error("Error updating department information: ", error);
@@ -82,8 +86,7 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <Input
-            type="text"
+          <Textarea
             placeholder="Department Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -95,7 +98,10 @@ const UpdateOrgCard = forwardRef<HTMLDivElement, UpdateOrgCardProps>(({ org, onC
               All fields are required in order to update department information!
             </AlertDescription>
           </Alert>
-          <Button onClick={handleUpdateOrg} className="mt-4">Update Department</Button>
+          <Button disabled={loading} onClick={handleUpdateOrg} className="mt-4">
+            {loading && <LoaderCircle className="w-4 h-4 animate-spin" />}
+            Update Department
+          </Button>
         </CardContent>
       </Card>
     </div>

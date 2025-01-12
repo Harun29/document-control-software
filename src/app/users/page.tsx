@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { Users, columns } from "./columns";
 import UpdateUserCard from "../../components/update-user-card";
@@ -53,22 +53,19 @@ const ManageUsers = () => {
   };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "users"));
-        const usersList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Users[];
-        setData(usersList);
-      } catch (error) {
-        console.error("Error fetching users: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
+    const unsubscribe = onSnapshot(collection(db, "users"), (querySnapshot) => {
+      const usersList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Users[];
+      setData(usersList);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching users: ", error);
+      setLoading(false);
+    });
+  
+    return () => unsubscribe();
   }, []);
 
   const handleModifyUser = (user: Users) => {
