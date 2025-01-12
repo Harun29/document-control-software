@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/config/firebaseConfig";
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { Orgs, orgsColumns } from "./columns";
 import UpdateOrgCard from "../../components/update-org-card";
 import {
@@ -72,7 +72,7 @@ const ManageOrgs = () => {
   
     return () => unsubscribe();
   }, []);
-  
+
 
   const handleModifyOrg = (org: Orgs) => {
     setSelectedOrg(org);

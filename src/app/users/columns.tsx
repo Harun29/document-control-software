@@ -27,7 +27,7 @@ export const columns = (
 ): ColumnDef<Users>[] => [
   {
     id: "id",
-    cell: ({ row }) => (
+    cell: () => (
       <div>
         <Avatar>
           <AvatarFallback>
