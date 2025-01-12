@@ -99,7 +99,7 @@ const AllDocumentsTable = ({ org }: { org: string }) => {
     };
 
     fetchDocs();
-  }, [docs, org, docsByOrg]);
+  }, [docs, org, docsByOrg, user?.uid]);
 
   const handleAddToFavourites = async (document: DocRequest, isFavourite: boolean) => {
       try {

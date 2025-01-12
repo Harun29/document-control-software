@@ -20,17 +20,9 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-
-import { useRef, useState, useEffect } from "react";
-import CreateUserCard from "@/components/create-user-card";
-import CreateOrgCard from "@/components/create-org-card";
 import { useAuth } from "@/context/AuthContext";
-import { url } from "inspector";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [createUser, setCreateUser] = useState(false);
-  const createOrgRef = useRef<HTMLDivElement | null>(null);
-  const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
   const { isAdmin } = useAuth();
   const { isEditor } = useAuth();
@@ -177,7 +169,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         />
       </SidebarFooter>
       <SidebarRail />
-      {createUser && <CreateUserCard ref={createUserRef} />}
     </Sidebar>
   );
 }

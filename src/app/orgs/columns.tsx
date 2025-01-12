@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +13,7 @@ import {
   Trash,
   Mail,
   IdCard,
-  PlusCircle,
   UserPlus2Icon,
-  Search,
-  Star,
 } from "lucide-react";
 import {
   DropdownMenu,

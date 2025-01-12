@@ -2,12 +2,10 @@
 import { useRef, useState, useEffect } from "react";
 import { Notifs, useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import Image from "next/image";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { FaFilePdf } from "react-icons/fa";
 import {
-  Dot,
   FileInput,
   FilePlus2,
   FileText,

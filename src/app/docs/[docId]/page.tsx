@@ -150,7 +150,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
       }
     };
     checkAssignedDocs();
-  }, [assignedDocs, document?.fileURL]);
+  }, [assignedDocs, document?.fileURL, document?.fileName, document?.org]);
 
   useEffect(() => {
     const unwrapParams = async () => {
@@ -216,7 +216,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     } catch (err) {
       console.error("Error fetching all departments: ", err);
     }
-  }, [user?.userInfo?.org]);
+  }, [user?.userInfo?.org, usersOrg]);
 
   useEffect(() => {
     console.log("docId: ", docId, "docsOrg: ", docsOrg);
@@ -431,7 +431,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
     if (document?.favoritedBy) {
       setIsFavourite(document.favoritedBy.includes(user?.uid as string));
     }
-  }, [document]);
+  }, [document, user?.uid]);
 
   const handleAddToFavourites = async () => {
     try {

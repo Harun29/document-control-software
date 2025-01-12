@@ -57,7 +57,6 @@ import { useGeneral } from "@/context/GeneralContext";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { db } from "@/config/firebaseConfig";
-import { title } from "process";
 
 interface DocumentReviewDrawerProps {
   drawerTriggerRef: React.RefObject<HTMLButtonElement>;
