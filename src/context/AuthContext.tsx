@@ -200,7 +200,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
 
           setIsAdmin(!!idTokenResult.claims.admin);
-          setIsEditor(!!userInfo?.role && userInfo.role === "Editor");
+          setIsEditor(!!userInfo?.role && userInfo.role === "editor");
           setUsersOrg(userInfo?.org);
           setAssignedDocs(userInfo?.assignedDocs || []);
           console.log("isAdmin in context: ", !!idTokenResult.claims.admin);

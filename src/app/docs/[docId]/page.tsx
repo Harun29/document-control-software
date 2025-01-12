@@ -94,6 +94,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
   const { updateDocument } = useGeneral();
   const { user } = useAuth();
   const { isAdmin } = useAuth();
+  const { isEditor } = useAuth();
   const { usersOrg } = useAuth();
   const { assignedDocs } = useAuth();
   const [docId, setDocId] = useState<string | null>(null);
@@ -738,7 +739,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
               <p>{document?.summary}</p>
             </div>
             <div className="flex space-x-4">
-              {(document?.org === user?.userInfo?.orgName || isAdmin) && (
+              {((document?.org === user?.userInfo?.orgName && isEditor) || issAssignedToMe || isAdmin) && (
                 <Button
                   onClick={handleModifyDoc}
                   className="group flex items-center"
@@ -796,7 +797,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   </span>
                 </Button>
               </a>
-              {document?.org === user?.userInfo?.orgName && (
+              {(document?.org === user?.userInfo?.orgName && isEditor) && (
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button className="group flex items-center">
@@ -869,7 +870,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                 </Dialog>
               )}
               {/* implement later */}
-              {document?.org === user?.userInfo?.orgName && (
+              {(document?.org === user?.userInfo?.orgName && isEditor) && (
                 <Dialog>
                   <DialogTrigger>
                     <Button className="group flex items-center">
@@ -962,7 +963,7 @@ const ManageDocs = ({ params }: { params: Promise<{ docId: string }> }) => {
                   </DialogContent>
                 </Dialog>
               )}
-              {(document?.org === user?.userInfo?.orgName || isAdmin) && (
+              {((document?.org === user?.userInfo?.orgName && isEditor) || isAdmin) && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button

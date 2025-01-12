@@ -39,6 +39,7 @@ export const columns = (
   loadingAction: boolean,
   usersOrg: string,
   isAdmin: boolean,
+  isEditor: boolean,
   userId: string,
   assignedDocs: { docUrl: string; message: string }[]
 ): ColumnDef<DocRequest>[] => [
@@ -177,7 +178,7 @@ export const columns = (
 
       return (
         <div className="flex space-x-4 justify-self-end hidden-on-row">
-          {(usersOrg === row.original.org || isAdmin) && (
+          {((row.original?.org === usersOrg && isEditor) || isAdmin) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger
@@ -233,7 +234,7 @@ export const columns = (
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {(usersOrg === row.original.org || isAdmin) && (
+          {((row.original?.org === usersOrg && isEditor) || isAdmin) && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="transition-transform transform hover:scale-125 duration-300 ease-in-out">

@@ -80,6 +80,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
   const { updateDocument } = useGeneral();
   const { usersOrg } = useAuth();
   const { user } = useAuth();
+  const {isEditor} = useAuth();
 
   const handleConfirmModifyDoc = async (
     document: DocRequest,
@@ -288,7 +289,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
                   Open in new tab
                 </Button>
               </a>
-              <AlertDialog>
+              {isEditor && <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive">
                     <Trash className="w-4 h-4" />
@@ -315,7 +316,7 @@ const DocumentReviewDrawer: React.FC<DocumentReviewDrawerProps> = ({
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
-              </AlertDialog>
+              </AlertDialog>}
             </div>
           </div>
         </DrawerHeader>
