@@ -12,6 +12,7 @@ import {
   IdCard,
   Info,
   Mail,
+  User2,
   Users2,
 } from "lucide-react";
 import Notifications from "@/components/notifications";
@@ -50,6 +51,7 @@ export default function Home() {
   const { usersNotifs } = useAuth();
   const { usersUnreadNotifs } = useAuth();
   const { viewNotifications } = useAuth();
+  const { isAdmin } = useAuth();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [history, setHistory] = useState<History[]>([]);
   const [notifications, setNotifications] = useState<Notifs[]>([]);
@@ -160,57 +162,80 @@ export default function Home() {
               <span className="text-2xl">Documents</span>
             </div>
           </Link>
-          <Link
-            href="/docs/create"
-            className="pointer hover:scale-105 transition-all"
-          >
-            <div className="flex flex-col justify-center items-center">
-              <FilePlus2 className="w-32 h-32 mr-2" strokeWidth={1} />
-              <span className="text-2xl">Add Documents</span>
-            </div>
-          </Link>
-          <Link
-            href="/docs/requests"
-            className="pointer hover:scale-105 transition-all"
-          >
-            <div className="flex flex-col justify-center items-center">
-              <FileInput className="w-32 h-32 mr-2" strokeWidth={1} />
-              <span className="text-2xl">Document Requests</span>
-            </div>
-          </Link>
+          {!isAdmin ? (
+            <Link
+              href="/docs/create"
+              className="pointer hover:scale-105 transition-all"
+            >
+              <div className="flex flex-col justify-center items-center">
+                <FilePlus2 className="w-32 h-32 mr-2" strokeWidth={1} />
+                <span className="text-2xl">Add Documents</span>
+              </div>
+            </Link>
+          ) : (
+            <Link
+              href="/users"
+              className="pointer hover:scale-105 transition-all"
+            >
+              <div className="flex flex-col justify-center items-center">
+                <User2 className="w-32 h-32 mr-2" strokeWidth={1} />
+                <span className="text-2xl">Manage Users</span>
+              </div>
+            </Link>
+          )}
+          {!isAdmin ? (
+            <Link
+              href="/docs/requests"
+              className="pointer hover:scale-105 transition-all"
+            >
+              <div className="flex flex-col justify-center items-center">
+                <FileInput className="w-32 h-32 mr-2" strokeWidth={1} />
+                <span className="text-2xl">Document Requests</span>
+              </div>
+            </Link>
+          ) : (
+            <Link
+              href="/orgs"
+              className="pointer hover:scale-105 transition-all"
+            >
+              <div className="flex flex-col justify-center items-center">
+                <Users2 className="w-32 h-32 mr-2" strokeWidth={1} />
+                <span className="text-2xl">Manage Departments</span>
+              </div>
+            </Link>
+          )}
         </div>
       </div>
 
       {/* Content Section */}
-      <div
-        className="grid space-x-10 border-2 rounded-xl p-10"
-        style={{ gridTemplateColumns: "2fr 3fr 2fr" }}
-      >
+      <div className="grid grid-cols-[2fr_3fr_2fr] space-x-10 border-2 rounded-xl p-10">
         {/* Recent Documents */}
-        <div className="flex flex-col">
-          <span className="text-xl font-bold mb-6">Recent</span>
-          <div className="border-l-2 p-5 grid grid-cols-2 gap-x-20 gap-y-5">
-            {docs.map((doc) => (
-              <Link
-                href={`/docs/${doc.fileName}?orgName=${doc.org}`}
-                key={doc.id}
-                className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition-all"
-              >
-                {doc.fileType === "application/pdf" && (
-                  <FaFilePdf className="text-red-500 w-10 h-10 me-2" />
-                )}
-                <div className="flex flex-col text-center">
-                  <span className="truncate w-32">
-                    {doc.title.substring(0, 15)}...
-                  </span>
-                  <span className="text-muted-foreground text-sm">
-                    {doc.reqBy}
-                  </span>
-                </div>
-              </Link>
-            ))}
+        {!isAdmin && (
+          <div className="flex flex-col">
+            <span className="text-xl font-bold mb-6">Recent</span>
+            <div className="border-l-2 p-5 grid grid-cols-2 gap-x-20 gap-y-5">
+              {docs.map((doc) => (
+                <Link
+                  href={`/docs/${doc.fileName}?orgName=${doc.org}`}
+                  key={doc.id}
+                  className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition-all"
+                >
+                  {doc.fileType === "application/pdf" && (
+                    <FaFilePdf className="text-red-500 w-10 h-10 me-2" />
+                  )}
+                  <div className="flex flex-col text-center">
+                    <span className="truncate w-32">
+                      {doc.title.substring(0, 15)}...
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      {doc.reqBy}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         {/* History Section */}
         <div className="flex flex-col">
           <span className="text-xl font-bold mb-6">History</span>
@@ -235,40 +260,42 @@ export default function Home() {
         </div>
 
         {/* Notifications Section */}
-        <div className="flex flex-col">
-          <span className="text-xl font-bold mb-6">Notifications</span>
-          <div className="border-l-2 p-5 space-y-3 flex flex-col items-center">
-            {notifications.map(
-              (notif, index) =>
-                !notif.read && (
-                  <div
-                    key={index}
-                    className="text-muted-foreground place-self-start hover:text-secondary-foreground grid grid-cols-[auto_1fr] items-center space-x-2 cursor-pointer hover:scale-105 transform transition-all"
-                  >
-                    <Info className="w-6 h-6 text-blue-500" />
-                    <div className="flex flex-col m-2">
-                      <span>
-                        {notif.title}
-                        {": "}
-                        {notif.documentName?.substring(0, 15)}...
-                      </span>
+        {!isAdmin && (
+          <div className="flex flex-col">
+            <span className="text-xl font-bold mb-6">Notifications</span>
+            <div className="border-l-2 p-5 space-y-3 flex flex-col items-center">
+              {notifications.map(
+                (notif, index) =>
+                  !notif.read && (
+                    <div
+                      key={index}
+                      className="text-muted-foreground place-self-start hover:text-secondary-foreground grid grid-cols-[auto_1fr] items-center space-x-2 cursor-pointer hover:scale-105 transform transition-all"
+                    >
+                      <Info className="w-6 h-6 text-blue-500" />
+                      <div className="flex flex-col m-2">
+                        <span>
+                          {notif.title}
+                          {": "}
+                          {notif.documentName?.substring(0, 15)}...
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                )
+                  )
+              )}
+              {usersUnreadNotifs === 0 && (
+                <span className="text-muted-foreground">
+                  You don&apos;t have any new notifications!
+                </span>
+              )}
+              <Button onClick={() => setShowNotifs(true)} variant="secondary">
+                {usersUnreadNotifs > 0 ? "View All" : "View"}
+              </Button>
+            </div>
+            {(showNotifs || viewNotifications) && (
+              <Notifications closeNotifs={() => setShowNotifs(false)} />
             )}
-            {usersUnreadNotifs === 0 && (
-              <span className="text-muted-foreground">
-                You don&apos;t have any new notifications!
-              </span>
-            )}
-            <Button onClick={() => setShowNotifs(true)} variant="secondary">
-              {usersUnreadNotifs > 0 ? "View All" : "View"}
-            </Button>
           </div>
-          {(showNotifs || viewNotifications) && (
-            <Notifications closeNotifs={() => setShowNotifs(false)} />
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
