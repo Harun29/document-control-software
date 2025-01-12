@@ -104,7 +104,7 @@ const UsersCell = ({ orgUsers }: { orgUsers: string[] }) => {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <div className="max-h-96 overflow-y-auto custom-scrollbar">
+            <div className="max-h-96 overflow-y-auto custom-scrollbar space-y-3">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <div
@@ -121,7 +121,7 @@ const UsersCell = ({ orgUsers }: { orgUsers: string[] }) => {
                         {user.firstName} {user.lastName}
                       </strong>
                     </div>
-                    <div className="ml-2">
+                    <div className="ml-2 text-muted-foreground text-sm">
                       <div className="flex mb-2">
                         <Mail />
                         <span className="ml-2">{user.email}</span>
