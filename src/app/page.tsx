@@ -63,34 +63,32 @@ export default function Home() {
         if (user) {
           if (user?.userInfo?.org) {
             // Fetch Recent Docs
-            const docsQuery = query(
-              collection(db, "org", user.userInfo.org, "docs"),
-              limit(6),
-              orderBy("createdAt", "desc")
-            );
-            const docsSnapshot = await getDocs(docsQuery);
-            const docsList = docsSnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-
-            // Fetch History
-            const historyQuery = query(
-              collection(db, "history"),
-              limit(4),
-              orderBy("timestamp", "desc")
-            );
-            const historySnapshot = await getDocs(historyQuery);
-            const historyList = historySnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-
-            setDocs(docsList as Doc[]);
-            setHistory(historyList as History[]);
-            console.log("Notifications: ", usersNotifs);
-            setNotifications(usersNotifs.slice(0, 5) as Notifs[]);
+              const docsQuery = query(
+                collection(db, "org", user.userInfo.org, "docs"),
+                limit(6),
+                orderBy("createdAt", "desc")
+              );
+              const docsSnapshot = await getDocs(docsQuery);
+              const docsList = docsSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              setDocs(docsList as Doc[]);
+              setNotifications(usersNotifs.slice(0, 5) as Notifs[]);
           }
+          // Fetch History
+          const historyQuery = query(
+            collection(db, "history"),
+            limit(4),
+            orderBy("timestamp", "desc")
+          );
+          const historySnapshot = await getDocs(historyQuery);
+          const historyList = historySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          setHistory(historyList as History[]);
         }
       };
 
