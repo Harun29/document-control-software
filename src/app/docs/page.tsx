@@ -10,9 +10,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 const ManageDocs = () => {
   const [orgs, setOrgs] = useState<string[]>([]);
+  const { isAdmin } = useAuth();
   useEffect(() => {
     const fetchOrgs = async () => {
       try {
@@ -53,10 +55,10 @@ const ManageDocs = () => {
                 <Star className="w-4 h-4 mr-2" />
                 Favorites
               </TabsTrigger>
-              <TabsTrigger value="mydocuments">
+              {!isAdmin && <TabsTrigger value="mydocuments">
                 <User2 className="w-4 h-4 mr-2" />
                 My Documents
-              </TabsTrigger>
+              </TabsTrigger>}
               {orgs.map((org) => (
                 <TabsTrigger key={org} value={org}>
                   <Folder className="w-4 h-4 mr-2" />
@@ -64,12 +66,12 @@ const ManageDocs = () => {
                 </TabsTrigger>
               ))}
               </div>
-              <Link href="/docs/create">
+              {!isAdmin && <Link href="/docs/create">
                 <Button variant="default" className="ml-4">
                   <FilePlus2 className="w-4 h-4 mr-2" />
                   Create Document
                 </Button>
-              </Link>
+              </Link>}
             </TabsList>
             <TabsContent value="alldocuments">
               <AllDocumentsTable org="" />
