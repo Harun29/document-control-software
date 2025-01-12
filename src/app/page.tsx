@@ -18,6 +18,7 @@ import {
 import Notifications from "@/components/notifications";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useGeneral } from "@/context/GeneralContext";
 
 export type Doc = {
   id: string;
@@ -52,6 +53,7 @@ export default function Home() {
   const { usersUnreadNotifs } = useAuth();
   const { viewNotifications } = useAuth();
   const { isAdmin } = useAuth();
+  const {docs: allDocs} = useGeneral();
   const [docs, setDocs] = useState<Doc[]>([]);
   const [history, setHistory] = useState<History[]>([]);
   const [notifications, setNotifications] = useState<Notifs[]>([]);
@@ -75,6 +77,9 @@ export default function Home() {
               }));
               setDocs(docsList as Doc[]);
               setNotifications(usersNotifs.slice(0, 5) as Notifs[]);
+          }else{
+            console.log("All Docs: ", allDocs);
+            setDocs(allDocs.slice(0, 6) as unknown as Doc[]);
           }
           // Fetch History
           const historyQuery = query(
@@ -206,9 +211,8 @@ export default function Home() {
       </div>
 
       {/* Content Section */}
-      <div className="grid grid-cols-[2fr_3fr_2fr] space-x-10 border-2 rounded-xl p-10">
+      <div className={`grid ${!isAdmin ? "grid-cols-[2fr_3fr_2fr]" : "grid-cols-[1fr_1fr]"} space-x-10 border-2 rounded-xl p-10`}>
         {/* Recent Documents */}
-        {!isAdmin && (
           <div className="flex flex-col">
             <span className="text-xl font-bold mb-6">Recent</span>
             <div className="border-l-2 p-5 grid grid-cols-2 gap-x-20 gap-y-5">
@@ -233,7 +237,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-        )}
+        
         {/* History Section */}
         <div className="flex flex-col">
           <span className="text-xl font-bold mb-6">History</span>
@@ -254,6 +258,11 @@ export default function Home() {
                 </span>
               </div>
             ))}
+            <Link href="/history" className="w-full">
+            <Button className="w-full" variant="secondary">
+              View All
+            </Button>
+            </Link>
           </div>
         </div>
 
@@ -285,7 +294,7 @@ export default function Home() {
                   You don&apos;t have any new notifications!
                 </span>
               )}
-              <Button onClick={() => setShowNotifs(true)} variant="secondary">
+              <Button onClick={() => setShowNotifs(true)} variant="secondary" className="w-full">
                 {usersUnreadNotifs > 0 ? "View All" : "View"}
               </Button>
             </div>
