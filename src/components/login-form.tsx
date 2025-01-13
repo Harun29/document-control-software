@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { useAuth } from "@/context/AuthContext"
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Terminal } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -24,7 +26,11 @@ export function LoginForm({
     try {
       await login(email, password);
     } catch (err) {
-      setError((err as Error).message || "Failed to login");
+      if((err as Error).message === "Firebase: Error (auth/invalid-credential).") {
+        setError("Invalid email or password!");
+      }else{
+        setError((err as Error).message || "Failed to login");
+      }
     }
   };
 
@@ -50,7 +56,15 @@ export function LoginForm({
         <Button type="submit" className="w-full">
           Login
         </Button>
-        {error && <div className="text-sm text-red-500">{error}</div>}
+        {error && 
+        <Alert variant="destructive">
+        <Terminal className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          {error}
+        </AlertDescription>
+      </Alert>
+        }
         
       </div>
       <div className="text-center text-sm">
