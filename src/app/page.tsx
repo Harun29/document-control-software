@@ -202,7 +202,7 @@ export default function Home() {
           {/* search */}
           <Input
             type="text"
-            placeholder="Search documents..."
+            placeholder="Search all documents..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`border-2 rounded-xl p-3 ${
