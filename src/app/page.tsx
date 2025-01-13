@@ -49,7 +49,7 @@ export default function Home() {
 
   useEffect(() => {
     setFilteredDocs(
-      docs.filter(
+      allDocs.filter(
         (doc) =>
           doc.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
           searchQuery !== ""
