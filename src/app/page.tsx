@@ -6,6 +6,8 @@ import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { FaFilePdf } from "react-icons/fa";
 import {
+  Bell,
+  BellDot,
   Calendar,
   FileInput,
   FilePlus2,
@@ -21,6 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGeneral } from "@/context/GeneralContext";
 import { DocRequest } from "./docs/types";
 import { Input } from "@/components/ui/input";
+import Notifications from "@/components/notifications";
 
 export type History = {
   id: string;
@@ -37,15 +40,14 @@ export default function Home() {
   const createUserRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAuth();
   const { usersNotifs } = useAuth();
-  // const { usersUnreadNotifs } = useAuth();
-  // const { viewNotifications } = useAuth();
+  const { usersUnreadNotifs } = useAuth();
+  const { viewNotifications } = useAuth();
   const { isAdmin } = useAuth();
   const {isEditor} = useAuth();
   const { docs: allDocs } = useGeneral();
   const [docs, setDocs] = useState<DocRequest[]>([]);
   const [history, setHistory] = useState<History[]>([]);
-  // const [notifications, setNotifications] = useState<Notifs[]>([]);
-  // const [showNotifs, setShowNotifs] = useState(false);
+  const [showNotifs, setShowNotifs] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredDocs, setFilteredDocs] = useState(docs); // Assuming `docs` is the initial list of documents
 
@@ -73,7 +75,6 @@ export default function Home() {
             const docsSnapshot = await getDocs(docsQuery);
             const docsList = docsSnapshot.docs.map((doc) => doc.data());
             setDocs(docsList as DocRequest[]);
-            // setNotifications(usersNotifs.slice(0, 5) as Notifs[]);
           } else {
             console.log("All Docs: ", allDocs);
             setDocs(allDocs.slice(0, 6) as DocRequest[]);
@@ -126,7 +127,7 @@ export default function Home() {
 
   return (
     <div className="p-16 overflow-auto h-full grid grid-cols-[2fr_3fr] gap-10">
-      <div className="flex items-center border-2 rounded-xl p-7">
+      <div className="flex items-center border-2 rounded-xl p-7 relative">
         <div className="mr-10">
           <Avatar className="w-24 h-24">
             <AvatarImage src="https://github.com/shadcn.png" />
@@ -153,6 +154,9 @@ export default function Home() {
             </span>
           )}
         </div>
+        {usersUnreadNotifs > 0 ? <BellDot onClick={() => setShowNotifs(true)} className="absolute top-10 right-10 w-10 h-10 text-blue-500 cursor-pointer hover:scale-105 transition-all" />: 
+          <Bell onClick={() => setShowNotifs(true)} className="absolute top-10 right-10 w-10 h-10 cursor-pointer hover:scale-105 transition-all" />
+          }
       </div>
       <div className="grid grid-cols-3 gap-10 border-2 rounded-xl p-7">
         <Link href="/docs" className="pointer hover:scale-105 transition-all">
@@ -366,11 +370,11 @@ export default function Home() {
                 {usersUnreadNotifs > 0 ? "View All" : "View"}
               </Button>
             </div>
-            {(showNotifs || viewNotifications) && (
-              <Notifications closeNotifs={() => setShowNotifs(false)} />
-            )}
-          </div>
-        )} */}
+            </div>
+            )} */}
+          {(showNotifs || viewNotifications) && (
+            <Notifications closeNotifs={() => setShowNotifs(false)} />
+          )}
       </div>
     </div>
   );
