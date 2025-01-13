@@ -123,7 +123,7 @@ export default function Home() {
   }, [createUser, createOrg]);
 
   return (
-    <div className="p-16 overflow-auto h-full grid grid-cols-[1fr_2fr] gap-10">
+    <div className="p-16 overflow-auto h-full grid grid-cols-[2fr_3fr] gap-10">
       <div className="flex items-center border-2 rounded-xl p-7">
         <div className="mr-10">
           <Avatar className="w-24 h-24">
@@ -260,37 +260,36 @@ export default function Home() {
         <div className="flex flex-col">
           <span className="text-xl font-bold mb-6">Recent</span>
           <div className="border-l-2 p-5 grid grid-cols-2 gap-x-20 gap-y-5">
-          {docs.map((doc) => (
-  <Link
-  key={doc.fileName}
-  href={`/docs/${doc.fileName}?orgName=${doc.org}`}
-  className="flex items-center gap-4 p-4 bg-background border rounded-lg hover:bg-secondary hover:shadow-md transition-all transform hover:scale-[1.02] focus:outline focus:outline-2 focus:outline-blue-500"
->
-  <FaFilePdf className="text-red-500 w-12 h-12 flex-shrink-0" />
-  <div className="flex flex-col gap-1">
-    <span className="text-lg font-medium text-primary">
-      {doc.title.substring(0, 20)}...
-    </span>
-    <div className="flex items-center gap-2 text-muted-foreground text-sm">
-      <User2 className="w-4 h-4" />
-      <span>{doc.reqBy}</span>
-    </div>
-    <div className="flex items-center gap-2 text-muted-foreground text-xs">
-      <Calendar className="w-4 h-4" />
-      <span>
-        {(doc.createdAt as any)
-          .toDate()
-          .toLocaleDateString("en-GB", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-      </span>
-    </div>
-  </div>
-</Link>
-))}
-
+            {docs.map((doc) => (
+              <Link
+                key={doc.fileName}
+                href={`/docs/${doc.fileName}?orgName=${doc.org}`}
+                className="flex items-center gap-4 p-4 bg-background border rounded-lg hover:bg-secondary hover:shadow-md transition-all transform hover:scale-[1.02] focus:outline focus:outline-2 focus:outline-blue-500"
+              >
+                <FaFilePdf className="text-red-500 w-12 h-12 flex-shrink-0" />
+                <div className="flex flex-col gap-1">
+                  <span className="text-lg font-medium text-primary">
+                    {doc.title.substring(0, 20)}...
+                  </span>
+                  <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                    <User2 className="w-4 h-4" />
+                    <span>{doc.reqBy.substring(0,23)}...</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                    <Calendar className="w-4 h-4" />
+                    <span>
+                      {(doc.createdAt as any)
+                        .toDate()
+                        .toLocaleDateString("en-GB", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
 
