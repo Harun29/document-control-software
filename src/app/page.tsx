@@ -10,6 +10,7 @@ import {
   FileInput,
   FilePlus2,
   FileText,
+  History,
   IdCard,
   Mail,
   User2,
@@ -39,6 +40,7 @@ export default function Home() {
   // const { usersUnreadNotifs } = useAuth();
   // const { viewNotifications } = useAuth();
   const { isAdmin } = useAuth();
+  const {isEditor} = useAuth();
   const { docs: allDocs } = useGeneral();
   const [docs, setDocs] = useState<DocRequest[]>([]);
   const [history, setHistory] = useState<History[]>([]);
@@ -180,7 +182,7 @@ export default function Home() {
             </div>
           </Link>
         )}
-        {!isAdmin ? (
+        {(!isAdmin && isEditor) ? (
           <Link
             href="/docs/requests"
             className="pointer hover:scale-105 transition-all"
@@ -190,14 +192,21 @@ export default function Home() {
               <span className="text-2xl">Document Requests</span>
             </div>
           </Link>
-        ) : (
+        ) : isAdmin ? (
           <Link href="/orgs" className="pointer hover:scale-105 transition-all">
             <div className="flex flex-col justify-center items-center">
               <Users2 className="w-32 h-32 mr-2" strokeWidth={1} />
               <span className="text-2xl">Manage Departments</span>
             </div>
           </Link>
-        )}
+        ): 
+        <Link href="/history" className="pointer hover:scale-105 transition-all">
+            <div className="flex flex-col justify-center items-center">
+              <History className="w-32 h-32 mr-2" strokeWidth={1} />
+              <span className="text-2xl">History</span>
+            </div>
+          </Link>
+        }
         <div className="col-span-3 relative">
           {/* search */}
           <Input
